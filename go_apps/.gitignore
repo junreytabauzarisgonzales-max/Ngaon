@@ -1,0 +1,11 @@
+.dart_tool/
+build/
+.idea/
+*.iml
+.packages
+pubspec_overrides.yaml
+**/android/app/google-services.json
+local.properties
+dist/
+backend/.env
+backend/data/

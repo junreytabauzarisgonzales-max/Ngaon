@@ -1,0 +1,30 @@
+[
+  {
+    "id": "65469637-7e4c-569b-88fe-420b4c071e6c",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3",
+    "sender": "system",
+    "text": "Rider Jamal H. is on the way.",
+    "created_at": "2026-11-13T00:11:00Z"
+  },
+  {
+    "id": "6b5178e9-7180-52df-8b89-c6f6f7e518e9",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3",
+    "sender": "rider",
+    "text": "Nasa gate na po ako.",
+    "created_at": "2026-11-13T00:16:00Z"
+  },
+  {
+    "id": "3cde1828-5588-5a11-98cd-fd74860c7f1f",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3",
+    "sender": "customer",
+    "text": "Okay, palabas na po.",
+    "created_at": "2026-11-13T00:16:30Z"
+  },
+  {
+    "id": "82a29eab-66ae-5b52-bff8-78e2c190bc21",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3",
+    "sender": "customer",
+    "image_url": "https://picsum.photos/seed/chat1/400",
+    "created_at": "2026-11-13T00:17:00Z"
+  }
+]

@@ -1,0 +1,359 @@
+[
+  {
+    "id": "408c11b0-e794-511d-883f-42da1dcfeae3",
+    "code": "GO-4821",
+    "service": "ride",
+    "status": "completed",
+    "created_at": "2026-11-13T00:10:00Z",
+    "updated_at": "2026-11-13T00:31:00Z",
+    "pickup": {
+      "address": "Lamion, near Barangay Hall, Bongao",
+      "location": {
+        "lat": 5.0251,
+        "lng": 119.7769
+      }
+    },
+    "dropoff": {
+      "address": "Provincial Capitol, Bongao",
+      "location": {
+        "lat": 5.0362,
+        "lng": 119.7795
+      }
+    },
+    "rider": {
+      "id": "ec806477-3125-579c-882f-8410a1a5bfd5",
+      "name": "Jamal H.",
+      "photo_url": "https://picsum.photos/seed/rider1/200",
+      "phone_masked": "+63 918 ••• 2222",
+      "plate": "123 ABC",
+      "make_model": "Honda Click 125i",
+      "color": "Red",
+      "rating": 4.9
+    },
+    "fare": {
+      "breakdown": [
+        {
+          "label": "Base fare",
+          "amount_centavos": 4000
+        },
+        {
+          "label": "Distance 1.6 km",
+          "amount_centavos": 2400
+        }
+      ],
+      "total_centavos": 6400
+    },
+    "payment": {
+      "method": "cash",
+      "status": "paid"
+    },
+    "allowed_actions": [
+      "rate"
+    ],
+    "timeline": [
+      {
+        "status": "searching",
+        "at": "2026-11-13T00:10:00Z"
+      },
+      {
+        "status": "rider_assigned",
+        "at": "2026-11-13T00:11:00Z"
+      },
+      {
+        "status": "arrived_pickup",
+        "at": "2026-11-13T00:16:00Z"
+      },
+      {
+        "status": "picked_up",
+        "at": "2026-11-13T00:18:00Z"
+      },
+      {
+        "status": "arrived_dropoff",
+        "at": "2026-11-13T00:30:00Z"
+      },
+      {
+        "status": "completed",
+        "at": "2026-11-13T00:31:00Z"
+      }
+    ]
+  },
+  {
+    "id": "547307a8-f0f6-5b9e-a397-e7240b588535",
+    "code": "GO-4790",
+    "service": "food",
+    "status": "completed",
+    "created_at": "2026-11-12T04:00:00Z",
+    "updated_at": "2026-11-12T04:52:00Z",
+    "pickup": {
+      "address": "Datu Halun St., Poblacion, Bongao",
+      "location": {
+        "lat": 5.0291,
+        "lng": 119.7712
+      },
+      "contact_name": "Kusina Bongao"
+    },
+    "dropoff": {
+      "address": "Lamion, near Barangay Hall, Bongao",
+      "location": {
+        "lat": 5.0251,
+        "lng": 119.7769
+      }
+    },
+    "rider": {
+      "id": "ec806477-3125-579c-882f-8410a1a5bfd5",
+      "name": "Jamal H.",
+      "photo_url": "https://picsum.photos/seed/rider1/200",
+      "phone_masked": "+63 918 ••• 2222",
+      "plate": "123 ABC",
+      "make_model": "Honda Click 125i",
+      "color": "Red",
+      "rating": 4.9
+    },
+    "merchant": {
+      "id": "56611fc1-cc08-5113-9d5c-3b71372dcd53",
+      "name": "Kusina Bongao",
+      "phone_masked": "+63 917 ••• 8890"
+    },
+    "food": {
+      "items": [
+        {
+          "name": "Chicken adobo",
+          "quantity": 2,
+          "addons": [
+            "Garlic rice"
+          ],
+          "line_total_centavos": 25000
+        },
+        {
+          "name": "Buko juice",
+          "quantity": 1,
+          "addons": [],
+          "note": "Less ice",
+          "line_total_centavos": 5000
+        }
+      ],
+      "subtotal_centavos": 30000,
+      "prep_time_minutes": 20,
+      "ready_at": "2026-11-12T04:25:00Z",
+      "is_ready": true
+    },
+    "fare": {
+      "breakdown": [
+        {
+          "label": "Food subtotal",
+          "amount_centavos": 30000
+        },
+        {
+          "label": "Delivery fee",
+          "amount_centavos": 4900
+        },
+        {
+          "label": "Service fee",
+          "amount_centavos": 1000
+        }
+      ],
+      "total_centavos": 35900
+    },
+    "payment": {
+      "method": "gcash",
+      "status": "paid"
+    },
+    "proof_url": "https://picsum.photos/seed/pod1/600/800",
+    "allowed_actions": [],
+    "timeline": [
+      {
+        "status": "pending_payment",
+        "at": "2026-11-12T04:00:00Z"
+      },
+      {
+        "status": "merchant_pending",
+        "at": "2026-11-12T04:01:00Z"
+      },
+      {
+        "status": "merchant_preparing",
+        "at": "2026-11-12T04:03:00Z"
+      },
+      {
+        "status": "searching",
+        "at": "2026-11-12T04:15:00Z"
+      },
+      {
+        "status": "rider_assigned",
+        "at": "2026-11-12T04:16:00Z"
+      },
+      {
+        "status": "arrived_pickup",
+        "at": "2026-11-12T04:24:00Z"
+      },
+      {
+        "status": "picked_up",
+        "at": "2026-11-12T04:30:00Z"
+      },
+      {
+        "status": "arrived_dropoff",
+        "at": "2026-11-12T04:50:00Z"
+      },
+      {
+        "status": "completed",
+        "at": "2026-11-12T04:52:00Z"
+      }
+    ]
+  },
+  {
+    "id": "6998e5d9-023f-5aea-af06-33f4769d19fa",
+    "code": "GO-4755",
+    "service": "pabili",
+    "status": "completed",
+    "created_at": "2026-11-10T07:00:00Z",
+    "updated_at": "2026-11-10T07:55:00Z",
+    "pickup": {
+      "address": "Bongao Public Market",
+      "location": {
+        "lat": 5.0296,
+        "lng": 119.7727
+      }
+    },
+    "dropoff": {
+      "address": "Lamion, near Barangay Hall, Bongao",
+      "location": {
+        "lat": 5.0251,
+        "lng": 119.7769
+      }
+    },
+    "rider": {
+      "id": "ec806477-3125-579c-882f-8410a1a5bfd5",
+      "name": "Jamal H.",
+      "photo_url": "https://picsum.photos/seed/rider1/200",
+      "phone_masked": "+63 918 ••• 2222",
+      "plate": "123 ABC",
+      "make_model": "Honda Click 125i",
+      "color": "Red",
+      "rating": 4.9
+    },
+    "pabili": {
+      "store_name": "Bongao Public Market",
+      "items": [
+        {
+          "name": "Tomatoes",
+          "quantity": 1,
+          "note": "1 kilo"
+        },
+        {
+          "name": "Eggs",
+          "quantity": 12
+        }
+      ],
+      "receipt_url": "https://picsum.photos/seed/receipt1/600/800",
+      "item_total_centavos": 21500
+    },
+    "fare": {
+      "breakdown": [
+        {
+          "label": "Pabili fee",
+          "amount_centavos": 6000
+        },
+        {
+          "label": "Items (receipt)",
+          "amount_centavos": 21500
+        }
+      ],
+      "total_centavos": 27500
+    },
+    "payment": {
+      "method": "cash",
+      "status": "paid"
+    },
+    "proof_url": "https://picsum.photos/seed/pod2/600/800",
+    "allowed_actions": [],
+    "timeline": [
+      {
+        "status": "searching",
+        "at": "2026-11-10T07:00:00Z"
+      },
+      {
+        "status": "rider_assigned",
+        "at": "2026-11-10T07:02:00Z"
+      },
+      {
+        "status": "arrived_pickup",
+        "at": "2026-11-10T07:12:00Z"
+      },
+      {
+        "status": "items_purchased",
+        "at": "2026-11-10T07:35:00Z"
+      },
+      {
+        "status": "picked_up",
+        "at": "2026-11-10T07:37:00Z"
+      },
+      {
+        "status": "arrived_dropoff",
+        "at": "2026-11-10T07:53:00Z"
+      },
+      {
+        "status": "completed",
+        "at": "2026-11-10T07:55:00Z"
+      }
+    ]
+  },
+  {
+    "id": "6fd852d1-8e4a-5492-ba8d-13797e70081e",
+    "code": "GO-4702",
+    "service": "padala",
+    "status": "cancelled",
+    "created_at": "2026-11-08T09:00:00Z",
+    "updated_at": "2026-11-08T09:05:00Z",
+    "pickup": {
+      "address": "Lamion, near Barangay Hall, Bongao",
+      "location": {
+        "lat": 5.0251,
+        "lng": 119.7769
+      }
+    },
+    "dropoff": {
+      "address": "MSU Tawi-Tawi, Sanga-Sanga",
+      "location": {
+        "lat": 5.0467,
+        "lng": 119.7484
+      },
+      "contact_name": "Nur Ali",
+      "contact_phone": "+639201234567"
+    },
+    "padala": {
+      "size": "small",
+      "description": "Documents in an envelope",
+      "recipient_name": "Nur Ali",
+      "recipient_phone": "+639201234567"
+    },
+    "fare": {
+      "breakdown": [
+        {
+          "label": "Base fare",
+          "amount_centavos": 5000
+        },
+        {
+          "label": "Distance 4.1 km",
+          "amount_centavos": 6200
+        }
+      ],
+      "total_centavos": 11200
+    },
+    "payment": {
+      "method": "cash",
+      "status": "pending"
+    },
+    "cancel_reason": "Changed my mind",
+    "cancelled_by": "customer",
+    "allowed_actions": [],
+    "timeline": [
+      {
+        "status": "searching",
+        "at": "2026-11-08T09:00:00Z"
+      },
+      {
+        "status": "cancelled",
+        "at": "2026-11-08T09:05:00Z"
+      }
+    ]
+  }
+]

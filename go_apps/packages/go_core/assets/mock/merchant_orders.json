@@ -1,0 +1,94 @@
+[
+  {
+    "id": "73f3b3b2-76ab-52d0-abef-0b7ea47307f0",
+    "job_id": "547307a8-f0f6-5b9e-a397-e7240b588535",
+    "code": "GO-4790",
+    "status": "completed",
+    "created_at": "2026-11-12T04:01:00Z",
+    "prep_time_minutes": 20,
+    "ready_at": "2026-11-12T04:25:00Z",
+    "items": [
+      {
+        "name": "Chicken adobo",
+        "quantity": 2,
+        "addons": [
+          "Garlic rice"
+        ],
+        "line_total_centavos": 25000
+      },
+      {
+        "name": "Buko juice",
+        "quantity": 1,
+        "addons": [],
+        "note": "Less ice",
+        "line_total_centavos": 5000
+      }
+    ],
+    "subtotal_centavos": 30000,
+    "commission_centavos": 3000,
+    "net_centavos": 27000,
+    "payment_method": "gcash",
+    "rider": {
+      "name": "Jamal H.",
+      "photo_url": "https://picsum.photos/seed/rider1/200",
+      "plate": "123 ABC",
+      "phone_masked": "+63 918 ••• 2222"
+    },
+    "customer_first_name": "Aisha",
+    "allowed_actions": []
+  },
+  {
+    "id": "3707f492-de84-5a98-bd62-050c1be5609b",
+    "job_id": "9765ea82-2d56-54c0-9aa7-ce457dd5544d",
+    "code": "GO-4831",
+    "status": "new",
+    "created_at": "2026-11-14T14:00:00Z",
+    "merchant_accept_deadline": "2026-11-14T14:03:00Z",
+    "items": [
+      {
+        "name": "Beef kaldereta",
+        "quantity": 1,
+        "addons": [
+          "Plain rice",
+          "Iced tea"
+        ],
+        "line_total_centavos": 18500
+      }
+    ],
+    "subtotal_centavos": 18500,
+    "commission_centavos": 1850,
+    "net_centavos": 16650,
+    "payment_method": "cash",
+    "rider_pays_at_pickup_centavos": 16650,
+    "customer_first_name": "Omar",
+    "notes": "Please add extra sauce",
+    "allowed_actions": [
+      "accept",
+      "reject"
+    ]
+  },
+  {
+    "id": "b3e09c3c-33c0-5dd0-a82a-751692ae00f0",
+    "job_id": "4ebf0231-7d90-5d84-89b7-2c20cfbe0c2b",
+    "code": "GO-4777",
+    "status": "rejected",
+    "created_at": "2026-11-11T11:00:00Z",
+    "items": [
+      {
+        "name": "Chicken curry",
+        "quantity": 1,
+        "addons": [
+          "Spicy"
+        ],
+        "line_total_centavos": 10500
+      }
+    ],
+    "subtotal_centavos": 10500,
+    "commission_centavos": 0,
+    "net_centavos": 0,
+    "payment_method": "maya",
+    "customer_first_name": "Fatima",
+    "reject_reason": "out_of_stock",
+    "allowed_actions": []
+  }
+]

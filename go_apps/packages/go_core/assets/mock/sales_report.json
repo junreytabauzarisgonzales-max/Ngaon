@@ -1,0 +1,52 @@
+{
+  "from": "2026-11-08",
+  "to": "2026-11-14",
+  "orders_count": 61,
+  "gross_centavos": 1043500,
+  "commission_centavos": 104350,
+  "net_centavos": 939150,
+  "days": [
+    {
+      "date": "2026-11-08",
+      "orders_count": 7,
+      "gross_centavos": 118000,
+      "net_centavos": 106200
+    },
+    {
+      "date": "2026-11-09",
+      "orders_count": 10,
+      "gross_centavos": 171500,
+      "net_centavos": 154350
+    },
+    {
+      "date": "2026-11-10",
+      "orders_count": 8,
+      "gross_centavos": 140000,
+      "net_centavos": 126000
+    },
+    {
+      "date": "2026-11-11",
+      "orders_count": 9,
+      "gross_centavos": 152000,
+      "net_centavos": 136800
+    },
+    {
+      "date": "2026-11-12",
+      "orders_count": 11,
+      "gross_centavos": 189000,
+      "net_centavos": 170100
+    },
+    {
+      "date": "2026-11-13",
+      "orders_count": 9,
+      "gross_centavos": 160500,
+      "net_centavos": 144450
+    },
+    {
+      "date": "2026-11-14",
+      "orders_count": 7,
+      "gross_centavos": 112500,
+      "net_centavos": 101250
+    }
+  ]
+}

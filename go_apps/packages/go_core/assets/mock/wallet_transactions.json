@@ -1,0 +1,45 @@
+[
+  {
+    "id": "536e4c97-cc64-5a1e-90ef-8973caca5041",
+    "type": "commission",
+    "amount_centavos": -1300,
+    "balance_after_centavos": 35000,
+    "note": "Commission GO-4821",
+    "created_at": "2026-11-13T00:31:00Z",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3"
+  },
+  {
+    "id": "9c6673e1-d550-5607-8eb5-3f1b19078936",
+    "type": "earning",
+    "amount_centavos": 6400,
+    "balance_after_centavos": 36300,
+    "note": "Cash fare GO-4821",
+    "created_at": "2026-11-13T00:31:00Z",
+    "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3"
+  },
+  {
+    "id": "3f5a0468-8802-5e37-867c-5e5a48a08fa1",
+    "type": "commission",
+    "amount_centavos": -1200,
+    "balance_after_centavos": 36300,
+    "note": "Commission GO-4790",
+    "created_at": "2026-11-12T04:52:00Z",
+    "job_id": "547307a8-f0f6-5b9e-a397-e7240b588535"
+  },
+  {
+    "id": "1305d02c-f941-5963-ab00-3519270d21e4",
+    "type": "topup",
+    "amount_centavos": 20000,
+    "balance_after_centavos": 37500,
+    "note": "GCash top-up",
+    "created_at": "2026-11-11T01:00:00Z"
+  },
+  {
+    "id": "70a314d5-6b42-5efd-a243-f1c12d86d651",
+    "type": "adjustment",
+    "amount_centavos": 500,
+    "balance_after_centavos": 17500,
+    "note": "Weather bonus",
+    "created_at": "2026-11-09T10:00:00Z"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Bongao Public Market",
+    "address": "Poblacion, Bongao",
+    "location": {
+      "lat": 5.0296,
+      "lng": 119.7727
+    }
+  },
+  {
+    "name": "Tawi-Tawi Provincial Capitol",
+    "address": "Capitol Hill, Bongao",
+    "location": {
+      "lat": 5.0362,
+      "lng": 119.7795
+    }
+  },
+  {
+    "name": "MSU Tawi-Tawi",
+    "address": "Sanga-Sanga, Bongao",
+    "location": {
+      "lat": 5.0467,
+      "lng": 119.7484
+    }
+  },
+  {
+    "name": "Bongao Port",
+    "address": "Port Area, Bongao",
+    "location": {
+      "lat": 5.0288,
+      "lng": 119.7741
+    }
+  },
+  {
+    "name": "Sanga-Sanga Airport",
+    "address": "Sanga-Sanga, Bongao",
+    "location": {
+      "lat": 5.0466,
+      "lng": 119.7426
+    }
+  },
+  {
+    "name": "Bud Bongao Trailhead",
+    "address": "Pasiagan, Bongao",
+    "location": {
+      "lat": 5.0252,
+      "lng": 119.7655
+    }
+  },
+  {
+    "name": "Tawi-Tawi Provincial Hospital",
+    "address": "Tubig Boh, Bongao",
+    "location": {
+      "lat": 5.0327,
+      "lng": 119.7767
+    }
+  },
+  {
+    "name": "Bongao Municipal Hall",
+    "address": "Poblacion, Bongao",
+    "location": {
+      "lat": 5.0302,
+      "lng": 119.7735
+    }
+  }
+]

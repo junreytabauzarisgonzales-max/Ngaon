@@ -1,0 +1,14 @@
+{
+  "id": "ec806477-3125-579c-882f-8410a1a5bfd5",
+  "user_id": "8e733f40-9624-5737-a8de-6ec373d55241",
+  "status": "approved",
+  "is_online": false,
+  "vehicle": {
+    "plate": "123 ABC",
+    "make_model": "Honda Click 125i",
+    "color": "Red"
+  },
+  "rating": 4.9,
+  "balance_centavos": 35000,
+  "min_balance_centavos": 10000
+}

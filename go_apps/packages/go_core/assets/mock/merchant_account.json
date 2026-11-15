@@ -1,0 +1,56 @@
+{
+  "merchant": {
+    "id": "56611fc1-cc08-5113-9d5c-3b71372dcd53",
+    "name": "Kusina Bongao",
+    "logo_url": "https://picsum.photos/seed/kusina-logo/200",
+    "cover_url": "https://picsum.photos/seed/kusina-cover/800/400",
+    "address": "Datu Halun St., Poblacion, Bongao",
+    "location": {
+      "lat": 5.0291,
+      "lng": 119.7712
+    },
+    "is_open": true,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 5,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "07:00",
+        "closes": "21:00"
+      }
+    ],
+    "prep_time_minutes": 20,
+    "rating": 4.7,
+    "min_order_centavos": 10000
+  },
+  "role": "owner",
+  "staff_name": "Mering"
+}

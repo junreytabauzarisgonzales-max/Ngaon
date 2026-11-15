@@ -1,0 +1,30 @@
+{
+  "service": "food",
+  "pickup": {
+    "address": "Datu Halun St., Poblacion, Bongao",
+    "location": {
+      "lat": 5.0291,
+      "lng": 119.7712
+    }
+  },
+  "dropoff": {
+    "address": "Lamion, near Barangay Hall, Bongao",
+    "location": {
+      "lat": 5.0251,
+      "lng": 119.7769
+    }
+  },
+  "food": {
+    "merchant_id": "56611fc1-cc08-5113-9d5c-3b71372dcd53",
+    "items": [
+      {
+        "item_id": "5b1da1f5-0c68-5aef-b08e-e8e0920ff7c6",
+        "quantity": 2,
+        "addon_option_ids": [
+          "6d03a099-c079-58e7-b205-6de48b663788"
+        ],
+        "note": "No onions"
+      }
+    ]
+  }
+}

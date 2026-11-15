@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1b0b5703-b7de-511c-9834-558e693b3624",
+    "period_from": "2026-11-02",
+    "period_to": "2026-11-08",
+    "amount_centavos": 412500,
+    "type": "payout",
+    "status": "paid",
+    "paid_at": "2026-11-10T03:00:00Z"
+  },
+  {
+    "id": "0c74fad4-b1d2-5ee7-bcbc-37820f531909",
+    "period_from": "2026-11-02",
+    "period_to": "2026-11-08",
+    "amount_centavos": 38200,
+    "type": "commission_invoice",
+    "status": "pending"
+  },
+  {
+    "id": "4437d79b-1a8c-5d49-b3fa-f555ceb8dab5",
+    "period_from": "2026-10-26",
+    "period_to": "2026-11-01",
+    "amount_centavos": 29900,
+    "type": "commission_invoice",
+    "status": "overdue"
+  },
+  {
+    "id": "eaf63d12-96f6-5857-b868-c3564965ebb4",
+    "period_from": "2026-11-09",
+    "period_to": "2026-11-15",
+    "amount_centavos": 0,
+    "type": "payout",
+    "status": "pending"
+  }
+]

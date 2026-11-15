@@ -1,0 +1,5 @@
+{
+  "upload_url": "https://storage.example.com/uploads/abc?X-Signature=...",
+  "key": "uploads/2026/11/14/abc.jpg",
+  "expires_at": "2026-11-14T14:15:00Z"
+}

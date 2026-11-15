@@ -1,0 +1,1126 @@
+[
+  {
+    "id": "56611fc1-cc08-5113-9d5c-3b71372dcd53",
+    "name": "Kusina Bongao",
+    "logo_url": "https://picsum.photos/seed/kusina-logo/200",
+    "cover_url": "https://picsum.photos/seed/kusina-cover/800/400",
+    "address": "Datu Halun St., Poblacion, Bongao",
+    "location": {
+      "lat": 5.0291,
+      "lng": 119.7712
+    },
+    "is_open": true,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 5,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "07:00",
+        "closes": "21:00"
+      }
+    ],
+    "prep_time_minutes": 20,
+    "rating": 4.7,
+    "min_order_centavos": 10000,
+    "distance_m": 350,
+    "menu": [
+      {
+        "id": "d737155c-5394-505e-a50d-36efd742abff",
+        "name": "Rice meals",
+        "sort_order": 0,
+        "items": [
+          {
+            "id": "5b1da1f5-0c68-5aef-b08e-e8e0920ff7c6",
+            "category_id": "d737155c-5394-505e-a50d-36efd742abff",
+            "name": "Chicken adobo",
+            "price_centavos": 9500,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "9eb3b673-8399-506e-a54b-d68641aaf865",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "14629022-d6ef-517a-8e5e-911000e39147",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "6d03a099-c079-58e7-b205-6de48b663788",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "da3c97ea-2a76-5deb-b97e-02f2fdc4cf8d",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              },
+              {
+                "id": "3dc9e453-ccfa-5a29-9481-970490d4978e",
+                "name": "Drink",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "d1c4a52a-b9a5-5795-a7c5-317d43c598e2",
+                    "name": "Iced tea",
+                    "price_centavos": 3500,
+                    "is_available": true
+                  },
+                  {
+                    "id": "ec9db1bd-60ae-59ad-a93b-1bcedbb96d37",
+                    "name": "Calamansi juice",
+                    "price_centavos": 4000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "f75915e8-a8c0-539f-9385-d0f78adfd217",
+                    "name": "Bottled water",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ],
+            "description": "Braised chicken in soy and vinegar, with rice."
+          },
+          {
+            "id": "65921ad6-4a2e-566f-9f80-cf43af123734",
+            "category_id": "d737155c-5394-505e-a50d-36efd742abff",
+            "name": "Beef kaldereta",
+            "price_centavos": 13000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "9eb3b673-8399-506e-a54b-d68641aaf865",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "14629022-d6ef-517a-8e5e-911000e39147",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "6d03a099-c079-58e7-b205-6de48b663788",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "da3c97ea-2a76-5deb-b97e-02f2fdc4cf8d",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              },
+              {
+                "id": "3dc9e453-ccfa-5a29-9481-970490d4978e",
+                "name": "Drink",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "d1c4a52a-b9a5-5795-a7c5-317d43c598e2",
+                    "name": "Iced tea",
+                    "price_centavos": 3500,
+                    "is_available": true
+                  },
+                  {
+                    "id": "ec9db1bd-60ae-59ad-a93b-1bcedbb96d37",
+                    "name": "Calamansi juice",
+                    "price_centavos": 4000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "f75915e8-a8c0-539f-9385-d0f78adfd217",
+                    "name": "Bottled water",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ],
+            "description": "Beef stew in tomato sauce with potatoes."
+          },
+          {
+            "id": "1b4f4682-0b78-590d-b637-b8387045bd9e",
+            "category_id": "d737155c-5394-505e-a50d-36efd742abff",
+            "name": "Fried bangus",
+            "price_centavos": 11000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "9eb3b673-8399-506e-a54b-d68641aaf865",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "14629022-d6ef-517a-8e5e-911000e39147",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "6d03a099-c079-58e7-b205-6de48b663788",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "da3c97ea-2a76-5deb-b97e-02f2fdc4cf8d",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              }
+            ],
+            "description": "Crispy marinated milkfish."
+          },
+          {
+            "id": "186523e4-1925-50aa-9f97-d44af96d8aae",
+            "category_id": "d737155c-5394-505e-a50d-36efd742abff",
+            "name": "Chicken curry",
+            "price_centavos": 10500,
+            "is_available": false,
+            "addon_groups": [
+              {
+                "id": "9eb3b673-8399-506e-a54b-d68641aaf865",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "14629022-d6ef-517a-8e5e-911000e39147",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "6d03a099-c079-58e7-b205-6de48b663788",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "da3c97ea-2a76-5deb-b97e-02f2fdc4cf8d",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              },
+              {
+                "id": "05bd2cd4-1d57-5660-a3aa-959924b7b1d1",
+                "name": "Spice level",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "cf728f8e-330c-5a95-89ef-65dfb8b38b60",
+                    "name": "Mild",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "38456e27-ed90-54b6-abb3-060852a2f7a0",
+                    "name": "Spicy",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "c9993342-2bf8-5d54-8a91-e4dbc408d28c",
+                    "name": "Extra spicy",
+                    "price_centavos": 1000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2ebd2ebe-b646-5c32-b70e-742fd7b01f38",
+        "name": "Soups",
+        "sort_order": 1,
+        "items": [
+          {
+            "id": "8bcb5d35-e1e9-5f0e-a20b-705867e0889a",
+            "category_id": "2ebd2ebe-b646-5c32-b70e-742fd7b01f38",
+            "name": "Sinigang na isda",
+            "price_centavos": 14000,
+            "is_available": true,
+            "addon_groups": [],
+            "description": "Sour tamarind fish soup, good for 2."
+          },
+          {
+            "id": "c2c37135-3a35-55b9-9f8d-58f7a04b24ab",
+            "category_id": "2ebd2ebe-b646-5c32-b70e-742fd7b01f38",
+            "name": "Tinola",
+            "price_centavos": 12000,
+            "is_available": true,
+            "addon_groups": [],
+            "description": "Chicken ginger soup with papaya."
+          }
+        ]
+      },
+      {
+        "id": "f165d9a4-d911-5910-824f-66e9286f1225",
+        "name": "Drinks",
+        "sort_order": 2,
+        "items": [
+          {
+            "id": "a7051d98-d45e-5333-ad7c-3cab9825c364",
+            "category_id": "f165d9a4-d911-5910-824f-66e9286f1225",
+            "name": "Iced tea (large)",
+            "price_centavos": 4500,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "fdc4ef62-c040-50c9-b08f-c9dd4411f04b",
+            "category_id": "f165d9a4-d911-5910-824f-66e9286f1225",
+            "name": "Buko juice",
+            "price_centavos": 5000,
+            "is_available": true,
+            "addon_groups": [],
+            "description": "Fresh young coconut."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "539d1f69-97af-59f2-b0e1-a07c6c572f4e",
+    "name": "Pantay Grill & Seafood",
+    "logo_url": "https://picsum.photos/seed/pantay-logo/200",
+    "cover_url": "https://picsum.photos/seed/pantay-cover/800/400",
+    "address": "Pantay Bay Rd., Bongao",
+    "location": {
+      "lat": 5.0312,
+      "lng": 119.7745
+    },
+    "is_open": true,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 5,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "07:00",
+        "closes": "21:00"
+      }
+    ],
+    "prep_time_minutes": 30,
+    "rating": 4.5,
+    "min_order_centavos": 15000,
+    "distance_m": 520,
+    "menu": [
+      {
+        "id": "2347b084-3db7-544c-b0c0-e7773b9799d3",
+        "name": "Grill",
+        "sort_order": 0,
+        "items": [
+          {
+            "id": "94c8ed47-3a7c-567f-a48e-116a9e9b1a81",
+            "category_id": "2347b084-3db7-544c-b0c0-e7773b9799d3",
+            "name": "Grilled tuna panga",
+            "price_centavos": 22000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "933cc2f2-f15d-537d-a411-cf581fc3aa4e",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "8c60ded9-979f-5332-ae70-1575501a1b16",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a75a1e20-55af-5011-8acc-653c7015740a",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "925eae03-1f69-53fd-b7c3-6130c46ebec8",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              },
+              {
+                "id": "5e2dd473-f394-56d9-a838-75eccfbe2a95",
+                "name": "Sauce",
+                "min_select": 0,
+                "max_select": 2,
+                "options": [
+                  {
+                    "id": "4f63b6f4-325f-554a-9885-fdb1fa35cc0b",
+                    "name": "Soy-calamansi",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "aa46ccba-cd4a-5071-ab14-9f04fcde917e",
+                    "name": "Spicy vinegar",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a823885d-ac8b-5ffa-b478-cee90be76dc1",
+                    "name": "Garlic butter",
+                    "price_centavos": 2500,
+                    "is_available": true
+                  }
+                ]
+              }
+            ],
+            "description": "Tuna jaw, char-grilled."
+          },
+          {
+            "id": "b6c0b89a-1b32-5f32-8f0d-7f520c08bbb5",
+            "category_id": "2347b084-3db7-544c-b0c0-e7773b9799d3",
+            "name": "Chicken inasal",
+            "price_centavos": 12500,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "933cc2f2-f15d-537d-a411-cf581fc3aa4e",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "8c60ded9-979f-5332-ae70-1575501a1b16",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a75a1e20-55af-5011-8acc-653c7015740a",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "925eae03-1f69-53fd-b7c3-6130c46ebec8",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              },
+              {
+                "id": "1afef112-218e-5eab-9893-26664d430c3b",
+                "name": "Drink",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "0629368b-d630-5a33-82f5-90158628f406",
+                    "name": "Iced tea",
+                    "price_centavos": 3500,
+                    "is_available": true
+                  },
+                  {
+                    "id": "8b122d9d-d51a-53a1-b0c7-acc2fc6a604c",
+                    "name": "Calamansi juice",
+                    "price_centavos": 4000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "14f5b6a0-609a-5720-9390-c0c695cd454f",
+                    "name": "Bottled water",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ef362c13-a974-5e2b-8eee-ff8592ba8c58",
+            "category_id": "2347b084-3db7-544c-b0c0-e7773b9799d3",
+            "name": "Grilled squid",
+            "price_centavos": 18000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "933cc2f2-f15d-537d-a411-cf581fc3aa4e",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "8c60ded9-979f-5332-ae70-1575501a1b16",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a75a1e20-55af-5011-8acc-653c7015740a",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "925eae03-1f69-53fd-b7c3-6130c46ebec8",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              }
+            ],
+            "description": "Stuffed with tomato and onion."
+          }
+        ]
+      },
+      {
+        "id": "5f180b08-ee62-52f6-bc05-4ef677dc218c",
+        "name": "Seafood",
+        "sort_order": 1,
+        "items": [
+          {
+            "id": "ad55be7d-d480-50d5-a950-4f43c518c3f5",
+            "category_id": "5f180b08-ee62-52f6-bc05-4ef677dc218c",
+            "name": "Shrimp in garlic butter",
+            "price_centavos": 24000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "933cc2f2-f15d-537d-a411-cf581fc3aa4e",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "8c60ded9-979f-5332-ae70-1575501a1b16",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a75a1e20-55af-5011-8acc-653c7015740a",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "925eae03-1f69-53fd-b7c3-6130c46ebec8",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ecc11e9f-1d02-5196-94c6-3f7bed8166b6",
+            "category_id": "5f180b08-ee62-52f6-bc05-4ef677dc218c",
+            "name": "Kinilaw na tuna",
+            "price_centavos": 16000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "f205c25e-3550-5605-9aea-4b5c827975a9",
+                "name": "Spice level",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "c6ff9e7d-d52f-505c-90c2-64ccb09e030f",
+                    "name": "Mild",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "de9f6e34-f8b7-5307-9c46-cc587e375286",
+                    "name": "Spicy",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "97e90e60-b90a-52d0-a3d6-e0f5c4c4646c",
+                    "name": "Extra spicy",
+                    "price_centavos": 1000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ],
+            "description": "Fresh tuna ceviche with coconut vinegar."
+          },
+          {
+            "id": "8c5e2c5d-d229-5d3c-9a06-7d0b523596c2",
+            "category_id": "5f180b08-ee62-52f6-bc05-4ef677dc218c",
+            "name": "Seaweed salad (lato)",
+            "price_centavos": 6000,
+            "is_available": true,
+            "addon_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2ae68024-c504-53d5-ab07-096a16377ddc",
+    "name": "Sitti Bakeshop",
+    "logo_url": "https://picsum.photos/seed/sitti-logo/200",
+    "cover_url": "https://picsum.photos/seed/sitti-cover/800/400",
+    "address": "Lamion, Bongao",
+    "location": {
+      "lat": 5.0277,
+      "lng": 119.7758
+    },
+    "is_open": true,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 5,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "07:00",
+        "closes": "21:00"
+      }
+    ],
+    "prep_time_minutes": 10,
+    "rating": 4.8,
+    "min_order_centavos": 5000,
+    "distance_m": 480,
+    "menu": [
+      {
+        "id": "230adc59-b1db-5e48-84e5-670daf58abdf",
+        "name": "Breads",
+        "sort_order": 0,
+        "items": [
+          {
+            "id": "d285ae64-06cc-5916-8dae-91a05d2e65bd",
+            "category_id": "230adc59-b1db-5e48-84e5-670daf58abdf",
+            "name": "Pandesal (10 pcs)",
+            "price_centavos": 3000,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "cec15a9f-7f84-5705-b669-9a5d2b4053e0",
+            "category_id": "230adc59-b1db-5e48-84e5-670daf58abdf",
+            "name": "Ube cheese pandesal (6 pcs)",
+            "price_centavos": 9000,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "e191e1fe-39cd-584f-bed2-7d8b59f1bf21",
+            "category_id": "230adc59-b1db-5e48-84e5-670daf58abdf",
+            "name": "Spanish bread (6 pcs)",
+            "price_centavos": 6000,
+            "is_available": true,
+            "addon_groups": []
+          }
+        ]
+      },
+      {
+        "id": "ca54740e-f29c-5e39-b8d8-92073daef2e8",
+        "name": "Local snacks",
+        "sort_order": 1,
+        "items": [
+          {
+            "id": "5faee385-979c-50fb-9f7c-4208be40d96d",
+            "category_id": "ca54740e-f29c-5e39-b8d8-92073daef2e8",
+            "name": "Panyalam",
+            "price_centavos": 2500,
+            "is_available": true,
+            "addon_groups": [],
+            "description": "Tausug rice-flour pancake."
+          },
+          {
+            "id": "7374de02-9d91-57fc-9089-2408d54b652e",
+            "category_id": "ca54740e-f29c-5e39-b8d8-92073daef2e8",
+            "name": "Daral",
+            "price_centavos": 3000,
+            "is_available": true,
+            "addon_groups": [],
+            "description": "Crepe rolled with sweet coconut."
+          },
+          {
+            "id": "e40851c2-07d0-5a99-b467-9d636be043d4",
+            "category_id": "ca54740e-f29c-5e39-b8d8-92073daef2e8",
+            "name": "Tiyulah itum",
+            "price_centavos": 15000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "cdaf91f7-5b11-5f8d-8b88-e236dc530cb5",
+                "name": "Rice",
+                "min_select": 0,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "320081ea-d058-5aac-b306-d1ad3331efd9",
+                    "name": "Plain rice",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "43b59e11-b5f7-5e78-a5b9-8d0d5f0f29b0",
+                    "name": "Garlic rice",
+                    "price_centavos": 3000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "4f2d95b3-7e14-5f9f-9dc8-0daf8ea8a5de",
+                    "name": "Java rice",
+                    "price_centavos": 3000,
+                    "is_available": false
+                  }
+                ]
+              }
+            ],
+            "description": "Traditional black beef soup."
+          }
+        ]
+      },
+      {
+        "id": "c69cbcf7-5af4-54d1-a101-1a2fe74707b3",
+        "name": "Coffee",
+        "sort_order": 2,
+        "items": [
+          {
+            "id": "0c609cf5-a55c-5792-860e-216a23bd0832",
+            "category_id": "c69cbcf7-5af4-54d1-a101-1a2fe74707b3",
+            "name": "Kahawa sug",
+            "price_centavos": 4000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "cc917b2e-6100-5f6d-810e-a3b81e470d7b",
+                "name": "Sweetness",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "0ad6d5ed-7930-5448-a672-96044ab462c1",
+                    "name": "Black",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "cd1d9cde-3846-57b5-80ff-042636ba334f",
+                    "name": "Regular",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "4711bd3e-c4d3-5704-804d-9c85cace99a1",
+                    "name": "Extra sweet",
+                    "price_centavos": 0,
+                    "is_available": true
+                  }
+                ]
+              }
+            ],
+            "description": "Native brewed coffee."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ad24a593-4cf6-5745-9d3e-0acca6653106",
+    "name": "Tiula Halo-Halo & Snacks",
+    "logo_url": "https://picsum.photos/seed/tiula-logo/200",
+    "cover_url": "https://picsum.photos/seed/tiula-cover/800/400",
+    "address": "Tubig Tanah, Bongao",
+    "location": {
+      "lat": 5.0305,
+      "lng": 119.7701
+    },
+    "is_open": true,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 5,
+        "opens": "07:00",
+        "closes": "21:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "07:00",
+        "closes": "21:00"
+      }
+    ],
+    "prep_time_minutes": 15,
+    "rating": 4.4,
+    "min_order_centavos": 8000,
+    "distance_m": 610,
+    "menu": [
+      {
+        "id": "2c1b2efb-8df1-5489-8c27-e2e4ce0751b3",
+        "name": "Halo-halo",
+        "sort_order": 0,
+        "items": [
+          {
+            "id": "c8990cef-dd4a-57c8-9939-5f37c30bbdd2",
+            "category_id": "2c1b2efb-8df1-5489-8c27-e2e4ce0751b3",
+            "name": "Halo-halo special",
+            "price_centavos": 12000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "3449126d-b25b-5391-955f-3f51ff8ff338",
+                "name": "Extras",
+                "min_select": 0,
+                "max_select": 3,
+                "options": [
+                  {
+                    "id": "b14a1907-7491-5921-bd37-dd1fee371194",
+                    "name": "Extra leche flan",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  },
+                  {
+                    "id": "f90af913-2b33-559f-93d6-6e9fcb539a0d",
+                    "name": "Extra ube",
+                    "price_centavos": 1500,
+                    "is_available": true
+                  },
+                  {
+                    "id": "42505aba-bf95-57ba-8d31-159d0346619c",
+                    "name": "Ice cream scoop",
+                    "price_centavos": 2500,
+                    "is_available": false
+                  }
+                ]
+              }
+            ],
+            "description": "Shaved ice, milk, ube, leche flan."
+          },
+          {
+            "id": "0bda4d6c-af4d-5347-81e7-f894553ded0b",
+            "category_id": "2c1b2efb-8df1-5489-8c27-e2e4ce0751b3",
+            "name": "Mais con yelo",
+            "price_centavos": 7000,
+            "is_available": true,
+            "addon_groups": []
+          }
+        ]
+      },
+      {
+        "id": "b20d13fb-08a8-592e-aeb9-0f12e5460a3f",
+        "name": "Snacks",
+        "sort_order": 1,
+        "items": [
+          {
+            "id": "0cd91893-a19f-5709-ad82-0318f87d4753",
+            "category_id": "b20d13fb-08a8-592e-aeb9-0f12e5460a3f",
+            "name": "Chicken lumpia (6 pcs)",
+            "price_centavos": 8000,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "104bf645-2188-542b-aba6-28388f1748bd",
+            "category_id": "b20d13fb-08a8-592e-aeb9-0f12e5460a3f",
+            "name": "Banana cue (3 sticks)",
+            "price_centavos": 4500,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "b67cc4f7-027e-5534-af53-d4eac64b1eb3",
+            "category_id": "b20d13fb-08a8-592e-aeb9-0f12e5460a3f",
+            "name": "Turon (3 pcs)",
+            "price_centavos": 4500,
+            "is_available": true,
+            "addon_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dffebdfd-3746-52a4-9eb2-f8682ce59b9e",
+    "name": "Bud Bongao Coffee",
+    "logo_url": "https://picsum.photos/seed/budcoffee-logo/200",
+    "cover_url": "https://picsum.photos/seed/budcoffee-cover/800/400",
+    "address": "Pasiagan, Bongao",
+    "location": {
+      "lat": 5.0268,
+      "lng": 119.7724
+    },
+    "is_open": false,
+    "hours": [
+      {
+        "weekday": 0,
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "weekday": 1,
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "weekday": 2,
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "weekday": 3,
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "weekday": 4,
+        "opens": "08:00",
+        "closes": "18:00"
+      },
+      {
+        "weekday": 6,
+        "opens": "08:00",
+        "closes": "18:00"
+      }
+    ],
+    "prep_time_minutes": 10,
+    "rating": 4.9,
+    "min_order_centavos": 5000,
+    "distance_m": 300,
+    "menu": [
+      {
+        "id": "8b590698-7f44-5d05-b2b1-c8c8a7e30937",
+        "name": "Coffee",
+        "sort_order": 0,
+        "items": [
+          {
+            "id": "d9040e5f-ddc4-5f17-835d-4047b95e5d89",
+            "category_id": "8b590698-7f44-5d05-b2b1-c8c8a7e30937",
+            "name": "Iced latte",
+            "price_centavos": 11000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "6e69460e-b7e3-5877-8999-bb388a75ae3a",
+                "name": "Milk",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "7d0c18c9-84ad-5543-a07c-8fd044e62e5e",
+                    "name": "Fresh milk",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "4b66fda3-e5f3-5418-a935-63627d7a48fc",
+                    "name": "Oat milk",
+                    "price_centavos": 2500,
+                    "is_available": true
+                  }
+                ]
+              },
+              {
+                "id": "57da5467-11cd-580d-9325-3c90d16afcce",
+                "name": "Size",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "61b13d46-4ccf-51f6-90b1-ad21c32e28fb",
+                    "name": "12 oz",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a73024e8-c95f-5a75-90d3-2bb44a55157d",
+                    "name": "16 oz",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "4727f491-c7ca-57a6-87ff-504236a1bd6b",
+            "category_id": "8b590698-7f44-5d05-b2b1-c8c8a7e30937",
+            "name": "Americano",
+            "price_centavos": 8000,
+            "is_available": true,
+            "addon_groups": [
+              {
+                "id": "57da5467-11cd-580d-9325-3c90d16afcce",
+                "name": "Size",
+                "min_select": 1,
+                "max_select": 1,
+                "options": [
+                  {
+                    "id": "61b13d46-4ccf-51f6-90b1-ad21c32e28fb",
+                    "name": "12 oz",
+                    "price_centavos": 0,
+                    "is_available": true
+                  },
+                  {
+                    "id": "a73024e8-c95f-5a75-90d3-2bb44a55157d",
+                    "name": "16 oz",
+                    "price_centavos": 2000,
+                    "is_available": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "020078fe-efc6-5fe2-b52a-b6aa4629e752",
+        "name": "Pastries",
+        "sort_order": 1,
+        "items": [
+          {
+            "id": "c9f7fd4d-7e35-5dd5-9821-b37f51ec0ff2",
+            "category_id": "020078fe-efc6-5fe2-b52a-b6aa4629e752",
+            "name": "Banana bread",
+            "price_centavos": 6500,
+            "is_available": true,
+            "addon_groups": []
+          },
+          {
+            "id": "58554ee3-8c90-5be8-97b5-0f8a0a8a6a11",
+            "category_id": "020078fe-efc6-5fe2-b52a-b6aa4629e752",
+            "name": "Cheese roll",
+            "price_centavos": 4500,
+            "is_available": true,
+            "addon_groups": []
+          }
+        ]
+      }
+    ]
+  }
+]

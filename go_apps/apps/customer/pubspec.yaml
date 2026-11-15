@@ -1,0 +1,26 @@
+name: go_customer
+description: Go Customer app.
+publish_to: none
+version: 1.0.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  go_core:
+    path: ../../packages/go_core
+  get: 4.7.3
+  mobile_scanner: 7.5.0
+  image_picker: 1.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+
+flutter:
+  uses-material-design: true

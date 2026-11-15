@@ -1,0 +1,21 @@
+{
+  "total_centavos": 52300,
+  "jobs_count": 9,
+  "days": [
+    {
+      "date": "2026-11-12",
+      "total_centavos": 18100,
+      "jobs_count": 3
+    },
+    {
+      "date": "2026-11-13",
+      "total_centavos": 21400,
+      "jobs_count": 4
+    },
+    {
+      "date": "2026-11-14",
+      "total_centavos": 12800,
+      "jobs_count": 2
+    }
+  ]
+}

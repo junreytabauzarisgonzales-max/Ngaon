@@ -1,0 +1,18 @@
+{
+  "id": "1656758b-46b6-5882-9db6-587138e1d43c",
+  "service": "ride",
+  "distance_m": 1600,
+  "duration_s": 420,
+  "expires_at": "2026-11-14T14:10:00Z",
+  "breakdown": [
+    {
+      "label": "Base fare",
+      "amount_centavos": 4000
+    },
+    {
+      "label": "Distance 1.6 km",
+      "amount_centavos": 2400
+    }
+  ],
+  "total_centavos": 6400
+}

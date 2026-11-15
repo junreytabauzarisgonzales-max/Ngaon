@@ -1,0 +1,33 @@
+name: go_apps_workspace
+description: Go delivery super-app monorepo (Go Customer, Go Rider, Go Merchant).
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - packages/go_core
+  - apps/customer
+  - apps/rider
+  - apps/merchant
+
+dev_dependencies:
+  melos: 8.10.1
+
+# Melos >= 7 reads its configuration from the workspace pubspec (not melos.yaml).
+melos:
+  command:
+    bootstrap:
+      runPubGetInParallel: false
+  scripts:
+    analyze:
+      description: Analyze every package (fails on warnings and infos).
+      run: melos exec -c 1 -- flutter analyze --no-pub --fatal-infos --fatal-warnings .
+    test:
+      description: Run all unit and widget tests.
+      run: melos exec -c 1 --dir-exists=test -- flutter test --no-pub
+    build_runner:
+      description: Regenerate json_serializable code.
+      run: melos exec -c 1 --depends-on=build_runner -- dart run build_runner build
+    format:
+      run: dart format packages apps

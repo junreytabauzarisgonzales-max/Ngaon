@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1027af85-22f0-5a9d-97dc-79f62da40eda",
+    "label": "Home",
+    "address": "Lamion, near Barangay Hall, Bongao",
+    "location": {
+      "lat": 5.0251,
+      "lng": 119.7769
+    }
+  },
+  {
+    "id": "7eb97ccc-ef12-51d8-89d7-ff9f9e90b027",
+    "label": "Work",
+    "address": "Provincial Capitol, Bongao",
+    "location": {
+      "lat": 5.0362,
+      "lng": 119.7795
+    }
+  }
+]

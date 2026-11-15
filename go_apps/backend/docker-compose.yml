@@ -1,0 +1,17 @@
+# Go API for local testing with the phone apps over Wi-Fi.
+name: go-apps
+# Values come from .env (see .env.example).
+services:
+  api:
+    build: .
+    image: go-api:dev
+    container_name: go-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file: .env
+    volumes:
+      - go-data:/data
+
+volumes:
+  go-data:
