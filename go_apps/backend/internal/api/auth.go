@@ -558,6 +558,7 @@ func (a *API) googleAuth(w http.ResponseWriter, r *http.Request) error {
 
 	prof, err := a.svc.Social.VerifyGoogle(ctx, tok)
 	if err != nil {
+		log.Printf("google auth token verification failed: %v", err)
 		return apiErr(401, "invalid_google_token", err.Error())
 	}
 
@@ -599,6 +600,7 @@ func (a *API) facebookAuth(w http.ResponseWriter, r *http.Request) error {
 
 	prof, err := a.svc.Social.VerifyFacebook(ctx, tok)
 	if err != nil {
+		log.Printf("facebook auth token verification failed: %v", err)
 		return apiErr(401, "invalid_facebook_token", err.Error())
 	}
 

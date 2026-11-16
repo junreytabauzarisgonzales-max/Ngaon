@@ -93,6 +93,7 @@ func (a *API) checkClientAPIKey(w http.ResponseWriter, r *http.Request) bool {
 		key = strings.TrimSpace(r.URL.Query().Get("api_key"))
 	}
 	if subtle.ConstantTimeCompare([]byte(key), []byte(expected)) != 1 {
+		log.Printf("client api key check failed for %s %s: missing or invalid X-Api-Key", r.Method, r.URL.Path)
 		fail(w, apiErr(401, "api_key_invalid", "Missing or invalid X-Api-Key header"))
 		return false
 	}
