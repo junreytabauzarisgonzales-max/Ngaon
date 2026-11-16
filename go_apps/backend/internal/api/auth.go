@@ -260,6 +260,7 @@ func (a *API) patchMe(w http.ResponseWriter, r *http.Request) error {
 		Name     *string `json:"name"`
 		Email    *string `json:"email"`
 		Language *string `json:"language"`
+		Phone    *string `json:"phone"`
 	}
 	if err := decode(r, &b); err != nil {
 		return err
@@ -276,11 +277,28 @@ func (a *API) patchMe(w http.ResponseWriter, r *http.Request) error {
 	if u == nil {
 		return errUnauthorized
 	}
+	if b.Phone != nil {
+		cleanPhone := strings.TrimSpace(*b.Phone)
+		if !phoneRe.MatchString(cleanPhone) {
+			return fieldErr("phone", "invalid", "Invalid phone format")
+		}
+		if otherUID, taken := a.svc.St.UserByPhone[cleanPhone]; taken && otherUID != u.ID {
+			return fieldErr("phone", "taken", "Phone number already in use by another account")
+		}
+		if u.Phone != "" {
+			delete(a.svc.St.UserByPhone, u.Phone)
+		}
+		u.Phone = cleanPhone
+		a.svc.St.UserByPhone[cleanPhone] = u.ID
+	}
 	if b.Name != nil {
 		u.Name = strings.TrimSpace(*b.Name)
 	}
 	if b.Email != nil {
 		u.Email = b.Email
+		if *b.Email != "" {
+			a.svc.St.UserByEmail[strings.ToLower(*b.Email)] = u.ID
+		}
 	}
 	if b.Language != nil {
 		u.Language = *b.Language
@@ -489,5 +507,198 @@ func (a *API) serviceArea(w http.ResponseWriter, _ *http.Request) error {
 	a.svc.Lock()
 	defer a.svc.Unlock()
 	ok(w, a.svc.St.ServiceArea)
+	return nil
+}
+
+// ---------- Social Authentication (Google & Facebook) ----------
+
+func (a *API) googleAuth(w http.ResponseWriter, r *http.Request) error {
+	var b struct {
+		IDToken string `json:"id_token"`
+		Token   string `json:"token"`
+		App     string `json:"app"`
+	}
+	if err := decode(r, &b); err != nil {
+		return err
+	}
+	tok := strings.TrimSpace(b.IDToken)
+	if tok == "" {
+		tok = strings.TrimSpace(b.Token)
+	}
+	if tok == "" {
+		return fieldErr("id_token", "required", "Google ID token required")
+	}
+	if b.App == "" {
+		b.App = "customer"
+	}
+	if !appRe.MatchString(b.App) {
+		return fieldErr("app", "invalid", "Invalid app")
+	}
+
+	if a.svc.Social == nil {
+		return apiErr(500, "social_auth_disabled", "Social auth not configured")
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
+	prof, err := a.svc.Social.VerifyGoogle(ctx, tok)
+	if err != nil {
+		return apiErr(401, "invalid_google_token", err.Error())
+	}
+
+	a.svc.Lock()
+	defer a.svc.Unlock()
+
+	return a.loginOrCreateSocialUser(w, b.App, "google", prof.ID, prof.Email, prof.Name, prof.Picture)
+}
+
+func (a *API) facebookAuth(w http.ResponseWriter, r *http.Request) error {
+	var b struct {
+		AccessToken string `json:"access_token"`
+		Token       string `json:"token"`
+		App         string `json:"app"`
+	}
+	if err := decode(r, &b); err != nil {
+		return err
+	}
+	tok := strings.TrimSpace(b.AccessToken)
+	if tok == "" {
+		tok = strings.TrimSpace(b.Token)
+	}
+	if tok == "" {
+		return fieldErr("access_token", "required", "Facebook access token required")
+	}
+	if b.App == "" {
+		b.App = "customer"
+	}
+	if !appRe.MatchString(b.App) {
+		return fieldErr("app", "invalid", "Invalid app")
+	}
+
+	if a.svc.Social == nil {
+		return apiErr(500, "social_auth_disabled", "Social auth not configured")
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
+	prof, err := a.svc.Social.VerifyFacebook(ctx, tok)
+	if err != nil {
+		return apiErr(401, "invalid_facebook_token", err.Error())
+	}
+
+	a.svc.Lock()
+	defer a.svc.Unlock()
+
+	return a.loginOrCreateSocialUser(w, b.App, "facebook", prof.ID, prof.Email, prof.Name, prof.Picture.Data.URL)
+}
+
+func (a *API) loginOrCreateSocialUser(w http.ResponseWriter, app, provider, socialID, email, name, avatar string) error {
+	var uid string
+	var exists bool
+
+	if provider == "google" {
+		uid, exists = a.svc.St.UserByGoogleID[socialID]
+	} else if provider == "facebook" {
+		uid, exists = a.svc.St.UserByFacebookID[socialID]
+	}
+
+	if !exists && email != "" {
+		if emailUID, emailFound := a.svc.St.UserByEmail[strings.ToLower(email)]; emailFound {
+			uid = emailUID
+			exists = true
+		}
+	}
+
+	isNew := false
+	if !exists {
+		uid = domain.NewID()
+		u := &domain.User{
+			ID:        uid,
+			Name:      strings.TrimSpace(name),
+			Language:  "en",
+			Roles:     []string{"customer"},
+			CreatedAt: domain.Now(),
+		}
+		if email != "" {
+			em := strings.ToLower(email)
+			u.Email = &em
+		}
+		if avatar != "" {
+			u.AvatarURL = &avatar
+		}
+		if provider == "google" {
+			u.GoogleID = &socialID
+		} else if provider == "facebook" {
+			u.FacebookID = &socialID
+		}
+		a.svc.St.Users[uid] = u
+		isNew = true
+	}
+
+	u := a.svc.St.Users[uid]
+	if provider == "google" {
+		u.GoogleID = &socialID
+		a.svc.St.UserByGoogleID[socialID] = uid
+	} else if provider == "facebook" {
+		u.FacebookID = &socialID
+		a.svc.St.UserByFacebookID[socialID] = uid
+	}
+	if email != "" {
+		em := strings.ToLower(email)
+		if u.Email == nil || *u.Email == "" {
+			u.Email = &em
+		}
+		a.svc.St.UserByEmail[em] = uid
+	}
+	if name != "" && u.Name == "" {
+		u.Name = strings.TrimSpace(name)
+	}
+	if avatar != "" && (u.AvatarURL == nil || *u.AvatarURL == "") {
+		u.AvatarURL = &avatar
+	}
+
+	addRole := func(role string) {
+		for _, r := range u.Roles {
+			if r == role {
+				return
+			}
+		}
+		u.Roles = append(u.Roles, role)
+	}
+	if app == "rider" {
+		addRole("rider")
+		if a.svc.St.Riders[uid] == nil {
+			a.svc.St.Riders[uid] = &domain.Rider{Profile: domain.RiderProfile{
+				ID: domain.NewID(), UserID: uid, Status: "incomplete", BalanceCentavos: a.svc.Cfg.RiderStartBalance, MinBalanceCentavos: 10000,
+			}}
+			if a.svc.Cfg.RiderStartBalance > 0 {
+				a.svc.AddTx(uid, "adjustment", a.svc.Cfg.RiderStartBalance, "", "Welcome credit (dev)")
+			}
+		}
+	}
+	if u.Phone != "" {
+		if _, staff := a.svc.St.Staff[u.Phone]; staff && app == "merchant" {
+			addRole("merchant")
+		}
+	}
+
+	if a.svc.Redis != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		_ = a.svc.Redis.SaveUser(ctx, u)
+		cancel()
+	}
+
+	access, refresh := a.svc.IssueTokens(uid, app)
+	a.svc.Touch()
+
+	ok(w, map[string]any{
+		"access_token":  access,
+		"refresh_token": refresh,
+		"user":          u,
+		"is_new_user":   isNew || strings.TrimSpace(u.Name) == "",
+		"needs_phone":   u.Phone == "",
+	})
 	return nil
 }

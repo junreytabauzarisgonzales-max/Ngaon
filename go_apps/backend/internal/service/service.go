@@ -42,6 +42,7 @@ type Service struct {
 	Maps       *integrations.Maps
 	Didit      *integrations.Didit
 	PM         *integrations.PayMongo
+	Social     *integrations.SocialAuth
 
 	revokedMu     sync.Mutex
 	revokedTokens map[string]time.Time
@@ -71,6 +72,7 @@ func New(cfg config.Config) (*Service, error) {
 		Maps:          integrations.NewMaps(cfg.Maps),
 		Didit:         integrations.NewDidit(cfg.Didit),
 		PM:            integrations.NewPayMongo(cfg.PayMongo),
+		Social:        integrations.NewSocialAuth(cfg.GoogleClientID),
 		revokedTokens: map[string]time.Time{},
 		rateBuckets:   map[string]*memRateBucket{},
 	}

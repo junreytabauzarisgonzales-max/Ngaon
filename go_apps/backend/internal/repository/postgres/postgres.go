@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -34,15 +35,26 @@ func Connect(databaseURL string) (*sql.DB, error) {
 		return nil, fmt.Errorf("ping postgres: %w", err)
 	}
 
-	migrationSQL, err := migrationsFS.ReadFile("migrations/000001_init_schema.up.sql")
+	entries, err := migrationsFS.ReadDir("migrations")
 	if err != nil {
 		_ = db.Close()
-		return nil, fmt.Errorf("read migration: %w", err)
+		return nil, fmt.Errorf("read migrations dir: %w", err)
 	}
-
-	if _, err := db.Exec(string(migrationSQL)); err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("exec migration: %w", err)
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].Name() < entries[j].Name()
+	})
+	for _, entry := range entries {
+		if strings.HasSuffix(entry.Name(), ".up.sql") {
+			sqlBytes, err := migrationsFS.ReadFile("migrations/" + entry.Name())
+			if err != nil {
+				_ = db.Close()
+				return nil, fmt.Errorf("read migration %s: %w", entry.Name(), err)
+			}
+			if _, err := db.Exec(string(sqlBytes)); err != nil {
+				_ = db.Close()
+				return nil, fmt.Errorf("exec migration %s: %w", entry.Name(), err)
+			}
+		}
 	}
 
 	log.Printf("connected to PostgreSQL and verified schema")
@@ -148,7 +160,7 @@ func Load(db *sql.DB, st *repository.State, anyLocation bool) error {
 	}
 
 	// 1. Users
-	userRows, err := db.Query("SELECT id, phone_number, email, full_name, language, roles, created_at FROM users")
+	userRows, err := db.Query("SELECT id, COALESCE(phone_number, ''), email, full_name, language, roles, created_at, google_id, facebook_id, avatar_url FROM users")
 	if err != nil {
 		return fmt.Errorf("query users: %w", err)
 	}
@@ -156,17 +168,31 @@ func Load(db *sql.DB, st *repository.State, anyLocation bool) error {
 
 	for userRows.Next() {
 		var u domain.User
-		var email sql.NullString
+		var email, googleID, facebookID, avatarURL sql.NullString
 		var roles []string
 		var createdAt time.Time
-		if err := userRows.Scan(&u.ID, &u.Phone, &email, &u.Name, &u.Language, pq.Array(&roles), &createdAt); err != nil {
+		if err := userRows.Scan(&u.ID, &u.Phone, &email, &u.Name, &u.Language, pq.Array(&roles), &createdAt, &googleID, &facebookID, &avatarURL); err != nil {
 			return fmt.Errorf("scan user: %w", err)
 		}
 		u.Email = strPtr(email)
+		u.GoogleID = strPtr(googleID)
+		u.FacebookID = strPtr(facebookID)
+		u.AvatarURL = strPtr(avatarURL)
 		u.Roles = roles
 		u.CreatedAt = domain.UTC{Time: createdAt.UTC()}
 		st.Users[u.ID] = &u
-		st.UserByPhone[u.Phone] = u.ID
+		if u.Phone != "" {
+			st.UserByPhone[u.Phone] = u.ID
+		}
+		if u.GoogleID != nil && *u.GoogleID != "" {
+			st.UserByGoogleID[*u.GoogleID] = u.ID
+		}
+		if u.FacebookID != nil && *u.FacebookID != "" {
+			st.UserByFacebookID[*u.FacebookID] = u.ID
+		}
+		if u.Email != nil && *u.Email != "" {
+			st.UserByEmail[*u.Email] = u.ID
+		}
 	}
 
 	// 2. Saved Places
@@ -789,25 +815,44 @@ func Save(db *sql.DB, st *repository.State) error {
 
 	// 1. Users
 	for _, u := range st.Users {
+		var phoneVal sql.NullString
+		if u.Phone != "" {
+			phoneVal = sql.NullString{String: u.Phone, Valid: true}
+		}
 		var dbID string
 		if err := tx.QueryRow(`
-			INSERT INTO users (id, phone_number, email, full_name, language, roles, is_active, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, $6, true, $7, NOW())
-			ON CONFLICT (phone_number) DO UPDATE SET
-				email = EXCLUDED.email,
+			INSERT INTO users (id, phone_number, email, full_name, language, roles, google_id, facebook_id, avatar_url, is_active, created_at, updated_at)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, $10, NOW())
+			ON CONFLICT (id) DO UPDATE SET
+				phone_number = COALESCE(EXCLUDED.phone_number, users.phone_number),
+				email = COALESCE(EXCLUDED.email, users.email),
+				google_id = COALESCE(EXCLUDED.google_id, users.google_id),
+				facebook_id = COALESCE(EXCLUDED.facebook_id, users.facebook_id),
+				avatar_url = COALESCE(EXCLUDED.avatar_url, users.avatar_url),
 				full_name = EXCLUDED.full_name,
 				language = EXCLUDED.language,
 				roles = EXCLUDED.roles,
 				updated_at = NOW()
 			RETURNING id;
-		`, u.ID, u.Phone, nullStr(u.Email), u.Name, u.Language, pq.Array(u.Roles), u.CreatedAt.Time).Scan(&dbID); err != nil {
+		`, u.ID, phoneVal, nullStr(u.Email), u.Name, u.Language, pq.Array(u.Roles), nullStr(u.GoogleID), nullStr(u.FacebookID), nullStr(u.AvatarURL), u.CreatedAt.Time).Scan(&dbID); err != nil {
 			return fmt.Errorf("save user %s: %w", u.ID, err)
 		}
 		if dbID != "" && dbID != u.ID {
 			delete(st.Users, u.ID)
 			u.ID = dbID
 			st.Users[dbID] = u
-			st.UserByPhone[u.Phone] = dbID
+			if u.Phone != "" {
+				st.UserByPhone[u.Phone] = dbID
+			}
+			if u.GoogleID != nil {
+				st.UserByGoogleID[*u.GoogleID] = dbID
+			}
+			if u.FacebookID != nil {
+				st.UserByFacebookID[*u.FacebookID] = dbID
+			}
+			if u.Email != nil {
+				st.UserByEmail[*u.Email] = dbID
+			}
 		}
 	}
 

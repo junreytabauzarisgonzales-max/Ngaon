@@ -47,6 +47,7 @@ type Config struct {
 	Maps                MapsConfig
 	Didit               DiditConfig
 	PayMongo            PayMongoConfig
+	GoogleClientID      string
 }
 
 func env(k, def string) string {
@@ -97,5 +98,6 @@ func Load() Config {
 			WebhookSecret: os.Getenv("PAYMONGO_WEBHOOK_SECRET"),
 			BaseURL:       env("PAYMONGO_BASE_URL", "https://api.paymongo.com"),
 		},
+		GoogleClientID: os.Getenv("GOOGLE_CLIENT_ID"),
 	}
 }

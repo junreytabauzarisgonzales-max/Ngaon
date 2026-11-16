@@ -99,6 +99,17 @@ func NewServer(cfg Config) (*Server, error) {
 	}, nil
 }
 
+func NewServerWithService(svc *service.Service) *Server {
+	return &Server{
+		svc:   svc,
+		api:   api.New(svc),
+		cfg:   &svc.Cfg,
+		st:    svc.St,
+		db:    svc.DB,
+		redis: svc.Redis,
+	}
+}
+
 func (s *Server) Close() {
 	if s.svc != nil {
 		s.svc.Close()

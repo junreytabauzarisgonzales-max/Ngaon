@@ -3,13 +3,16 @@ package domain
 import "time"
 
 type User struct {
-	ID        string   `json:"id"`
-	Phone     string   `json:"phone"`
-	Name      string   `json:"name"`
-	Email     *string  `json:"email,omitempty"`
-	Language  string   `json:"language"`
-	Roles     []string `json:"roles"`
-	CreatedAt UTC      `json:"created_at"`
+	ID         string   `json:"id"`
+	Phone      string   `json:"phone"`
+	Name       string   `json:"name"`
+	Email      *string  `json:"email,omitempty"`
+	Language   string   `json:"language"`
+	Roles      []string `json:"roles"`
+	GoogleID   *string  `json:"google_id,omitempty"`
+	FacebookID *string  `json:"facebook_id,omitempty"`
+	AvatarURL  *string  `json:"avatar_url,omitempty"`
+	CreatedAt  UTC      `json:"created_at"`
 }
 
 type SavedPlace struct {

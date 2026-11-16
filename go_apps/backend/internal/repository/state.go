@@ -7,7 +7,10 @@ import (
 // State is the central in-memory store representation.
 type State struct {
 	Users       map[string]*domain.User          `json:"users"`
-	UserByPhone map[string]string                `json:"user_by_phone"`
+	UserByPhone      map[string]string                `json:"user_by_phone"`
+	UserByGoogleID   map[string]string                `json:"user_by_google_id"`
+	UserByFacebookID map[string]string                `json:"user_by_facebook_id"`
+	UserByEmail      map[string]string                `json:"user_by_email"`
 	Places      map[string]*domain.SavedPlace    `json:"places"`
 	Merchants   map[string]*domain.MerchantRow   `json:"merchants"`
 	MerchantIDs []string                         `json:"merchant_ids"`
@@ -38,7 +41,10 @@ type State struct {
 func NewState() *State {
 	return &State{
 		Users:       map[string]*domain.User{},
-		UserByPhone: map[string]string{},
+		UserByPhone:      map[string]string{},
+		UserByGoogleID:   map[string]string{},
+		UserByFacebookID: map[string]string{},
+		UserByEmail:      map[string]string{},
 		Places:      map[string]*domain.SavedPlace{},
 		Merchants:   map[string]*domain.MerchantRow{},
 		Staff:       map[string]domain.MerchantStaff{},

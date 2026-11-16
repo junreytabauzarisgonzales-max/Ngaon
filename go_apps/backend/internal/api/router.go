@@ -37,6 +37,8 @@ func (a *API) Routes() http.Handler {
 	// auth
 	mux.HandleFunc("POST "+v+"/auth/otp/request", p(a.otpRequest))
 	mux.HandleFunc("POST "+v+"/auth/otp/verify", p(a.otpVerify))
+	mux.HandleFunc("POST "+v+"/auth/google", p(a.googleAuth))
+	mux.HandleFunc("POST "+v+"/auth/facebook", p(a.facebookAuth))
 	mux.HandleFunc("POST "+v+"/auth/refresh", p(a.refresh))
 	mux.HandleFunc("POST "+v+"/auth/logout", p(a.logout))
 	mux.HandleFunc("GET "+v+"/me", authed(a.getMe))

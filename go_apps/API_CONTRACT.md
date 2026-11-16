@@ -92,10 +92,12 @@ Error (4xx/5xx):
 | --- | --- | --- | --- |
 | POST | `/auth/otp/request` | `{ phone }` | `{ expires_in_seconds, resend_after_seconds }` |
 | POST | `/auth/otp/verify` | `{ phone, code, app }` | `{ access_token, refresh_token, user: User, is_new_user }` |
+| POST | `/auth/google` | `{ id_token, app? }` | `{ access_token, refresh_token, user: User, is_new_user, needs_phone }` |
+| POST | `/auth/facebook` | `{ access_token, app? }` | `{ access_token, refresh_token, user: User, is_new_user, needs_phone }` |
 | POST | `/auth/refresh` | `{ refresh_token }` | `{ access_token, refresh_token }` |
 | POST | `/auth/logout` | `{ refresh_token }` | `{}` |
 | GET | `/me` | | `User` |
-| PATCH | `/me` | `{ name?, email?, language? }` | `User` |
+| PATCH | `/me` | `{ name?, email?, language?, phone? }` | `User` |
 | DELETE | `/me` | | `{}` |
 | POST | `/me/devices` | `{ fcm_token, platform: "android", app }` | `{}` |
 

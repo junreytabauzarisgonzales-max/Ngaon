@@ -44,6 +44,15 @@ func Load(path string, st *repository.State) error {
 	if st.UserByPhone == nil {
 		st.UserByPhone = fresh.UserByPhone
 	}
+	if st.UserByGoogleID == nil {
+		st.UserByGoogleID = fresh.UserByGoogleID
+	}
+	if st.UserByFacebookID == nil {
+		st.UserByFacebookID = fresh.UserByFacebookID
+	}
+	if st.UserByEmail == nil {
+		st.UserByEmail = fresh.UserByEmail
+	}
 	if st.Places == nil {
 		st.Places = fresh.Places
 	}
