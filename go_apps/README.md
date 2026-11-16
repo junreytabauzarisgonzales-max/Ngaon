@@ -46,14 +46,14 @@ Seed data (5 Bongao merchants with menus and add-ons, saved places, past jobs, w
 
 ## Backend (Golang)
 
-`backend/` is a Golang 1.27 server that implements [`API_CONTRACT.md`](API_CONTRACT.md) (REST + WebSocket). It currently stores state as JSON in a Docker volume (`/data/state.json` + uploaded photos); Postgres can replace that behind the same store later.
+`backend/` is a Go server that implements [`API_CONTRACT.md`](API_CONTRACT.md) (REST + WebSocket). It uses **PostgreSQL** for persistent relational storage with automated migrations (`migrations/000001_init_schema.up.sql`) and **Redis** (`internal/repository/redis`) for caching, hashed OTP/session management, JWT revocation blacklisting, distributed rate limiting, geospatial rider indexing, and WebSocket Pub/Sub fan-out. A fallback file store (`/data/state.json`) is also supported when `DATABASE_URL` is unset. See [`backend/README.md`](backend/README.md) for the full architecture, security design, and complete endpoint documentation.
 
 ```bash
 cd backend
-cp .env.example .env          # set PUBLIC_URL to an address the phones can reach, e.g. http://192.168.x.x:8080
-docker compose up -d --build  # Compose project "go-apps", container "go-api", port 8080
+cp .env.example .env          # set PUBLIC_URL and review PostgreSQL / Redis credentials
+docker compose up -d --build  # Starts PostgreSQL (go-postgres:5433), Redis (go-redis:6379), and Go API (go-api:8080)
 docker logs -f go-api         # request log, OTP codes, dispatch decisions
-go test ./...                 # end-to-end tests (customer + merchant + rider flows)
+go test ./...                 # end-to-end, security, and integration tests
 ```
 
 Build the apps against it:
