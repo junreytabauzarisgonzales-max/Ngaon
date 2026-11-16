@@ -316,53 +316,6 @@ func (s *Server) gazetteer() []GeoPlace {
 	return out
 }
 
-func (s *Server) geoReverse(w http.ResponseWriter, r *http.Request) error {
-	p, err := parseLatLng(r)
-	if err != nil {
-		return err
-	}
-	s.lock()
-	defer s.unlock()
-	best, bestD := GeoPlace{}, 1<<30
-	for _, g := range s.gazetteer() {
-		if d := distanceM(p, g.Location); d < bestD {
-			best, bestD = g, d
-		}
-	}
-	addr := "Bongao, Tawi-Tawi"
-	switch {
-	case best.Name == "":
-	case bestD < 80:
-		addr = best.Name + ", Bongao"
-	case bestD < 3000:
-		addr = "Near " + best.Name + ", Bongao"
-	}
-	ok(w, map[string]string{"address": addr})
-	return nil
-}
-
-func (s *Server) geoSearch(w http.ResponseWriter, r *http.Request) error {
-	near, err := parseLatLng(r)
-	if err != nil {
-		return err
-	}
-	q := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("q")))
-	s.lock()
-	defer s.unlock()
-	out := []GeoPlace{}
-	for _, g := range s.gazetteer() {
-		if q == "" || strings.Contains(strings.ToLower(g.Name+" "+g.Address), q) {
-			out = append(out, g)
-		}
-	}
-	sort.Slice(out, func(i, j int) bool { return distanceM(near, out[i].Location) < distanceM(near, out[j].Location) })
-	if len(out) > 10 {
-		out = out[:10]
-	}
-	ok(w, out)
-	return nil
-}
-
 func (s *Server) serviceArea(w http.ResponseWriter, _ *http.Request) error {
 	ok(w, s.st.ServiceArea)
 	return nil

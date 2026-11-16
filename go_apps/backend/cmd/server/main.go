@@ -1,4 +1,4 @@
-// Go backend: implements API_CONTRACT.md for Go Customer, Go Rider and Go Merchant.
+// Ngain backend: implements API_CONTRACT.md for Go Customer, Go Rider and Go Merchant.
 package main
 
 import (
@@ -40,6 +40,21 @@ func main() {
 		AdminToken:         env("ADMIN_TOKEN", "change-me"),
 		AnyLocation:        os.Getenv("DEV_ANY_LOCATION") == "true",
 		MaxDispatchM:       envInt("MAX_DISPATCH_M", 15000),
+		Maps: app.MapsConfig{
+			APIKey:     os.Getenv("GOOGLE_MAPS_API_KEY"),
+			TravelMode: env("GOOGLE_ROUTES_TRAVEL_MODE", "TWO_WHEELER"),
+		},
+		Didit: app.DiditConfig{
+			APIKey:        os.Getenv("DIDIT_API_KEY"),
+			WorkflowID:    os.Getenv("DIDIT_WORKFLOW_ID"),
+			WebhookSecret: os.Getenv("DIDIT_WEBHOOK_SECRET"),
+			BaseURL:       env("DIDIT_BASE_URL", "https://verification.didit.me"),
+		},
+		PayMongo: app.PayMongoConfig{
+			SecretKey:     os.Getenv("PAYMONGO_SECRET_KEY"),
+			WebhookSecret: os.Getenv("PAYMONGO_WEBHOOK_SECRET"),
+			BaseURL:       env("PAYMONGO_BASE_URL", "https://api.paymongo.com"),
+		},
 	}
 	s, err := app.NewServer(cfg)
 	if err != nil {
@@ -63,7 +78,7 @@ func main() {
 		}
 	}()
 	go func() {
-		log.Printf("Go API listening on :%s (public %s)", cfg.Port, cfg.PublicURL)
+		log.Printf("Ngain API listening on :%s (public %s)", cfg.Port, cfg.PublicURL)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}

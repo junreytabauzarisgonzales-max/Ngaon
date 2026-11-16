@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gm;
 
 import '../config/app_config.dart';
@@ -31,6 +32,7 @@ class GoMap extends StatefulWidget {
     this.interactive = true,
     this.myLocation = false,
     this.followMarkerId,
+    this.route = const [],
   });
 
   final LatLng center;
@@ -42,6 +44,9 @@ class GoMap extends StatefulWidget {
 
   /// Keeps the camera on this marker as it moves (rider tracking).
   final String? followMarkerId;
+
+  /// Road route to draw (decoded from the API's `route_polyline`).
+  final List<LatLng> route;
 
   @override
   State<GoMap> createState() => GoMapState();
@@ -82,7 +87,7 @@ class GoMapState extends State<GoMap> {
 
   @override
   Widget build(BuildContext context) {
-    if (!AppConfig.current.mapsEnabled) return _Schematic(center: widget.center, markers: widget.markers);
+    if (!AppConfig.current.mapsEnabled) return _Schematic(center: widget.center, markers: widget.markers, route: widget.route);
     return gm.GoogleMap(
       initialCameraPosition: gm.CameraPosition(target: toGm(widget.center), zoom: widget.zoom),
       onMapCreated: (c) => _controller = c,
@@ -101,6 +106,15 @@ class GoMapState extends State<GoMap> {
         final c = _cameraCenter;
         if (c != null) widget.onCameraIdle?.call(c);
       },
+      polylines: {
+        if (widget.route.length >= 2)
+          gm.Polyline(
+            polylineId: const gm.PolylineId('route'),
+            points: [for (final p in widget.route) toGm(p)],
+            color: GoColors.primary,
+            width: 5,
+          ),
+      },
       markers: {
         for (final m in widget.markers)
           gm.Marker(markerId: gm.MarkerId(m.id), position: toGm(m.position), icon: gm.BitmapDescriptor.defaultMarkerWithHue(_hue(m.kind))),
@@ -110,9 +124,10 @@ class GoMapState extends State<GoMap> {
 }
 
 class _Schematic extends StatelessWidget {
-  const _Schematic({required this.center, required this.markers});
+  const _Schematic({required this.center, required this.markers, this.route = const []});
   final LatLng center;
   final List<GoMarker> markers;
+  final List<LatLng> route;
 
   @override
   Widget build(BuildContext context) {
@@ -122,8 +137,9 @@ class _Schematic extends StatelessWidget {
         // With 2+ markers, fit them all (with margin); otherwise ~2.5 km around center.
         var mid = center;
         var span = 0.025;
-        if (markers.length >= 2) {
-          final lats = markers.map((m) => m.position.lat), lngs = markers.map((m) => m.position.lng);
+        final pts = [...markers.map((m) => m.position), ...route];
+        if (pts.length >= 2) {
+          final lats = pts.map((p) => p.lat), lngs = pts.map((p) => p.lng);
           final minLat = lats.reduce(math.min), maxLat = lats.reduce(math.max);
           final minLng = lngs.reduce(math.min), maxLng = lngs.reduce(math.max);
           mid = LatLng(lat: (minLat + maxLat) / 2, lng: (minLng + maxLng) / 2);
@@ -138,6 +154,7 @@ class _Schematic extends StatelessWidget {
             clipBehavior: Clip.hardEdge,
             children: [
               Positioned.fill(child: CustomPaint(painter: _GridPainter(dark ? const Color(0xFF243530) : const Color(0xFFCADCD2)))),
+              if (route.length >= 2) Positioned.fill(child: CustomPaint(painter: _RoutePainter([for (final p in route) pos(p)]))),
               for (final m in markers)
                 Positioned(
                   left: pos(m.position).dx - 16,
@@ -185,4 +202,39 @@ class _GridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _GridPainter oldDelegate) => oldDelegate.color != color;
+}
+
+class _RoutePainter extends CustomPainter {
+  _RoutePainter(this.points);
+  final List<Offset> points;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (final p in points.skip(1)) {
+      path.lineTo(p.dx, p.dy);
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = GoColors.primary
+        ..strokeWidth = 5
+        ..style = PaintingStyle.stroke
+        ..strokeJoin = StrokeJoin.round
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.points != points;
+}
+
+/// Google requires this notice wherever two-wheeler (motorcycle) routes are shown.
+class RouteBetaNote extends StatelessWidget {
+  const RouteBetaNote({super.key});
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 6),
+    child: Text('map.route_beta'.tr, style: TextStyle(fontSize: 11, color: GoColors.muted)),
+  );
 }

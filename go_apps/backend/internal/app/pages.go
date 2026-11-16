@@ -42,8 +42,8 @@ func peso(c int) string {
 	return out
 }
 
-var payTpl = template.Must(template.New("pay").Parse(`<!doctype html><html><head><title>Go Pay</title>` + pageCSS + `</head><body>
-<div class="card"><div class="brand">Go · {{.Method}}</div><p class="muted">Development checkout (no real money moves).</p>
+var payTpl = template.Must(template.New("pay").Parse(`<!doctype html><html><head><title>Ngain Pay</title>` + pageCSS + `</head><body>
+<div class="card"><div class="brand">Ngain · {{.Method}}</div><p class="muted">Development checkout (no real money moves).</p>
 <div class="muted">{{.What}}</div><div class="amt">{{.Amount}}</div>
 {{if .Done}}<p><span class="tag">{{.Done}}</span></p><p>You can go back to the app now.</p>
 {{else}}<form method="post"><button class="pay" name="result" value="paid">Pay {{.Amount}}</button>
@@ -99,9 +99,8 @@ func (s *Server) payAction(w http.ResponseWriter, r *http.Request) {
 	case "job":
 		if js := s.st.Jobs[id]; js != nil && js.Job.Status == "pending_payment" && js.Job.Payment.Status != "paid" {
 			if paid {
-				js.Job.Payment.Status = "paid"
 				result = "Payment successful"
-				s.afterPayment(js)
+				s.markJobPaid(js, "")
 			} else {
 				js.Job.Payment.Status = "failed"
 				s.publishJob(js)
@@ -110,12 +109,8 @@ func (s *Server) payAction(w http.ResponseWriter, r *http.Request) {
 	case "topup":
 		if t := s.st.Topups[id]; t != nil && t.Status != "paid" {
 			if paid {
-				t.Status = "paid"
 				result = "Top-up successful"
-				s.addTx(t.UserID, "topup", t.AmountCentavos, "", strings.ToUpper(t.Method[:1])+t.Method[1:]+" top-up")
-				if rd := s.st.Riders[t.UserID]; rd != nil {
-					s.emit(t.UserID, "rider", "rider.profile_updated", map[string]any{"profile": rd.Profile})
-				}
+				s.creditTopup(t)
 			} else {
 				t.Status = "failed"
 			}
@@ -126,8 +121,8 @@ func (s *Server) payAction(w http.ResponseWriter, r *http.Request) {
 	s.renderPay(w, r, result)
 }
 
-var shareTpl = template.Must(template.New("share").Parse(`<!doctype html><html><head><title>Go trip {{.Code}}</title>
-<meta http-equiv="refresh" content="10">` + pageCSS + `</head><body><div class="card"><div class="brand">Go</div>
+var shareTpl = template.Must(template.New("share").Parse(`<!doctype html><html><head><title>Ngain trip {{.Code}}</title>
+<meta http-equiv="refresh" content="10">` + pageCSS + `</head><body><div class="card"><div class="brand">Ngain</div>
 <h1>{{.Code}} · {{.Status}}</h1><p class="muted">Live trip shared with you. This page refreshes every 10 seconds.</p>
 <table><tr><td class="muted">From</td><td>{{.From}}</td></tr><tr><td class="muted">To</td><td>{{.To}}</td></tr>
 {{if .Rider}}<tr><td class="muted">Rider</td><td>{{.Rider}}</td></tr>{{end}}</table>
@@ -153,8 +148,8 @@ func (s *Server) sharePage(w http.ResponseWriter, r *http.Request) {
 	_ = shareTpl.Execute(w, d)
 }
 
-var adminTpl = template.Must(template.New("admin").Parse(`<!doctype html><html><head><title>Go admin</title>` + pageCSS + `</head><body>
-<div class="card"><div class="brand">Go admin</div><h1>Rider applications</h1>
+var adminTpl = template.Must(template.New("admin").Parse(`<!doctype html><html><head><title>Ngain admin</title>` + pageCSS + `</head><body>
+<div class="card"><div class="brand">Ngain admin</div><h1>Rider applications</h1>
 {{if not .Riders}}<p class="muted">No riders yet.</p>{{end}}
 <table>{{range .Riders}}<tr><td><b>{{.Name}}</b><br><span class="muted">{{.Phone}} · {{.Plate}}</span><br><span class="tag">{{.Status}}</span></td>
 <td>{{if eq .Status "pending_review"}}<form method="post" action="/admin/riders/{{.UserID}}/approve?token={{$.Token}}"><button class="pay">Approve</button></form>
@@ -223,7 +218,7 @@ func (s *Server) indexPage(w http.ResponseWriter, _ *http.Request) {
 	}
 	s.unlock()
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<!doctype html><html><head><title>Go API</title>%s</head><body><div class="card"><div class="brand">Go API</div>
+	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngain API</title>%s</head><body><div class="card"><div class="brand">Ngain API</div>
 <h1>Running ✓</h1><table><tr><td class="muted">Users</td><td>%d</td></tr><tr><td class="muted">Jobs</td><td>%d (%d live)</td></tr>
 <tr><td class="muted">Riders online</td><td>%d</td></tr><tr><td class="muted">WebSockets</td><td>%d</td></tr></table>
 <p class="muted">API base: %s/api/v1</p></div></body></html>`, pageCSS, users, jobs, live, online, s.hub.count(), s.cfg.PublicURL)

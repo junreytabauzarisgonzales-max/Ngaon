@@ -181,6 +181,9 @@ class HttpUploadsRepository implements UploadsRepository {
 class HttpRiderRepository implements RiderRepository {
   HttpRiderRepository(this.api);
   final ApiClient api;
+
+  @override
+  Future<KycSession> createKycSession() => api.send('POST', '/rider/kyc/session', (d) => KycSession.fromJson(asMap(d)));
   RiderProfile _profile(Object? d) => RiderProfile.fromJson(asMap(d));
   Job _job(Object? d) => Job.fromJson(asMap(d));
 

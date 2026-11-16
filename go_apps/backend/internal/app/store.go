@@ -29,6 +29,9 @@ type Config struct {
 	AdminToken         string
 	AnyLocation        bool // dev: accept pickups/drop-offs anywhere (testing outside Bongao)
 	MaxDispatchM       int  // max rider-to-pickup distance for offers; 0 = unlimited
+	Maps               MapsConfig
+	Didit              DiditConfig
+	PayMongo           PayMongoConfig
 }
 
 type RefreshToken struct {
@@ -97,7 +100,11 @@ type Server struct {
 	st      *State
 	dirty   bool
 	pending []outEvent
+	tasks   []func() // network work queued under the lock, run after unlock
 	hub     *Hub
+	maps    *Maps
+	didit   *Didit
+	pm      *PayMongo
 }
 
 type outEvent struct {
@@ -108,7 +115,8 @@ type outEvent struct {
 }
 
 func NewServer(cfg Config) (*Server, error) {
-	s := &Server{cfg: cfg, hub: newHub()}
+	s := &Server{cfg: cfg, hub: newHub(), maps: NewMaps(cfg.Maps), didit: NewDidit(cfg.Didit), pm: NewPayMongo(cfg.PayMongo)}
+	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v", s.maps.Enabled(), s.didit.Enabled(), s.pm.Enabled())
 	if err := s.load(); err != nil {
 		return nil, err
 	}
@@ -119,13 +127,19 @@ func NewServer(cfg Config) (*Server, error) {
 func (s *Server) lock() { s.mu.Lock() }
 
 func (s *Server) unlock() {
-	evs := s.pending
-	s.pending = nil
+	evs, tasks := s.pending, s.tasks
+	s.pending, s.tasks = nil, nil
 	s.mu.Unlock()
 	for _, e := range evs {
 		s.hub.send(e.UserID, e.App, e.Type, e.Data)
 	}
+	for _, t := range tasks {
+		go t()
+	}
 }
+
+// later runs fn after the lock is released (for outbound API calls).
+func (s *Server) later(fn func()) { s.tasks = append(s.tasks, fn) }
 
 func (s *Server) emit(userID, app, typ string, data any) {
 	if userID == "" {
@@ -281,7 +295,7 @@ func randToken(n int) string {
 
 func (s *Server) nextCode() string {
 	s.st.CodeSeq++
-	return fmt.Sprintf("GO-%d", s.st.CodeSeq)
+	return fmt.Sprintf("NG-%d", s.st.CodeSeq)
 }
 
 func (s *Server) fileURL(key string) *string {

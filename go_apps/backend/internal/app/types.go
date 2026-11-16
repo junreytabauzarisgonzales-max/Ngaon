@@ -168,6 +168,7 @@ type Quote struct {
 	Breakdown             []FareLine `json:"breakdown"`
 	TotalCentavos         int        `json:"total_centavos"`
 	MaxItemBudgetCentavos *int       `json:"max_item_budget_centavos,omitempty"`
+	RoutePolyline         *string    `json:"route_polyline,omitempty"` // ADDED: Google encoded polyline
 
 	// internal
 	UserID  string        `json:"-"`
@@ -270,6 +271,7 @@ type Job struct {
 	CancelledBy    *string         `json:"cancelled_by,omitempty"`
 	AllowedActions []string        `json:"allowed_actions"`
 	Timeline       []TimelineEntry `json:"timeline"`
+	RoutePolyline  *string         `json:"route_polyline,omitempty"` // ADDED: pickup -> drop-off route
 }
 
 // JobState wraps a job with internal bookkeeping (persisted, never sent).
@@ -287,6 +289,9 @@ type JobState struct {
 	CommissionCentavos int                 `json:"commission_centavos"`
 	CompletedAt        time.Time           `json:"completed_at"`
 	ShareToken         string              `json:"share_token,omitempty"`
+	PMCheckoutID       string              `json:"pm_checkout_id,omitempty"`
+	PMPaymentID        string              `json:"pm_payment_id,omitempty"`
+	PayCheckedAt       time.Time           `json:"-"`
 	Order              *MerchantOrderState `json:"order,omitempty"`
 }
 
@@ -342,18 +347,23 @@ type RiderProfile struct {
 	Rating             *float64 `json:"rating,omitempty"`
 	BalanceCentavos    int      `json:"balance_centavos"`
 	MinBalanceCentavos int      `json:"min_balance_centavos"`
+	// ADDED: identity verification (Didit); present when KYC is enabled.
+	KycStatus *string `json:"kyc_status,omitempty"` // not_started|in_progress|in_review|approved|declined|expired
 }
 
 // Rider is the persisted rider (public profile + internals).
 type Rider struct {
-	Profile     RiderProfile      `json:"profile"`
-	Documents   map[string]string `json:"documents"`
-	Location    *LatLng           `json:"location"`
-	LocationAt  time.Time         `json:"location_at"`
-	ActiveJobID string            `json:"active_job_id"`
-	RatingSum   int               `json:"rating_sum"`
-	RatingCount int               `json:"rating_count"`
-	SubmittedAt time.Time         `json:"submitted_at"`
+	Profile      RiderProfile      `json:"profile"`
+	Documents    map[string]string `json:"documents"`
+	Location     *LatLng           `json:"location"`
+	LocationAt   time.Time         `json:"location_at"`
+	ActiveJobID  string            `json:"active_job_id"`
+	RatingSum    int               `json:"rating_sum"`
+	RatingCount  int               `json:"rating_count"`
+	SubmittedAt  time.Time         `json:"submitted_at"`
+	KycSessionID string            `json:"kyc_session_id,omitempty"`
+	KycURL       string            `json:"kyc_url,omitempty"`
+	KycCheckedAt time.Time         `json:"-"`
 }
 
 type JobOffer struct {
@@ -404,11 +414,14 @@ type MerchantStaff struct {
 }
 
 type Topup struct {
-	ID             string `json:"id"`
-	UserID         string `json:"user_id"`
-	AmountCentavos int    `json:"amount_centavos"`
-	Method         string `json:"method"`
-	Status         string `json:"status"`
+	ID             string    `json:"id"`
+	UserID         string    `json:"user_id"`
+	AmountCentavos int       `json:"amount_centavos"`
+	Method         string    `json:"method"`
+	Status         string    `json:"status"`
+	PMCheckoutID   string    `json:"pm_checkout_id,omitempty"`
+	CheckoutURL    string    `json:"checkout_url,omitempty"`
+	CheckedAt      time.Time `json:"-"`
 }
 
 type Device struct {

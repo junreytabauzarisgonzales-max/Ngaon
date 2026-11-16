@@ -105,6 +105,7 @@ class Quote {
     required this.breakdown,
     required this.totalCentavos,
     this.maxItemBudgetCentavos,
+    this.routePolyline,
   });
   final String id;
   final ServiceType service;
@@ -114,6 +115,9 @@ class Quote {
   final List<FareLine> breakdown;
   final int totalCentavos;
   final int? maxItemBudgetCentavos;
+
+  /// ADDED: Google encoded polyline of the route (when Google Maps is enabled).
+  final String? routePolyline;
 
   factory Quote.fromJson(Map<String, dynamic> json) => _$QuoteFromJson(json);
   Map<String, dynamic> toJson() => _$QuoteToJson(this);
@@ -292,6 +296,7 @@ class Job {
     this.cancelledBy,
     required this.allowedActions,
     required this.timeline,
+    this.routePolyline,
   });
 
   final String id;
@@ -314,6 +319,9 @@ class Job {
   final PartyRole? cancelledBy;
   final List<String> allowedActions;
   final List<TimelineEntry> timeline;
+
+  /// ADDED: pickup -> drop-off route (Google encoded polyline).
+  final String? routePolyline;
 
   bool can(String action) => allowedActions.contains(action);
   bool get isActive => !status.isFinal;

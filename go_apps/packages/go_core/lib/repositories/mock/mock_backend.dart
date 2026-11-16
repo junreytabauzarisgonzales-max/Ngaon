@@ -114,7 +114,7 @@ class MockBackend {
   static JsonMap copy(JsonMap m) => jsonDecode(jsonEncode(m)) as JsonMap;
   static String _now() => toIsoUtc(DateTime.now());
   String _id() => _uuid.v4();
-  String _code() => 'GO-${_codeSeq++}';
+  String _code() => 'NG-${_codeSeq++}';
 
   Duration _d(num seconds) => Duration(milliseconds: max(1, (seconds * 1000 * speed).round()));
 
@@ -555,7 +555,7 @@ class MockBackend {
     final job = _job(id);
     if (job['status'] != 'items_purchased') fail(ErrorCodes.invalidStatusTransition, 'Nothing to confirm', status: 409);
     if (!approved) {
-      job['cancel_reason'] = 'Item total disputed by customer. Go support will contact you.';
+      job['cancel_reason'] = 'Item total disputed by customer. Ngain support will contact you.';
       job['cancelled_by'] = 'customer';
       _setStatus(job, 'cancelled');
       return jobView(job);

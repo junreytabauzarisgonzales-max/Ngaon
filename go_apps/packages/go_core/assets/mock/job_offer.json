@@ -2,7 +2,7 @@
   "id": "f23cf800-9178-5995-8ca8-2a6610d68645",
   "job": {
     "id": "c3a4d613-2109-5852-aaa7-8c725603b660",
-    "code": "GO-4830",
+    "code": "NG-4830",
     "service": "ride",
     "status": "searching",
     "created_at": "2026-11-14T14:00:00Z",

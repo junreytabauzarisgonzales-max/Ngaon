@@ -38,8 +38,10 @@ class ActiveJobView extends GetView<ActiveJobController> {
                   GoMarker('p', j.pickup.location, j.service == ServiceType.food ? MarkerKind.store : MarkerKind.pickup),
                   GoMarker('d', j.dropoff.location, MarkerKind.dropoff),
                 ],
+                route: j.routePolyline == null ? const [] : decodePolyline(j.routePolyline!),
               ),
             ),
+            if (j.routePolyline != null) const Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: RouteBetaNote()),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(

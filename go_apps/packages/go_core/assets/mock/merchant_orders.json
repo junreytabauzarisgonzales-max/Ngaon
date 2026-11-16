@@ -2,7 +2,7 @@
   {
     "id": "73f3b3b2-76ab-52d0-abef-0b7ea47307f0",
     "job_id": "547307a8-f0f6-5b9e-a397-e7240b588535",
-    "code": "GO-4790",
+    "code": "NG-4790",
     "status": "completed",
     "created_at": "2026-11-12T04:01:00Z",
     "prep_time_minutes": 20,
@@ -40,7 +40,7 @@
   {
     "id": "3707f492-de84-5a98-bd62-050c1be5609b",
     "job_id": "9765ea82-2d56-54c0-9aa7-ce457dd5544d",
-    "code": "GO-4831",
+    "code": "NG-4831",
     "status": "new",
     "created_at": "2026-11-14T14:00:00Z",
     "merchant_accept_deadline": "2026-11-14T14:03:00Z",
@@ -70,7 +70,7 @@
   {
     "id": "b3e09c3c-33c0-5dd0-a82a-751692ae00f0",
     "job_id": "4ebf0231-7d90-5d84-89b7-2c20cfbe0c2b",
-    "code": "GO-4777",
+    "code": "NG-4777",
     "status": "rejected",
     "created_at": "2026-11-11T11:00:00Z",
     "items": [

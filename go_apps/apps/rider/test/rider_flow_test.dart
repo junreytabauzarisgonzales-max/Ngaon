@@ -10,7 +10,7 @@ import 'package:go_rider/app/services/rider_session_service.dart';
 import 'package:go_rider/app/translations/rider_translations.dart';
 
 Widget app() => buildGoApp(
-  title: 'Go Rider',
+  title: 'Ngain Rider',
   initialRoute: Routes.splash,
   pages: AppPages.pages,
   translations: riderTranslations,
@@ -79,7 +79,7 @@ void main() {
     final b = (await tester.runAsync(() => initGoTest(GoApp.rider)))!;
     await loginForTest(b, GoApp.rider, phone: '+639181111111');
     await tester.pumpWidget(app());
-    await pumpUntil(tester, find.text('Become a Go rider'));
+    await pumpUntil(tester, find.text('Become a Ngain rider'));
     expect(find.text("Driver's license"), findsOneWidget);
     expect(find.text('Submit (0/4 documents)'), findsOneWidget);
     await tearDownGoTest(tester, b);

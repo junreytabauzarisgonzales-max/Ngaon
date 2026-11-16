@@ -12,7 +12,7 @@ class SplashView extends GetView<SplashController> {
     backgroundColor: GoColors.primary,
     body: Center(
       child: Text(
-        'Go',
+        'Ngain',
         style: TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w900),
       ),
     ),

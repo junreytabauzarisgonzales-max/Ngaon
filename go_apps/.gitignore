@@ -9,3 +9,6 @@ local.properties
 dist/
 backend/.env
 backend/data/
+env/*.json
+!env/example.json
+!env/mock.json

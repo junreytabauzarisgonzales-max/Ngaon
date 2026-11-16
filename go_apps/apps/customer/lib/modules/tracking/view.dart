@@ -31,8 +31,11 @@ class TrackingView extends GetView<TrackingController> {
                     GoMarker('d', j.dropoff.location, MarkerKind.dropoff),
                     if (rider != null) GoMarker('rider', rider, MarkerKind.rider),
                   ],
+                  route: j.routePolyline == null ? const [] : decodePolyline(j.routePolyline!),
                 ),
               ),
+            if (!j.status.isFinal && j.routePolyline != null)
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: RouteBetaNote()),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -113,26 +114,8 @@ func findOption(it *MenuItem, id string) *AddonOption {
 
 const maxPabiliBudget = 300000
 
-func (s *Server) createQuote(w http.ResponseWriter, r *http.Request) error {
-	var req QuoteRequest
-	if err := decode(r, &req); err != nil {
-		return err
-	}
-	s.lock()
-	defer s.unlock()
-	q, err := s.priceQuote(&req)
-	if err != nil {
-		return err
-	}
-	q.UserID = claimsOf(r).Sub
-	q.Request = &req
-	s.st.Quotes[q.ID] = q
-	ok(w, q)
-	return nil
-}
-
 // priceQuote: same tariff as the mock backend.
-func (s *Server) priceQuote(req *QuoteRequest) (*Quote, error) {
+func (s *Server) priceQuote(req *QuoteRequest, rt *Route) (*Quote, error) {
 	if req.Service == "food" && req.Food != nil {
 		if m := s.st.Merchants[req.Food.MerchantID]; m != nil {
 			req.Pickup = Stop{Address: m.Merchant.Address, Location: m.Merchant.Location, ContactName: strp(m.Merchant.Name)}
@@ -141,8 +124,16 @@ func (s *Server) priceQuote(req *QuoteRequest) (*Quote, error) {
 	if !s.inServiceArea(req.Pickup.Location) || !s.inServiceArea(req.Dropoff.Location) {
 		return nil, apiErr(422, "out_of_service_area", "Outside the Bongao service area")
 	}
+	// Road distance/ETA from Google Routes when available, else straight line x1.3.
 	dist := int(float64(distanceM(req.Pickup.Location, req.Dropoff.Location)) * 1.3)
 	dur := max(180, int(float64(dist)/1000/22*3600))
+	var poly *string
+	if rt != nil && rt.DistanceM > 0 {
+		dist, dur = rt.DistanceM, max(60, rt.DurationS)
+		if rt.Polyline != "" {
+			poly = strp(rt.Polyline)
+		}
+	}
 	km := int(math.Ceil(float64(dist) / 1000))
 	kmLabel := fmt.Sprintf("Distance %.1f km", float64(dist)/1000)
 	var lines []FareLine
@@ -223,71 +214,24 @@ func (s *Server) priceQuote(req *QuoteRequest) (*Quote, error) {
 	}
 	return &Quote{
 		ID: newID(), Service: req.Service, DistanceM: dist, DurationS: dur, ExpiresAt: *at(time.Now().Add(5 * time.Minute)),
-		Breakdown: lines, TotalCentavos: total, MaxItemBudgetCentavos: maxBudget, FeesCentavos: fees,
+		Breakdown: lines, TotalCentavos: total, MaxItemBudgetCentavos: maxBudget, FeesCentavos: fees, RoutePolyline: poly,
 	}, nil
 }
 
 // ---------- jobs ----------
 
-func (s *Server) createJob(w http.ResponseWriter, r *http.Request) error {
-	var b struct {
-		QuoteID       string  `json:"quote_id"`
-		PaymentMethod string  `json:"payment_method"`
-		Notes         *string `json:"notes"`
-	}
-	if err := decode(r, &b); err != nil {
-		return err
-	}
-	if b.PaymentMethod != "cash" && b.PaymentMethod != "gcash" && b.PaymentMethod != "maya" {
-		return fieldErr("payment_method", "invalid", "Invalid payment method")
-	}
-	uid := claimsOf(r).Sub
-	s.lock()
-	defer s.unlock()
-	idem := r.Header.Get("Idempotency-Key")
-	if idem != "" {
-		if jid, done := s.st.Idempotency[uid+":"+idem]; done {
-			ok(w, s.jobView(s.st.Jobs[jid], "customer"))
-			return nil
-		}
-	}
-	q := s.st.Quotes[b.QuoteID]
-	if q == nil || q.UserID != uid || time.Now().After(q.ExpiresAt.Time) {
-		return apiErr(409, "quote_expired", "Quote expired")
-	}
-	// Re-validate (menu or store state may have changed since the quote).
-	if _, err := s.priceQuote(q.Request); err != nil {
-		return err
-	}
-	js := s.buildJob(uid, q, b.PaymentMethod, b.Notes)
-	s.st.Jobs[js.Job.ID] = js
-	s.st.JobIDs = append(s.st.JobIDs, js.Job.ID)
-	delete(s.st.Quotes, q.ID)
-	if idem != "" {
-		s.st.Idempotency[uid+":"+idem] = js.Job.ID
-	}
-	if b.PaymentMethod == "cash" {
-		s.afterPayment(js)
-	} else {
-		s.setStatus(js, "pending_payment")
-	}
-	ok(w, s.jobView(js, "customer"))
-	return nil
-}
-
-func (s *Server) buildJob(uid string, q *Quote, method string, notes *string) *JobState {
+func (s *Server) buildJob(uid string, q *Quote, method string, notes *string, id, code string) *JobState {
 	req := q.Request
-	id := newID()
 	dropoff := req.Dropoff
 	if notes != nil && strings.TrimSpace(*notes) != "" {
 		dropoff.Notes = notes
 	}
 	j := Job{
-		ID: id, Code: s.nextCode(), Service: req.Service, CreatedAt: Now(), UpdatedAt: Now(),
+		ID: id, Code: code, Service: req.Service, CreatedAt: Now(), UpdatedAt: Now(),
 		Pickup: req.Pickup, Dropoff: dropoff,
 		Fare:     Fare{Breakdown: q.Breakdown, TotalCentavos: q.TotalCentavos},
 		Payment:  JobPayment{Method: method, Status: "pending"},
-		Timeline: []TimelineEntry{}, AllowedActions: []string{},
+		Timeline: []TimelineEntry{}, AllowedActions: []string{}, RoutePolyline: q.RoutePolyline,
 	}
 	if method != "cash" {
 		j.Payment.CheckoutURL = strp(strings.TrimRight(s.cfg.PublicURL, "/") + "/pay/job/" + id)
@@ -384,17 +328,6 @@ func (s *Server) listJobs(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *Server) getJob(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	js, err := s.jobFor(r)
-	if err != nil {
-		return err
-	}
-	ok(w, s.jobView(js, claimsOf(r).App))
-	return nil
-}
-
 func (s *Server) cancelJob(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		Reason string `json:"reason"`
@@ -424,6 +357,13 @@ func (s *Server) cancel(js *JobState, by, reason string) {
 	js.Job.CancelReason = strp(reason)
 	if js.Job.Payment.Status == "paid" {
 		js.Job.Payment.Status = "refunded"
+		if s.pm.Enabled() && js.PMPaymentID != "" {
+			pid, amount, code := js.PMPaymentID, js.Job.Fare.TotalCentavos, js.Job.Code
+			s.later(func() {
+				err := s.pm.Refund(context.Background(), pid, amount, "Ngain booking "+code+" cancelled: "+reason)
+				logIntegration("paymongo refund "+code, err)
+			})
+		}
 	}
 	if r := s.st.Riders[js.RiderUserID]; r != nil && r.ActiveJobID == js.Job.ID {
 		r.ActiveJobID = ""
@@ -460,7 +400,7 @@ func (s *Server) confirmItems(w http.ResponseWriter, r *http.Request) error {
 		s.setStatus(js, "picked_up")
 	} else {
 		// Open question Q1 in the contract: dispute = cancel + support follow-up.
-		s.cancel(js, "customer", "Item total disputed by customer. Go support will contact you.")
+		s.cancel(js, "customer", "Item total disputed by customer. Ngain support will contact you.")
 	}
 	ok(w, s.jobView(js, "customer"))
 	return nil

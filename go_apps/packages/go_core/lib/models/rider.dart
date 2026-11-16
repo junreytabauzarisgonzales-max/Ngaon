@@ -65,6 +65,7 @@ class RiderProfile {
     this.rating,
     required this.balanceCentavos,
     required this.minBalanceCentavos,
+    this.kycStatus,
   });
   final String id;
   final String userId;
@@ -75,6 +76,13 @@ class RiderProfile {
   final double? rating;
   final int balanceCentavos;
   final int minBalanceCentavos;
+
+  /// ADDED: Didit identity verification status when KYC is enabled:
+  /// not_started | in_progress | in_review | approved | declined | expired.
+  final String? kycStatus;
+
+  bool get kycRequired => kycStatus != null;
+  bool get kycApproved => kycStatus == 'approved';
 
   bool get hasEnoughBalance => balanceCentavos >= minBalanceCentavos;
 
@@ -146,4 +154,16 @@ class Earnings {
 
   factory Earnings.fromJson(Map<String, dynamic> json) => _$EarningsFromJson(json);
   Map<String, dynamic> toJson() => _$EarningsToJson(this);
+}
+
+/// ADDED: response of `POST /rider/kyc/session`.
+@JsonSerializable()
+class KycSession {
+  KycSession({required this.sessionId, required this.url, required this.kycStatus});
+  final String sessionId;
+  final String url;
+  final String kycStatus;
+
+  factory KycSession.fromJson(Map<String, dynamic> json) => _$KycSessionFromJson(json);
+  Map<String, dynamic> toJson() => _$KycSessionToJson(this);
 }

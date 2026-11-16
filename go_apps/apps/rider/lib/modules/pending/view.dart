@@ -51,7 +51,10 @@ class PendingView extends GetView<PendingController> {
                 ],
                 const SizedBox(height: 24),
                 if (rejected) FilledButton(onPressed: controller.fix, child: Text('rider.fix_resubmit'.tr)),
-                if (!rejected && !suspended) const LinearProgressIndicator(),
+                if (!rejected && !suspended && p != null && p.kycRequired && !p.kycApproved)
+                  _KycCard(status: p.kycStatus!, controller: controller)
+                else if (!rejected && !suspended)
+                  const LinearProgressIndicator(),
               ],
             );
           }),
@@ -59,4 +62,47 @@ class PendingView extends GetView<PendingController> {
       ),
     ),
   );
+}
+
+/// Identity verification step (Didit): ID document + selfie liveness.
+class _KycCard extends StatelessWidget {
+  const _KycCard({required this.status, required this.controller});
+  final String status;
+  final PendingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final inReview = status == 'in_review';
+    final retry = status == 'expired' || status == 'declined';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(inReview ? Icons.hourglass_top : Icons.verified_user_outlined, color: GoColors.primary, size: 28),
+                const SizedBox(width: 10),
+                Expanded(child: Text('rider.kyc.title'.tr, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800))),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text('rider.kyc.status.$status'.tr, style: TextStyle(color: GoColors.muted)),
+            if (!inReview) ...[
+              const SizedBox(height: 12),
+              Obx(
+                () => FilledButton.icon(
+                  key: const Key('kyc.start'),
+                  onPressed: controller.startingKyc.value ? null : controller.verifyIdentity,
+                  icon: const Icon(Icons.badge_outlined),
+                  label: Text(retry || status == 'in_progress' ? 'rider.kyc.continue'.tr : 'rider.kyc.start'.tr),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }

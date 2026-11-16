@@ -14,7 +14,7 @@ class SplashView extends GetView<SplashController> {
       () => controller.error.value == null
           ? const Center(
               child: Text(
-                'Go Rider',
+                'Ngain Rider',
                 style: TextStyle(color: GoColors.accent, fontSize: 44, fontWeight: FontWeight.w900),
               ),
             )

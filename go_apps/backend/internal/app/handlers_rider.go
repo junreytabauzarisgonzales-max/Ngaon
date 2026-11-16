@@ -23,17 +23,6 @@ func (s *Server) rider(r *http.Request) (*Rider, error) {
 	return rd, nil
 }
 
-func (s *Server) riderMe(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	rd, err := s.rider(r)
-	if err != nil {
-		return err
-	}
-	ok(w, rd.Profile)
-	return nil
-}
-
 func (s *Server) riderSubmit(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		Vehicle   Vehicle `json:"vehicle"`
@@ -421,17 +410,6 @@ func dateRange(from, to string) []string {
 	return out
 }
 
-func (s *Server) riderWallet(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	rd, err := s.rider(r)
-	if err != nil {
-		return err
-	}
-	ok(w, map[string]int{"balance_centavos": rd.Profile.BalanceCentavos, "min_balance_centavos": rd.Profile.MinBalanceCentavos})
-	return nil
-}
-
 func (s *Server) riderTransactions(w http.ResponseWriter, r *http.Request) error {
 	uid := claimsOf(r).Sub
 	s.lock()
@@ -444,40 +422,6 @@ func (s *Server) riderTransactions(w http.ResponseWriter, r *http.Request) error
 	}
 	page, next := paginate(out, r, 20)
 	okPage(w, page, next)
-	return nil
-}
-
-func (s *Server) riderTopup(w http.ResponseWriter, r *http.Request) error {
-	var b struct {
-		AmountCentavos int    `json:"amount_centavos"`
-		Method         string `json:"method"`
-	}
-	if err := decode(r, &b); err != nil {
-		return err
-	}
-	if b.AmountCentavos < 10000 || b.AmountCentavos > 2000000 {
-		return fieldErr("amount_centavos", "out_of_range", "Top up between ₱100 and ₱20,000")
-	}
-	if b.Method != "gcash" && b.Method != "maya" {
-		return fieldErr("method", "invalid", "GCash or Maya only")
-	}
-	uid := claimsOf(r).Sub
-	s.lock()
-	defer s.unlock()
-	idem := r.Header.Get("Idempotency-Key")
-	var t *Topup
-	if id, seen := s.st.Idempotency[uid+":"+idem]; idem != "" && seen {
-		t = s.st.Topups[id]
-	}
-	if t == nil {
-		t = &Topup{ID: newID(), UserID: uid, AmountCentavos: b.AmountCentavos, Method: b.Method, Status: "pending"}
-		s.st.Topups[t.ID] = t
-		if idem != "" {
-			s.st.Idempotency[uid+":"+idem] = t.ID
-		}
-		s.touch()
-	}
-	ok(w, map[string]string{"topup_id": t.ID, "checkout_url": strings.TrimRight(s.cfg.PublicURL, "/") + "/pay/topup/" + t.ID})
 	return nil
 }
 
@@ -568,11 +512,19 @@ func (s *Server) Tick() {
 			}
 		}
 	}
-	if s.cfg.AutoApproveSeconds > 0 {
-		for _, rd := range s.st.Riders {
-			if rd.Profile.Status == "pending_review" && now.Sub(rd.SubmittedAt) > time.Duration(s.cfg.AutoApproveSeconds)*time.Second {
+	for _, rd := range s.st.Riders {
+		if rd.Profile.Status != "pending_review" {
+			continue
+		}
+		if s.didit.Enabled() {
+			// With Didit on, identity verification decides (admin can still override).
+			if rd.Profile.KycStatus != nil && *rd.Profile.KycStatus == "approved" {
 				s.setRiderReview(rd, true, "")
 			}
+			continue
+		}
+		if s.cfg.AutoApproveSeconds > 0 && now.Sub(rd.SubmittedAt) > time.Duration(s.cfg.AutoApproveSeconds)*time.Second {
+			s.setRiderReview(rd, true, "")
 		}
 	}
 }

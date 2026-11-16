@@ -288,6 +288,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET "+v+"/rider/wallet", a(s.riderWallet))
 	mux.HandleFunc("GET "+v+"/rider/wallet/transactions", a(s.riderTransactions))
 	mux.HandleFunc("POST "+v+"/rider/wallet/topups", a(s.riderTopup))
+	mux.HandleFunc("POST "+v+"/rider/kyc/session", a(s.riderKycSession))
 
 	// merchant
 	mux.HandleFunc("GET "+v+"/merchant/me", a(s.merchantMe))
@@ -320,5 +321,13 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /admin/riders/{id}/{action}", s.adminRider)
 	mux.HandleFunc("GET /admin", s.adminPage)
 
+	// provider webhooks + return pages (in-app browser lands here afterwards)
+	mux.HandleFunc("POST /webhooks/paymongo", s.paymongoWebhook)
+	mux.HandleFunc("POST /webhooks/didit", s.diditWebhook)
+	mux.HandleFunc("GET /pay/return", s.returnPage("Payment received", "If you paid, your booking updates in a few seconds. You can close this page and go back to Ngain."))
+	mux.HandleFunc("GET /kyc/return", s.returnPage("Verification submitted", "Thanks! Close this page and go back to Ngain Rider. Approval usually takes a few minutes."))
+
 	return logging(mux)
 }
+
+func b64std(s string) string { return base64.StdEncoding.EncodeToString([]byte(s)) }
