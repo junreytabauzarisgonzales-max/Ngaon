@@ -1,0 +1,26 @@
+import { ArrowDown, ArrowUpRight, Motorbike, Info, MapPin, Plus, Smartphone, Store, UserRound } from "lucide-react";
+import { applications, faqs, navigation } from "@/content/site-content";
+import { Reveal } from "./motion";
+import { Brand, IconBox, SectionHeading } from "./ui";
+
+const appIcons = { customer: UserRound, rider: Motorbike, merchant: Store };
+
+export function Ecosystem() {
+  return <section id="ecosystem" tabIndex={-1} className="section ecosystem-section" aria-labelledby="ecosystem-heading"><div className="container"><Reveal><div className="heading-row"><SectionHeading eyebrow="One connected community" title="Connected from order to doorstep." id="ecosystem-heading" /><p className="heading-aside">Three apps.<br />One shared everyday.</p></div></Reveal><div className="ecosystem-grid">{applications.map((app, index) => <Reveal key={app.id} delay={index * 0.07}><article className="ecosystem-card"><div className="ecosystem-card-top"><IconBox icon={appIcons[app.id]} /><span>0{index + 1}</span></div><p className="eyebrow">{app.detail}</p><h3>{app.name}</h3><p>{app.description}</p><a href="#download" className="text-link">App availability<ArrowUpRight size={16} aria-hidden="true" /></a></article></Reveal>)}</div></div></section>;
+}
+
+export function About() {
+  return <section id="about" tabIndex={-1} className="section about-section" aria-labelledby="about-heading"><div className="container about-grid"><Reveal className="about-art"><div className="about-grid-pattern" aria-hidden="true" /><div className="local-pin" aria-hidden="true"><MapPin size={58} strokeWidth={1.2} /></div><span className="local-coordinate">5.0294° N &nbsp; 119.7730° E</span><div className="about-place"><p>A LITTLE CLOSER TO HOME</p><span>Bongao,<br />Tawi-Tawi<span className="green-text">.</span></span></div><span className="about-place-tag"><span />OUR LOCAL FOCUS</span></Reveal><Reveal><SectionHeading eyebrow="Rooted in the local" title="Built around everyday life in Bongao." id="about-heading" /><p className="about-description">A ride across town. A meal from a local kitchen. Something picked up, or something sent with care.</p><p className="about-description">Ngaon brings Ride, Food, Pabili, and Padala into one delivery ecosystem designed for Bongao, Tawi-Tawi—with connected apps for customers, riders, and merchants.</p><div className="about-signoff"><span className="signoff-line" /><p>Everyday needs.<br /><strong>A locally connected experience.</strong></p></div></Reveal></div></section>;
+}
+
+export function Download() {
+  return <section id="download" tabIndex={-1} className="section download-section" aria-labelledby="download-heading"><div className="container"><Reveal><div className="download-heading-row"><SectionHeading eyebrow="Your everyday starts here" title="Find your Ngaon app." description="A dedicated app for every part of the journey." id="download-heading" /><span className="download-heading-icon"><ArrowDown size={31} strokeWidth={1.2} aria-hidden="true" /></span></div></Reveal><div className="download-grid">{applications.map((app, index) => <Reveal key={app.id} delay={index * 0.06}><article className="download-card"><IconBox icon={appIcons[app.id]} /><p className="download-platform"><Smartphone size={13} aria-hidden="true" />Android application</p><h3>{app.shortName}</h3><p>{app.detail}</p>{app.releaseStatus && <span className="release-status">{app.releaseStatus}</span>}{app.downloadUrl ? <a href={app.downloadUrl} className="button button-primary">Get {app.shortName}<ArrowUpRight size={16} aria-hidden="true" /></a> : <div className="availability-note"><Info size={16} aria-hidden="true" /><span>Public download link<br />not available here yet.</span></div>}</article></Reveal>)}</div><p className="download-note">Public release or beta status has not been confirmed. Verified download links will be added when supplied.</p></div></section>;
+}
+
+export function Faq() {
+  return <section id="faq" tabIndex={-1} className="section faq-section" aria-labelledby="faq-heading"><div className="container faq-grid"><Reveal><SectionHeading eyebrow="A little clarity" title="Good questions. Simple answers." description="A few things you might like to know about Ngaon." id="faq-heading" /><span className="faq-decorative" aria-hidden="true">?</span></Reveal><div className="faq-list">{faqs.map((faq) => <details className="faq-item" key={faq.question}><summary>{faq.question}<span><Plus size={19} strokeWidth={1.5} aria-hidden="true" /></span></summary><p>{faq.answer}</p></details>)}</div></div></section>;
+}
+
+export function Footer() {
+  return <footer className="site-footer"><div className="container"><div className="footer-main"><div><Brand /><p>Your everyday, delivered.<br />Locally connected in Bongao, Tawi-Tawi.</p></div><nav aria-label="Footer navigation">{[...navigation, { label: "Get Ngaon", href: "#download" }, { label: "FAQ", href: "#faq" }].map((link) => <a href={link.href} key={link.href}>{link.label}</a>)}</nav><a href="#top" className="back-top" aria-label="Back to top"><ArrowUpRight size={22} strokeWidth={1.5} aria-hidden="true" /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Ngaon.</span><span><MapPin size={12} aria-hidden="true" />Bongao, Tawi-Tawi, Philippines</span><span>Ride. Food. Pabili. Padala.</span></div></div></footer>;
+}
