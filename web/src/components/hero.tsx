@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { ArrowDown, ArrowUpRight, MapPin, Package, Route } from "lucide-react";
+import { m } from "motion/react";
 import { HeroEntrance } from "./motion";
 import { PhonePreview } from "./phone-preview";
 import { LinkButton } from "./ui";
@@ -12,7 +14,10 @@ export function Hero() {
       <HeroEntrance className="hero-content">
         <p className="location-pill"><span className="location-dot" />Made for Bongao, Tawi-Tawi<ArrowUpRight size={13} aria-hidden="true" /></p>
         <div className="hero-chip-group" aria-label="Ngaon services"><span className="hero-chip">Ride</span><span className="hero-chip">Food</span><span className="hero-chip">Pabili</span><span className="hero-chip">Padala</span></div>
-        <h1 id="hero-heading">Your everyday,{" "}<br /><span>delivered.</span></h1>
+        <m.div initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="hero-logo-wrap">
+          <Image src="/brand/ngaon-logo.gif" alt="Ngaon logo" width={160} height={160} className="hero-logo" />
+        </m.div>
+        <m.h1 id="hero-heading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.9 }}>Your everyday,{" "}<br /><span>delivered.</span></m.h1>
         <p className="hero-description">Rides, food, shopping errands, and parcel delivery—together in Ngaon, built for Bongao, Tawi-Tawi.</p>
         <div className="hero-actions"><LinkButton href="#features">Explore Ngaon</LinkButton><LinkButton href="#showcase" secondary>See the App</LinkButton></div>
         <a className="hero-scroll" href="#features"><span><ArrowDown size={14} aria-hidden="true" /></span>A little more about your everyday</a>
