@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 export function Brand({ inverse = false, href = "#top" }: { inverse?: boolean; href?: string }) {
   return (
     <a href={href} className={`brand${inverse ? " brand-inverse" : ""}`} aria-label="Ngaon home">
-      <Image src="/brand/ngaon-logo-192.png" alt="" width={38} height={38} />
+      <Image src="/brand/ngaon-logo-192.jpg" alt="" width={38} height={38} />
       <span>ngaon<span className="brand-dot">.</span></span>
     </a>
   );

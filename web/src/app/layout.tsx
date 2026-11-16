@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   applicationName: "Ngaon",
   icons: [
     { rel: "icon", url: "/brand/icon-32.png", sizes: "32x32", type: "image/png" },
-    { rel: "icon", url: "/brand/ngaon-logo-192.png", sizes: "192x192", type: "image/png" },
+    { rel: "icon", url: "/brand/ngaon-logo-192.jpg", sizes: "192x192", type: "image/jpeg" },
     { rel: "apple-touch-icon", url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
   ],
   openGraph: {

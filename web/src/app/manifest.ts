@@ -16,7 +16,7 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       { src: "/brand/icon-32.png", sizes: "32x32", type: "image/png" },
       { src: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-      { src: "/brand/ngaon-logo-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/brand/ngaon-logo-192.jpg", sizes: "192x192", type: "image/jpeg" },
     ],
   };
 }
