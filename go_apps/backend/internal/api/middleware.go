@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"crypto/subtle"
 	"log"
 	"net"
 	"net/http"
@@ -79,8 +80,30 @@ func (a *API) clientIP(r *http.Request) string {
 
 type handler func(w http.ResponseWriter, r *http.Request) error
 
+func (a *API) checkClientAPIKey(w http.ResponseWriter, r *http.Request) bool {
+	expected := strings.TrimSpace(a.svc.Cfg.APIKey)
+	if expected == "" {
+		return true // not enforced if API_KEY is unset
+	}
+	key := strings.TrimSpace(r.Header.Get("X-Api-Key"))
+	if key == "" {
+		key = strings.TrimSpace(r.Header.Get("X-API-KEY"))
+	}
+	if key == "" {
+		key = strings.TrimSpace(r.URL.Query().Get("api_key"))
+	}
+	if subtle.ConstantTimeCompare([]byte(key), []byte(expected)) != 1 {
+		fail(w, apiErr(401, "api_key_invalid", "Missing or invalid X-Api-Key header"))
+		return false
+	}
+	return true
+}
+
 func (a *API) pub(h handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !a.checkClientAPIKey(w, r) {
+			return
+		}
 		if !a.checkRateLimit(w, r) {
 			return
 		}
@@ -92,6 +115,9 @@ func (a *API) pub(h handler) http.HandlerFunc {
 
 func (a *API) authed(h handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !a.checkClientAPIKey(w, r) {
+			return
+		}
 		if !a.checkRateLimit(w, r) {
 			return
 		}

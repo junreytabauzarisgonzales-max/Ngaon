@@ -82,7 +82,7 @@ func New(cfg config.Config) (*Service, error) {
 		revokedTokens: map[string]time.Time{},
 		rateBuckets:   map[string]*memRateBucket{},
 	}
-	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v infobip_sms=%v", s.Maps.Enabled(), s.Didit.Enabled(), s.PM.Enabled(), s.Infobip.Enabled())
+	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v infobip_sms=%v api_key_auth=%v", s.Maps.Enabled(), s.Didit.Enabled(), s.PM.Enabled(), s.Infobip.Enabled(), s.Cfg.APIKey != "")
 
 	_ = os.MkdirAll(filepath.Join(cfg.DataDir, "uploads"), 0o755)
 

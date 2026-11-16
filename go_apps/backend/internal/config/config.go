@@ -55,6 +55,7 @@ type Config struct {
 	PayMongo            PayMongoConfig
 	Infobip             InfobipConfig
 	GoogleClientID      string
+	APIKey              string
 }
 
 func env(k, def string) string {
@@ -111,5 +112,6 @@ func Load() Config {
 			SenderID: env("INFOBIP_SENDER_ID", "Ngaon"),
 		},
 		GoogleClientID: os.Getenv("GOOGLE_CLIENT_ID"),
+		APIKey:         os.Getenv("API_KEY"),
 	}
 }
