@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { ArrowDown, ArrowUpRight, MapPin, Package, Route } from "lucide-react";
 import { m } from "motion/react";
