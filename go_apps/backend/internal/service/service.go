@@ -312,7 +312,7 @@ func (s *Service) Cancel(js *domain.JobState, cancelledBy, reason string) {
 		if s.PM != nil && s.PM.Enabled() && js.PMPaymentID != "" {
 			pid, amount, code := js.PMPaymentID, js.Job.Fare.TotalCentavos, js.Job.Code
 			go func() {
-				err := s.PM.Refund(context.Background(), pid, amount, "Ngain booking "+code+" cancelled: "+reason)
+				err := s.PM.Refund(context.Background(), pid, amount, "Ngaon booking "+code+" cancelled: "+reason)
 				integrations.LogIntegration("paymongo refund "+code, err)
 			}()
 		}

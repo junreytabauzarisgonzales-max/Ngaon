@@ -48,8 +48,8 @@ func peso(c int) string {
 	return out
 }
 
-var payTpl = template.Must(template.New("pay").Parse(`<!doctype html><html><head><title>Ngain Pay</title>` + pageCSS + `</head><body>
-<div class="card"><div class="brand">Ngain · {{.Method}}</div><p class="muted">Development checkout (no real money moves).</p>
+var payTpl = template.Must(template.New("pay").Parse(`<!doctype html><html><head><title>Ngaon Pay</title>` + pageCSS + `</head><body>
+<div class="card"><div class="brand">Ngaon · {{.Method}}</div><p class="muted">Development checkout (no real money moves).</p>
 <div class="muted">{{.What}}</div><div class="amt">{{.Amount}}</div>
 {{if .Done}}<p><span class="tag">{{.Done}}</span></p><p>You can go back to the app now.</p>
 {{else}}<form method="post"><button class="pay" name="result" value="paid">Pay {{.Amount}}</button>
@@ -128,8 +128,8 @@ func (a *API) payAction(w http.ResponseWriter, r *http.Request) {
 	a.renderPay(w, r, result)
 }
 
-var shareTpl = template.Must(template.New("share").Parse(`<!doctype html><html><head><title>Ngain trip {{.Code}}</title>
-<meta http-equiv="refresh" content="10">` + pageCSS + `</head><body><div class="card"><div class="brand">Ngain</div>
+var shareTpl = template.Must(template.New("share").Parse(`<!doctype html><html><head><title>Ngaon trip {{.Code}}</title>
+<meta http-equiv="refresh" content="10">` + pageCSS + `</head><body><div class="card"><div class="brand">Ngaon</div>
 <h1>{{.Code}} · {{.Status}}</h1><p class="muted">Live trip shared with you. This page refreshes every 10 seconds.</p>
 <table><tr><td class="muted">From</td><td>{{.From}}</td></tr><tr><td class="muted">To</td><td>{{.To}}</td></tr>
 {{if .Rider}}<tr><td class="muted">Rider</td><td>{{.Rider}}</td></tr>{{end}}</table>
@@ -155,8 +155,8 @@ func (a *API) sharePage(w http.ResponseWriter, r *http.Request) {
 	_ = shareTpl.Execute(w, d)
 }
 
-var adminTpl = template.Must(template.New("admin").Parse(`<!doctype html><html><head><title>Ngain admin</title>` + pageCSS + `</head><body>
-<div class="card"><div class="brand">Ngain admin</div><h1>Rider applications</h1>
+var adminTpl = template.Must(template.New("admin").Parse(`<!doctype html><html><head><title>Ngaon admin</title>` + pageCSS + `</head><body>
+<div class="card"><div class="brand">Ngaon admin</div><h1>Rider applications</h1>
 {{if not .Riders}}<p class="muted">No riders yet.</p>{{end}}
 <table>{{range .Riders}}<tr><td><b>{{.Name}}</b><br><span class="muted">{{.Phone}} · {{.Plate}}</span><br><span class="tag">{{.Status}}</span></td>
 <td>{{if eq .Status "pending_review"}}<form method="post" action="/admin/riders/{{.UserID}}/approve?token={{$.Token}}"><button class="pay">Approve</button></form>
@@ -254,7 +254,7 @@ func (a *API) indexPage(w http.ResponseWriter, _ *http.Request) {
 	}
 	a.svc.Unlock()
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngain API</title>%s</head><body><div class="card"><div class="brand">Ngain API</div>
+	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngaon API</title>%s</head><body><div class="card"><div class="brand">Ngaon API</div>
 <h1>Running ✓</h1><table><tr><td class="muted">Users</td><td>%d</td></tr><tr><td class="muted">Jobs</td><td>%d (%d live)</td></tr>
 <tr><td class="muted">Riders online</td><td>%d</td></tr><tr><td class="muted">WebSockets</td><td>%d</td></tr></table>
 <p class="muted">API base: %s/api/v1</p></div></body></html>`, pageCSS, users, jobs, live, online, a.svc.Hub.Count(), a.svc.Cfg.PublicURL)
@@ -349,6 +349,6 @@ func (a *API) diditWebhook(w http.ResponseWriter, r *http.Request) {
 func (a *API) returnPage(title, body string) http.HandlerFunc {
 	return func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintf(w, `<!doctype html><html><head><title>%s</title>%s</head><body><div class="card"><div class="brand">Ngain</div><h1>%s</h1><p class="muted">%s</p></div></body></html>`, title, pageCSS, title, body)
+		fmt.Fprintf(w, `<!doctype html><html><head><title>%s</title>%s</head><body><div class="card"><div class="brand">Ngaon</div><h1>%s</h1><p class="muted">%s</p></div></body></html>`, title, pageCSS, title, body)
 	}
 }

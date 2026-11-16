@@ -126,8 +126,8 @@ func (a *API) Routes() http.Handler {
 	// provider webhooks + return pages (in-app browser lands here afterwards)
 	mux.HandleFunc("POST /webhooks/paymongo", a.paymongoWebhook)
 	mux.HandleFunc("POST /webhooks/didit", a.diditWebhook)
-	mux.HandleFunc("GET /pay/return", a.returnPage("Payment received", "If you paid, your booking updates in a few seconds. You can close this page and go back to Ngain."))
-	mux.HandleFunc("GET /kyc/return", a.returnPage("Verification submitted", "Thanks! Close this page and go back to Ngain Rider. Approval usually takes a few minutes."))
+	mux.HandleFunc("GET /pay/return", a.returnPage("Payment received", "If you paid, your booking updates in a few seconds. You can close this page and go back to Ngaon."))
+	mux.HandleFunc("GET /kyc/return", a.returnPage("Verification submitted", "Thanks! Close this page and go back to Ngaon Rider. Approval usually takes a few minutes."))
 
 	return a.cors(securityHeaders(logging(mux)))
 }

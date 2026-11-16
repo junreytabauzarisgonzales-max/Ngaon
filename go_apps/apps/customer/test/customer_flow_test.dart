@@ -10,7 +10,7 @@ import 'package:go_customer/app/translations/customer_translations.dart';
 import 'package:go_customer/modules/ride/controller.dart';
 
 Widget app(String initial) => buildGoApp(
-  title: 'Ngain',
+  title: 'Ngaon',
   initialRoute: initial,
   pages: AppPages.pages,
   translations: customerTranslations,

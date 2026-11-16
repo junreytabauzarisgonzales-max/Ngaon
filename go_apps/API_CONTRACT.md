@@ -1,6 +1,6 @@
-# Ngain API contract (v1)
+# Ngaon API contract (v1)
 
-This is the single source of truth for the Golang backend and the three Flutter apps (Ngain, Ngain Rider, Ngain Merchant).
+This is the single source of truth for the Golang backend and the three Flutter apps (Ngaon, Ngaon Rider, Ngaon Merchant).
 Everything here is implemented by the apps' HTTP repositories (`packages/go_core/lib/repositories/http/`) and simulated by the mock backend (`packages/go_core/lib/repositories/mock/`).
 
 Example payloads for every model live in [`packages/go_core/assets/mock/*.json`](packages/go_core/assets/mock). The Dart test suite round-trips each fixture through the models (`fromJson → toJson` must be identical), so **the fixtures are the canonical JSON examples**.

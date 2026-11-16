@@ -9,7 +9,7 @@ import 'package:go_merchant/app/routes/app_routes.dart';
 import 'package:go_merchant/app/translations/merchant_translations.dart';
 
 Widget app() => buildGoApp(
-  title: 'Ngain Merchant',
+  title: 'Ngaon Merchant',
   initialRoute: Routes.splash,
   pages: AppPages.pages,
   translations: merchantTranslations,
@@ -90,7 +90,7 @@ void main() {
     usePhoneScreen(tester);
     final b = await start(tester, phone: '+639170000000');
     await pumpUntil(tester, find.byKey(const Key('not_merchant')));
-    expect(find.text('This number is not registered as a merchant. Contact Ngain support.'), findsOneWidget);
+    expect(find.text('This number is not registered as a merchant. Contact Ngaon support.'), findsOneWidget);
     await tearDownGoTest(tester, b);
   });
 }

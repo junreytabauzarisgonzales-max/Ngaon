@@ -1,4 +1,4 @@
-// Ngain backend: implements API_CONTRACT.md for Go Customer, Go Rider and Go Merchant.
+// Ngaon backend: implements API_CONTRACT.md for Go Customer, Go Rider and Go Merchant.
 package main
 
 import (
@@ -49,7 +49,7 @@ func main() {
 		}
 	}()
 	go func() {
-		log.Printf("Ngain API listening on :%s (public %s)", cfg.Port, cfg.PublicURL)
+		log.Printf("Ngaon API listening on :%s (public %s)", cfg.Port, cfg.PublicURL)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}

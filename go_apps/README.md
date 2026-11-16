@@ -1,12 +1,12 @@
-# Ngain apps: Ngain · Ngain Rider · Ngain Merchant
+# Ngaon apps: Ngaon · Ngaon Rider · Ngaon Merchant
 
-Flutter (GetX) monorepo for **Ngain**, a delivery super-app for Bongao, Tawi-Tawi. It combines Ride, Food, Pabili and Padala on one shared rider fleet.
+Flutter (GetX) monorepo for **Ngaon**, a delivery super-app for Bongao, Tawi-Tawi. It combines Ride, Food, Pabili and Padala on one shared rider fleet.
 
 | App | Folder | Android applicationId |
 | --- | --- | --- |
-| Ngain (customer) | `apps/customer` | `com.goapp.customer` |
-| Ngain Rider | `apps/rider` | `com.goapp.rider` |
-| Ngain Merchant | `apps/merchant` | `com.goapp.merchant` |
+| Ngaon (customer) | `apps/customer` | `com.goapp.customer` |
+| Ngaon Rider | `apps/rider` | `com.goapp.rider` |
+| Ngaon Merchant | `apps/merchant` | `com.goapp.merchant` |
 
 > Package IDs keep the original `com.goapp.*` names. Changing them makes Android treat the apps as new installs and needs new Firebase app registrations. Internal code names (`go_core`, `GoColors`…) are unchanged.
 
@@ -76,7 +76,7 @@ Dev stand-ins until real providers are connected:
 | Rider wallet | New riders get `RIDER_START_BALANCE` so they can go online; top-ups use the dev payment page |
 | Location | `DEV_ANY_LOCATION=true` accepts any pickup/drop-off; `MAX_DISPATCH_M=0` offers jobs to riders at any distance |
 
-Seeded merchant owner numbers for Ngain Merchant: `9193334444` (Kusina Bongao), `9193334445` (Pantay Grill), `9193334446` (Sitti Bakeshop), `9193334447` (Tiula Halo-Halo), `9193334448` (Bud Bongao Coffee). Any other number gets "not registered as a merchant".
+Seeded merchant owner numbers for Ngaon Merchant: `9193334444` (Kusina Bongao), `9193334445` (Pantay Grill), `9193334446` (Sitti Bakeshop), `9193334447` (Tiula Halo-Halo), `9193334448` (Bud Bongao Coffee). Any other number gets "not registered as a merchant".
 
 Live contract test (real HTTP + WebSocket repositories against a running server):
 `GO_API=http://127.0.0.1:8080 flutter test packages/go_core/test/live/live_api_test.dart`

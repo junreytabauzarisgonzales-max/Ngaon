@@ -709,7 +709,7 @@ func (a *API) riderTopup(w http.ResponseWriter, r *http.Request) error {
 	if t.PMCheckoutID == "" && a.svc.PM != nil && a.svc.PM.Enabled() {
 		a.svc.Unlock()
 		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
-		co, err := a.svc.PM.CreateCheckout(ctx, "TOP-"+t.ID[:8], fmt.Sprintf("Ngain rider top-up ₱%d", t.AmountCentavos/100), t.AmountCentavos, t.Method, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", map[string]string{"type": "topup", "topup_id": t.ID, "user_id": uid})
+		co, err := a.svc.PM.CreateCheckout(ctx, "TOP-"+t.ID[:8], fmt.Sprintf("Ngaon rider top-up ₱%d", t.AmountCentavos/100), t.AmountCentavos, t.Method, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", map[string]string{"type": "topup", "topup_id": t.ID, "user_id": uid})
 		cancel()
 		a.svc.Lock()
 		if err == nil {
