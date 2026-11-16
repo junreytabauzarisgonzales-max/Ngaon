@@ -4,7 +4,7 @@
     "type": "commission",
     "amount_centavos": -1300,
     "balance_after_centavos": 35000,
-    "note": "Commission GO-4821",
+    "note": "Commission NG-4821",
     "created_at": "2026-11-13T00:31:00Z",
     "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3"
   },
@@ -13,7 +13,7 @@
     "type": "earning",
     "amount_centavos": 6400,
     "balance_after_centavos": 36300,
-    "note": "Cash fare GO-4821",
+    "note": "Cash fare NG-4821",
     "created_at": "2026-11-13T00:31:00Z",
     "job_id": "408c11b0-e794-511d-883f-42da1dcfeae3"
   },
@@ -22,7 +22,7 @@
     "type": "commission",
     "amount_centavos": -1200,
     "balance_after_centavos": 36300,
-    "note": "Commission GO-4790",
+    "note": "Commission NG-4790",
     "created_at": "2026-11-12T04:52:00Z",
     "job_id": "547307a8-f0f6-5b9e-a397-e7240b588535"
   },

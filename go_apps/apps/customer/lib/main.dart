@@ -7,7 +7,7 @@ import 'app/translations/customer_translations.dart';
 
 Future<void> main() => bootstrapGoApp(
   config: AppConfig(app: GoApp.customer),
-  title: 'Go Customer',
+  title: 'Ngain',
   initialRoute: Routes.splash,
   pages: AppPages.pages,
   translations: customerTranslations,

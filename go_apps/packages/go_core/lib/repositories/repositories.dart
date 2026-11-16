@@ -86,6 +86,9 @@ abstract class RiderRepository {
   Future<Wallet> wallet();
   Future<Page<WalletTransaction>> transactions({String? cursor});
   Future<TopupResult> topup(int amountCentavos, PaymentMethod method, {required String idempotencyKey});
+
+  /// ADDED: start/resume Didit identity verification; returns the hosted URL.
+  Future<KycSession> createKycSession();
 }
 
 enum MerchantOrderFilter { newOrders, preparing, ready, done }

@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"goapp/backend/internal/domain"
+	"goapp/backend/internal/integrations"
 	"goapp/backend/internal/service"
 )
 
@@ -31,15 +33,130 @@ func (a *API) rider(r *http.Request) (*domain.Rider, error) {
 	return rd, nil
 }
 
+func (a *API) kycStatus(rd *domain.Rider) *string {
+	if a.svc.Didit == nil || !a.svc.Didit.Enabled() {
+		return nil
+	}
+	if rd.Profile.KycStatus != nil {
+		return rd.Profile.KycStatus
+	}
+	st := "not_started"
+	if rd.KycSessionID != "" {
+		st = "in_progress"
+	}
+	return &st
+}
+
 func (a *API) riderMe(w http.ResponseWriter, r *http.Request) error {
+	uid := claimsOf(r).Sub
+	if a.svc.Didit != nil && a.svc.Didit.Enabled() {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		a.syncKyc(ctx, uid)
+		cancel()
+	}
 	a.svc.Lock()
 	defer a.svc.Unlock()
 	rd, err := a.rider(r)
 	if err != nil {
 		return err
 	}
-	ok(w, rd.Profile)
+	prof := rd.Profile
+	prof.KycStatus = a.kycStatus(rd)
+	ok(w, prof)
 	return nil
+}
+
+func (a *API) riderKycSession(w http.ResponseWriter, r *http.Request) error {
+	if a.svc.Didit == nil || !a.svc.Didit.Enabled() {
+		return apiErr(400, "kyc_not_configured", "Identity verification is not enabled on this server")
+	}
+	uid := claimsOf(r).Sub
+	a.svc.Lock()
+	rd, err := a.rider(r)
+	if err != nil {
+		a.svc.Unlock()
+		return err
+	}
+	if rd.Profile.Status == "approved" {
+		a.svc.Unlock()
+		return apiErr(409, "already_approved", "Your account is already approved")
+	}
+	u := a.svc.St.Users[uid]
+	phone := ""
+	if u != nil {
+		phone = u.Phone
+	}
+	callback := strings.TrimRight(a.svc.Cfg.PublicURL, "/") + "/kyc/return"
+	a.svc.Unlock()
+
+	ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+	sess, err := a.svc.Didit.CreateSession(ctx, uid, callback, phone)
+	cancel()
+	if err != nil {
+		integrations.LogIntegration("didit create session", err)
+		return apiErr(502, "didit_error", "Could not start identity verification. Please try again.")
+	}
+
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	rd = a.svc.St.Riders[uid]
+	if rd != nil {
+		rd.KycSessionID = sess.SessionID
+		rd.KycURL = sess.URL
+		sStatus := integrations.KycFromDidit(sess.Status)
+		if sStatus == "not_started" {
+			sStatus = "in_progress"
+		}
+		rd.Profile.KycStatus = domain.StrPtr(sStatus)
+		a.svc.Touch()
+		ok(w, map[string]string{
+			"session_id": sess.SessionID,
+			"url":        sess.URL,
+			"kyc_status": sStatus,
+		})
+		return nil
+	}
+	return errNotFound
+}
+
+func (a *API) applyKyc(rd *domain.Rider, diditStatus string) {
+	mapped := integrations.KycFromDidit(diditStatus)
+	rd.Profile.KycStatus = &mapped
+	switch mapped {
+	case "approved":
+		a.svc.SetRiderReview(rd, true, "")
+	case "declined":
+		a.svc.SetRiderReview(rd, false, "Identity verification declined by provider")
+	}
+	a.svc.Touch()
+	a.svc.Emit(rd.Profile.UserID, "rider", "rider.profile_updated", map[string]any{"profile": rd.Profile})
+}
+
+func (a *API) syncKyc(ctx context.Context, uid string) {
+	a.svc.Lock()
+	rd := a.svc.St.Riders[uid]
+	if rd == nil || rd.KycSessionID == "" || a.svc.Didit == nil || !a.svc.Didit.Enabled() || time.Since(rd.KycCheckedAt) < 5*time.Second {
+		a.svc.Unlock()
+		return
+	}
+	if rd.Profile.KycStatus != nil && (*rd.Profile.KycStatus == "approved" || *rd.Profile.KycStatus == "declined") {
+		a.svc.Unlock()
+		return
+	}
+	rd.KycCheckedAt = time.Now()
+	sessID := rd.KycSessionID
+	a.svc.Unlock()
+
+	st, err := a.svc.Didit.Decision(ctx, sessID)
+	if err != nil {
+		integrations.LogIntegration("didit poll", err)
+		return
+	}
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	if rd := a.svc.St.Riders[uid]; rd != nil {
+		a.applyKyc(rd, st)
+	}
 }
 
 func (a *API) riderSubmit(w http.ResponseWriter, r *http.Request) error {
@@ -458,14 +575,66 @@ func dateRange(from, to string) []string {
 }
 
 func (a *API) riderWallet(w http.ResponseWriter, r *http.Request) error {
+	uid := claimsOf(r).Sub
+	if a.svc.PM != nil && a.svc.PM.Enabled() {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		a.syncTopups(ctx, uid)
+		cancel()
+	}
 	a.svc.Lock()
 	defer a.svc.Unlock()
-	rd, err := a.rider(r)
-	if err != nil {
-		return err
+	rd := a.svc.St.Riders[uid]
+	if rd == nil {
+		return errNotFound
 	}
 	ok(w, map[string]int{"balance_centavos": rd.Profile.BalanceCentavos, "min_balance_centavos": rd.Profile.MinBalanceCentavos})
 	return nil
+}
+
+func (a *API) syncTopups(ctx context.Context, uid string) {
+	a.svc.Lock()
+	var pending []*domain.Topup
+	for _, t := range a.svc.St.Topups {
+		if t.UserID == uid && t.Status != "paid" && t.PMCheckoutID != "" && time.Since(t.CheckedAt) > 4*time.Second {
+			t.CheckedAt = time.Now()
+			pending = append(pending, t)
+		}
+	}
+	a.svc.Unlock()
+	if len(pending) == 0 || a.svc.PM == nil || !a.svc.PM.Enabled() {
+		return
+	}
+	for _, t := range pending {
+		st, err := a.svc.PM.RetrieveCheckout(ctx, t.PMCheckoutID)
+		if err != nil {
+			integrations.LogIntegration("paymongo retrieve topup", err)
+			continue
+		}
+		if st.Paid {
+			a.svc.Lock()
+			a.creditTopup(t)
+			a.svc.Unlock()
+		}
+	}
+}
+
+func (a *API) topupURL(t *domain.Topup) string {
+	if t.CheckoutURL != "" {
+		return t.CheckoutURL
+	}
+	return strings.TrimRight(a.svc.Cfg.PublicURL, "/") + "/pay/topup/" + t.ID
+}
+
+func (a *API) creditTopup(t *domain.Topup) {
+	if t.Status == "paid" {
+		return
+	}
+	t.Status = "paid"
+	a.svc.AddTx(t.UserID, "topup", t.AmountCentavos, "", strings.ToUpper(t.Method[:1])+t.Method[1:]+" top-up")
+	if rd := a.svc.St.Riders[t.UserID]; rd != nil {
+		a.svc.Emit(t.UserID, "rider", "rider.profile_updated", map[string]any{"profile": rd.Profile})
+	}
+	a.svc.Touch()
 }
 
 func (a *API) riderTransactions(w http.ResponseWriter, r *http.Request) error {
@@ -537,9 +706,20 @@ func (a *API) riderTopup(w http.ResponseWriter, r *http.Request) error {
 		}
 		a.svc.Touch()
 	}
-	ok(w, map[string]string{
-		"topup_id":     t.ID,
-		"checkout_url": strings.TrimRight(a.svc.Cfg.PublicURL, "/") + "/pay/topup/" + t.ID,
-	})
+	if t.PMCheckoutID == "" && a.svc.PM != nil && a.svc.PM.Enabled() {
+		a.svc.Unlock()
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		co, err := a.svc.PM.CreateCheckout(ctx, "TOP-"+t.ID[:8], fmt.Sprintf("Ngain rider top-up ₱%d", t.AmountCentavos/100), t.AmountCentavos, t.Method, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", map[string]string{"type": "topup", "topup_id": t.ID, "user_id": uid})
+		cancel()
+		a.svc.Lock()
+		if err == nil {
+			t.PMCheckoutID = co.ID
+			t.CheckoutURL = co.URL
+		} else {
+			integrations.LogIntegration("paymongo topup "+t.ID, err)
+		}
+	}
+	u := a.topupURL(t)
+	ok(w, map[string]string{"topup_id": t.ID, "checkout_url": u})
 	return nil
 }

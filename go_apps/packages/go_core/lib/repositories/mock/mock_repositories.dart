@@ -133,6 +133,10 @@ class MockRiderRepository implements RiderRepository {
   MockRiderRepository(this.b);
   final MockBackend b;
 
+  /// Mock mode has no KYC provider: verification is instantly approved.
+  @override
+  Future<KycSession> createKycSession() => b.call(() => KycSession(sessionId: 'mock', url: '', kycStatus: 'approved'));
+
   @override
   Future<RiderProfile> me() => b.call(() => RiderProfile.fromJson(b.getRiderProfile()));
   @override

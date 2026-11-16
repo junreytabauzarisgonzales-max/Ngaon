@@ -4,10 +4,10 @@ import os, re, struct, zlib, math
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 APPS = {
-    "customer": {"label": "Go Customer", "color": (0x0B, 0x8A, 0x5B), "glyph": "pin", "extra_perms": ["CAMERA"], "lock": False},
-    'rider': {'label': 'Go Rider', 'color': (0xF0, 0x8C, 0x00), 'glyph': 'bike',
+    "customer": {"label": "Ngain", "color": (0x0B, 0x8A, 0x5B), "glyph": "pin", "extra_perms": ["CAMERA"], "lock": False},
+    'rider': {'label': 'Ngain Rider', 'color': (0xF0, 0x8C, 0x00), 'glyph': 'bike',
               'extra_perms': ['FOREGROUND_SERVICE', 'FOREGROUND_SERVICE_LOCATION', 'WAKE_LOCK', 'VIBRATE', 'USE_FULL_SCREEN_INTENT', 'CAMERA'], 'lock': True},
-    'merchant': {'label': 'Go Merchant', 'color': (0xE5, 0x53, 0x3D), 'glyph': 'store',
+    'merchant': {'label': 'Ngain Merchant', 'color': (0xE5, 0x53, 0x3D), 'glyph': 'store',
                  'extra_perms': ['WAKE_LOCK', 'VIBRATE', 'USE_FULL_SCREEN_INTENT', 'CAMERA'], 'lock': True},
 }
 BASE_PERMS = ['INTERNET', 'ACCESS_NETWORK_STATE', 'ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION', 'POST_NOTIFICATIONS']

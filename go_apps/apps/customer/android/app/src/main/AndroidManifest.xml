@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="Go Customer"
+        android:label="Ngain"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">

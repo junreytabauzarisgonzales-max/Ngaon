@@ -90,6 +90,7 @@ func (a *API) Routes() http.Handler {
 	mux.HandleFunc("GET "+v+"/rider/wallet", authed(a.riderWallet))
 	mux.HandleFunc("GET "+v+"/rider/wallet/transactions", authed(a.riderTransactions))
 	mux.HandleFunc("POST "+v+"/rider/wallet/topups", authed(a.riderTopup))
+	mux.HandleFunc("POST "+v+"/rider/kyc/session", authed(a.riderKycSession))
 
 	// merchant
 	mux.HandleFunc("GET "+v+"/merchant/me", authed(a.merchantMe))
@@ -121,6 +122,12 @@ func (a *API) Routes() http.Handler {
 	mux.HandleFunc("GET /t/{token}", a.sharePage)
 	mux.HandleFunc("POST /admin/riders/{id}/{action}", a.adminRider)
 	mux.HandleFunc("GET /admin", a.adminPage)
+
+	// provider webhooks + return pages (in-app browser lands here afterwards)
+	mux.HandleFunc("POST /webhooks/paymongo", a.paymongoWebhook)
+	mux.HandleFunc("POST /webhooks/didit", a.diditWebhook)
+	mux.HandleFunc("GET /pay/return", a.returnPage("Payment received", "If you paid, your booking updates in a few seconds. You can close this page and go back to Ngain."))
+	mux.HandleFunc("GET /kyc/return", a.returnPage("Verification submitted", "Thanks! Close this page and go back to Ngain Rider. Approval usually takes a few minutes."))
 
 	return a.cors(securityHeaders(logging(mux)))
 }

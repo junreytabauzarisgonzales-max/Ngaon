@@ -32,7 +32,7 @@ Future<void> goFirebaseBackgroundHandler(RemoteMessage message) async {
   await plugin.show(
     id: type.hashCode,
     title: type == 'offer.new' ? 'New job offer' : 'New order',
-    body: type == 'offer.new' ? 'Open Go Rider to accept' : 'Open Go Merchant to accept',
+    body: type == 'offer.new' ? 'Open Ngain Rider to accept' : 'Open Ngain Merchant to accept',
     notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         ch.id,

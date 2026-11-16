@@ -6,6 +6,27 @@ import (
 )
 
 // Config holds all configuration options for the Go backend service.
+type MapsConfig struct {
+	APIKey     string
+	TravelMode string
+	RoutesURL  string
+	GeocodeURL string
+	PlacesURL  string
+}
+
+type DiditConfig struct {
+	APIKey        string
+	WorkflowID    string
+	WebhookSecret string
+	BaseURL       string
+}
+
+type PayMongoConfig struct {
+	SecretKey     string
+	WebhookSecret string
+	BaseURL       string
+}
+
 type Config struct {
 	Port                string
 	PublicURL           string // e.g. http://192.168.2.194:8080 (what phones can reach)
@@ -23,6 +44,9 @@ type Config struct {
 	TrustedProxies      string // comma-separated trusted reverse-proxy IPs/CIDRs (or "*") for X-Forwarded-For
 	RateLimitPerMin     int    // general API requests per minute per IP (default 300)
 	AuthRateLimitPerMin int    // auth/OTP requests per minute per IP (default 30)
+	Maps                MapsConfig
+	Didit               DiditConfig
+	PayMongo            PayMongoConfig
 }
 
 func env(k, def string) string {
@@ -58,5 +82,20 @@ func Load() Config {
 		TrustedProxies:      env("TRUSTED_PROXIES", ""),
 		RateLimitPerMin:     envInt("RATE_LIMIT_PER_MIN", 300),
 		AuthRateLimitPerMin: envInt("AUTH_RATE_LIMIT_PER_MIN", 30),
+		Maps: MapsConfig{
+			APIKey:     os.Getenv("GOOGLE_MAPS_API_KEY"),
+			TravelMode: env("GOOGLE_ROUTES_TRAVEL_MODE", "TWO_WHEELER"),
+		},
+		Didit: DiditConfig{
+			APIKey:        os.Getenv("DIDIT_API_KEY"),
+			WorkflowID:    os.Getenv("DIDIT_WORKFLOW_ID"),
+			WebhookSecret: os.Getenv("DIDIT_WEBHOOK_SECRET"),
+			BaseURL:       env("DIDIT_BASE_URL", "https://verification.didit.me"),
+		},
+		PayMongo: PayMongoConfig{
+			SecretKey:     os.Getenv("PAYMONGO_SECRET_KEY"),
+			WebhookSecret: os.Getenv("PAYMONGO_WEBHOOK_SECRET"),
+			BaseURL:       env("PAYMONGO_BASE_URL", "https://api.paymongo.com"),
+		},
 	}
 }

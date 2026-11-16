@@ -100,6 +100,7 @@ type Job struct {
 	CancelledBy    *string         `json:"cancelled_by,omitempty"`
 	AllowedActions []string        `json:"allowed_actions"`
 	Timeline       []TimelineEntry `json:"timeline"`
+	RoutePolyline  *string         `json:"route_polyline,omitempty"` // ADDED: pickup -> drop-off route
 }
 
 type JobState struct {
@@ -116,6 +117,9 @@ type JobState struct {
 	CommissionCentavos int                 `json:"commission_centavos"`
 	CompletedAt        time.Time           `json:"completed_at"`
 	ShareToken         string              `json:"share_token,omitempty"`
+	PMCheckoutID       string              `json:"pm_checkout_id,omitempty"`
+	PMPaymentID        string              `json:"pm_payment_id,omitempty"`
+	PayCheckedAt       time.Time           `json:"-"`
 	Order              *MerchantOrderState `json:"order,omitempty"`
 }
 
@@ -191,6 +195,7 @@ type Quote struct {
 	Breakdown             []FareLine `json:"breakdown"`
 	TotalCentavos         int        `json:"total_centavos"`
 	MaxItemBudgetCentavos *int       `json:"max_item_budget_centavos,omitempty"`
+	RoutePolyline         *string    `json:"route_polyline,omitempty"`
 
 	// internal
 	UserID       string        `json:"-"`

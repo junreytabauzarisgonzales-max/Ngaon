@@ -13,6 +13,7 @@ import (
 
 	"goapp/backend/internal/config"
 	"goapp/backend/internal/domain"
+	"goapp/backend/internal/integrations"
 	"goapp/backend/internal/repository"
 	"goapp/backend/internal/repository/file"
 	"goapp/backend/internal/repository/postgres"
@@ -38,6 +39,9 @@ type Service struct {
 	DB         *sql.DB
 	Redis      *redis.Store
 	InstanceID string
+	Maps       *integrations.Maps
+	Didit      *integrations.Didit
+	PM         *integrations.PayMongo
 
 	revokedMu     sync.Mutex
 	revokedTokens map[string]time.Time
@@ -64,9 +68,13 @@ func New(cfg config.Config) (*Service, error) {
 		Hub:           websocket.NewHub(),
 		St:            repository.NewState(),
 		InstanceID:    domain.NewID(),
+		Maps:          integrations.NewMaps(cfg.Maps),
+		Didit:         integrations.NewDidit(cfg.Didit),
+		PM:            integrations.NewPayMongo(cfg.PayMongo),
 		revokedTokens: map[string]time.Time{},
 		rateBuckets:   map[string]*memRateBucket{},
 	}
+	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v", s.Maps.Enabled(), s.Didit.Enabled(), s.PM.Enabled())
 
 	_ = os.MkdirAll(filepath.Join(cfg.DataDir, "uploads"), 0o755)
 
@@ -175,7 +183,7 @@ func (s *Service) FileURL(key string) *string {
 
 func (s *Service) NextCode() string {
 	s.St.CodeSeq++
-	return fmt.Sprintf("GO-%d", s.St.CodeSeq)
+	return fmt.Sprintf("NG-%d", s.St.CodeSeq)
 }
 
 // EnsureUserLocked verifies that userID exists and has not been revoked across instances.
@@ -301,6 +309,13 @@ func (s *Service) Cancel(js *domain.JobState, cancelledBy, reason string) {
 	js.Job.CancelReason = &reason
 	if js.Job.Payment.Status == "paid" {
 		js.Job.Payment.Status = "refunded"
+		if s.PM != nil && s.PM.Enabled() && js.PMPaymentID != "" {
+			pid, amount, code := js.PMPaymentID, js.Job.Fare.TotalCentavos, js.Job.Code
+			go func() {
+				err := s.PM.Refund(context.Background(), pid, amount, "Ngain booking "+code+" cancelled: "+reason)
+				integrations.LogIntegration("paymongo refund "+code, err)
+			}()
+		}
 	}
 	if js.Order != nil {
 		js.Order.Status = "rejected"

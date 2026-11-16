@@ -159,11 +159,18 @@ func (s *Service) Tick() {
 		}
 	}
 
-	if s.Cfg.AutoApproveSeconds > 0 {
-		for _, rd := range s.St.Riders {
-			if rd.Profile.Status == "pending_review" && now.Sub(rd.SubmittedAt) > time.Duration(s.Cfg.AutoApproveSeconds)*time.Second {
+	for _, rd := range s.St.Riders {
+		if rd.Profile.Status != "pending_review" {
+			continue
+		}
+		if s.Didit != nil && s.Didit.Enabled() {
+			if rd.Profile.KycStatus != nil && *rd.Profile.KycStatus == "approved" {
 				s.SetRiderReview(rd, true, "")
 			}
+			continue
+		}
+		if s.Cfg.AutoApproveSeconds > 0 && now.Sub(rd.SubmittedAt) > time.Duration(s.Cfg.AutoApproveSeconds)*time.Second {
+			s.SetRiderReview(rd, true, "")
 		}
 	}
 

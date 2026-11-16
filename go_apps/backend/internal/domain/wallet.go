@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type WalletTransaction struct {
 	ID                   string  `json:"id"`
 	UserID               string  `json:"-"`
@@ -23,9 +25,12 @@ type Payout struct {
 }
 
 type Topup struct {
-	ID             string `json:"id"`
-	UserID         string `json:"user_id"`
-	AmountCentavos int    `json:"amount_centavos"`
-	Method         string `json:"method"`
-	Status         string `json:"status"`
+	ID             string    `json:"id"`
+	UserID         string    `json:"user_id"`
+	AmountCentavos int       `json:"amount_centavos"`
+	Method         string    `json:"method"`
+	Status         string    `json:"status"`
+	PMCheckoutID   string    `json:"pm_checkout_id,omitempty"`
+	CheckoutURL    string    `json:"checkout_url,omitempty"`
+	CheckedAt      time.Time `json:"-"`
 }

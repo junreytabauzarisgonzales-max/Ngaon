@@ -169,7 +169,7 @@ class _LoginScaffold extends StatelessWidget {
               decoration: BoxDecoration(color: GoColors.primary, borderRadius: BorderRadius.circular(18)),
               alignment: Alignment.center,
               child: const Text(
-                'Go',
+                'N',
                 style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
               ),
             ),

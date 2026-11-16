@@ -146,12 +146,12 @@ market = {'address': 'Bongao Public Market', 'location': ll(5.0296, 119.7727)}
 capitol = {'address': 'Provincial Capitol, Bongao', 'location': ll(5.0362, 119.7795)}
 k = M[0]
 jobs = [
-    {'id': uid('job-ride-1'), 'code': 'GO-4821', 'service': 'ride', 'status': 'completed', 'created_at': '2026-11-13T00:10:00Z', 'updated_at': '2026-11-13T00:31:00Z',
+    {'id': uid('job-ride-1'), 'code': 'NG-4821', 'service': 'ride', 'status': 'completed', 'created_at': '2026-11-13T00:10:00Z', 'updated_at': '2026-11-13T00:31:00Z',
      'pickup': home, 'dropoff': capitol, 'rider': rider_info, 'fare': fare([('Base fare', 4000), ('Distance 1.6 km', 2400)]),
      'payment': {'method': 'cash', 'status': 'paid'}, 'allowed_actions': ['rate'],
      'timeline': tl(('searching', '2026-11-13T00:10:00Z'), ('rider_assigned', '2026-11-13T00:11:00Z'), ('arrived_pickup', '2026-11-13T00:16:00Z'),
                     ('picked_up', '2026-11-13T00:18:00Z'), ('arrived_dropoff', '2026-11-13T00:30:00Z'), ('completed', '2026-11-13T00:31:00Z'))},
-    {'id': uid('job-food-1'), 'code': 'GO-4790', 'service': 'food', 'status': 'completed', 'created_at': '2026-11-12T04:00:00Z', 'updated_at': '2026-11-12T04:52:00Z',
+    {'id': uid('job-food-1'), 'code': 'NG-4790', 'service': 'food', 'status': 'completed', 'created_at': '2026-11-12T04:00:00Z', 'updated_at': '2026-11-12T04:52:00Z',
      'pickup': {'address': k['address'], 'location': k['location'], 'contact_name': k['name']}, 'dropoff': home, 'rider': rider_info,
      'merchant': {'id': k['id'], 'name': k['name'], 'phone_masked': '+63 917 ••• 8890'},
      'food': {'items': [{'name': 'Chicken adobo', 'quantity': 2, 'addons': ['Garlic rice'], 'line_total_centavos': 25000},
@@ -162,7 +162,7 @@ jobs = [
      'timeline': tl(('pending_payment', '2026-11-12T04:00:00Z'), ('merchant_pending', '2026-11-12T04:01:00Z'), ('merchant_preparing', '2026-11-12T04:03:00Z'),
                     ('searching', '2026-11-12T04:15:00Z'), ('rider_assigned', '2026-11-12T04:16:00Z'), ('arrived_pickup', '2026-11-12T04:24:00Z'),
                     ('picked_up', '2026-11-12T04:30:00Z'), ('arrived_dropoff', '2026-11-12T04:50:00Z'), ('completed', '2026-11-12T04:52:00Z'))},
-    {'id': uid('job-pabili-1'), 'code': 'GO-4755', 'service': 'pabili', 'status': 'completed', 'created_at': '2026-11-10T07:00:00Z', 'updated_at': '2026-11-10T07:55:00Z',
+    {'id': uid('job-pabili-1'), 'code': 'NG-4755', 'service': 'pabili', 'status': 'completed', 'created_at': '2026-11-10T07:00:00Z', 'updated_at': '2026-11-10T07:55:00Z',
      'pickup': market, 'dropoff': home, 'rider': rider_info,
      'pabili': {'store_name': 'Bongao Public Market', 'items': [{'name': 'Tomatoes', 'quantity': 1, 'note': '1 kilo'}, {'name': 'Eggs', 'quantity': 12}],
                 'receipt_url': 'https://picsum.photos/seed/receipt1/600/800', 'item_total_centavos': 21500},
@@ -170,7 +170,7 @@ jobs = [
      'proof_url': 'https://picsum.photos/seed/pod2/600/800', 'allowed_actions': [],
      'timeline': tl(('searching', '2026-11-10T07:00:00Z'), ('rider_assigned', '2026-11-10T07:02:00Z'), ('arrived_pickup', '2026-11-10T07:12:00Z'),
                     ('items_purchased', '2026-11-10T07:35:00Z'), ('picked_up', '2026-11-10T07:37:00Z'), ('arrived_dropoff', '2026-11-10T07:53:00Z'), ('completed', '2026-11-10T07:55:00Z'))},
-    {'id': uid('job-padala-1'), 'code': 'GO-4702', 'service': 'padala', 'status': 'cancelled', 'created_at': '2026-11-08T09:00:00Z', 'updated_at': '2026-11-08T09:05:00Z',
+    {'id': uid('job-padala-1'), 'code': 'NG-4702', 'service': 'padala', 'status': 'cancelled', 'created_at': '2026-11-08T09:00:00Z', 'updated_at': '2026-11-08T09:05:00Z',
      'pickup': home, 'dropoff': {'address': 'MSU Tawi-Tawi, Sanga-Sanga', 'location': ll(5.0467, 119.7484), 'contact_name': 'Nur Ali', 'contact_phone': '+639201234567'},
      'padala': {'size': 'small', 'description': 'Documents in an envelope', 'recipient_name': 'Nur Ali', 'recipient_phone': '+639201234567'},
      'fare': fare([('Base fare', 5000), ('Distance 4.1 km', 6200)]), 'payment': {'method': 'cash', 'status': 'pending'},
@@ -186,7 +186,7 @@ dump('quote_request.json', {'service': 'food', 'pickup': {'address': k['address'
               'addon_option_ids': [k['menu'][0]['items'][0]['addon_groups'][0]['options'][1]['id']], 'note': 'No onions'}]}})
 
 offer_job = json.loads(json.dumps(jobs[0]))
-offer_job.update({'id': uid('job-offer-1'), 'code': 'GO-4830', 'status': 'searching', 'created_at': '2026-11-14T14:00:00Z', 'updated_at': '2026-11-14T14:00:00Z',
+offer_job.update({'id': uid('job-offer-1'), 'code': 'NG-4830', 'status': 'searching', 'created_at': '2026-11-14T14:00:00Z', 'updated_at': '2026-11-14T14:00:00Z',
                   'payment': {'method': 'cash', 'status': 'pending'}, 'allowed_actions': [], 'timeline': tl(('searching', '2026-11-14T14:00:00Z'))})
 del offer_job['rider']
 dump('job_offer.json', {'id': uid('offer-1'), 'job': offer_job, 'earnings_centavos': 5100, 'pickup_distance_m': 800, 'expires_at': '2026-11-14T14:00:15Z'})
@@ -195,8 +195,8 @@ dump('rider_profile.json', {'id': uid('rider-1'), 'user_id': rider_user['id'], '
      'vehicle': {'plate': '123 ABC', 'make_model': 'Honda Click 125i', 'color': 'Red'}, 'rating': 4.9, 'balance_centavos': 35000, 'min_balance_centavos': 10000})
 
 txs, bal = [], 35000
-entries = [('commission', -1300, uid('job-ride-1'), 'Commission GO-4821', '2026-11-13T00:31:00Z'), ('earning', 6400, uid('job-ride-1'), 'Cash fare GO-4821', '2026-11-13T00:31:00Z'),
-           ('commission', -1200, uid('job-food-1'), 'Commission GO-4790', '2026-11-12T04:52:00Z'), ('topup', 20000, None, 'GCash top-up', '2026-11-11T01:00:00Z'),
+entries = [('commission', -1300, uid('job-ride-1'), 'Commission NG-4821', '2026-11-13T00:31:00Z'), ('earning', 6400, uid('job-ride-1'), 'Cash fare NG-4821', '2026-11-13T00:31:00Z'),
+           ('commission', -1200, uid('job-food-1'), 'Commission NG-4790', '2026-11-12T04:52:00Z'), ('topup', 20000, None, 'GCash top-up', '2026-11-11T01:00:00Z'),
            ('adjustment', 500, None, 'Weather bonus', '2026-11-09T10:00:00Z')]
 for i, (t, amt, jid, note, at) in enumerate(entries):
     tx = {'id': uid(f'tx-{i}'), 'type': t, 'amount_centavos': amt, 'balance_after_centavos': bal, 'note': note, 'created_at': at}
@@ -214,15 +214,15 @@ macct = {'merchant': {kk: v for kk, v in k.items() if kk not in ('menu', 'distan
 dump('merchant_account.json', macct)
 
 orders = [
-    {'id': uid('order-1'), 'job_id': uid('job-food-1'), 'code': 'GO-4790', 'status': 'completed', 'created_at': '2026-11-12T04:01:00Z', 'prep_time_minutes': 20,
+    {'id': uid('order-1'), 'job_id': uid('job-food-1'), 'code': 'NG-4790', 'status': 'completed', 'created_at': '2026-11-12T04:01:00Z', 'prep_time_minutes': 20,
      'ready_at': '2026-11-12T04:25:00Z', 'items': jobs[1]['food']['items'], 'subtotal_centavos': 30000, 'commission_centavos': 3000, 'net_centavos': 27000,
      'payment_method': 'gcash', 'rider': {'name': 'Jamal H.', 'photo_url': 'https://picsum.photos/seed/rider1/200', 'plate': '123 ABC', 'phone_masked': '+63 918 ••• 2222'},
      'customer_first_name': 'Aisha', 'allowed_actions': []},
-    {'id': uid('order-2'), 'job_id': uid('job-food-2'), 'code': 'GO-4831', 'status': 'new', 'created_at': '2026-11-14T14:00:00Z', 'merchant_accept_deadline': '2026-11-14T14:03:00Z',
+    {'id': uid('order-2'), 'job_id': uid('job-food-2'), 'code': 'NG-4831', 'status': 'new', 'created_at': '2026-11-14T14:00:00Z', 'merchant_accept_deadline': '2026-11-14T14:03:00Z',
      'items': [{'name': 'Beef kaldereta', 'quantity': 1, 'addons': ['Plain rice', 'Iced tea'], 'line_total_centavos': 18500}],
      'subtotal_centavos': 18500, 'commission_centavos': 1850, 'net_centavos': 16650, 'payment_method': 'cash', 'rider_pays_at_pickup_centavos': 16650,
      'customer_first_name': 'Omar', 'notes': 'Please add extra sauce', 'allowed_actions': ['accept', 'reject']},
-    {'id': uid('order-3'), 'job_id': uid('job-food-3'), 'code': 'GO-4777', 'status': 'rejected', 'created_at': '2026-11-11T11:00:00Z',
+    {'id': uid('order-3'), 'job_id': uid('job-food-3'), 'code': 'NG-4777', 'status': 'rejected', 'created_at': '2026-11-11T11:00:00Z',
      'items': [{'name': 'Chicken curry', 'quantity': 1, 'addons': ['Spicy'], 'line_total_centavos': 10500}], 'subtotal_centavos': 10500, 'commission_centavos': 0,
      'net_centavos': 0, 'payment_method': 'maya', 'customer_first_name': 'Fatima', 'reject_reason': 'out_of_stock', 'allowed_actions': []},
 ]

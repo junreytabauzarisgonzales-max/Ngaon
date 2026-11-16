@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"goapp/backend/internal/domain"
+	"goapp/backend/internal/integrations"
 	"goapp/backend/internal/service"
 )
 
@@ -138,9 +139,30 @@ func (a *API) createQuote(w http.ResponseWriter, r *http.Request) error {
 	if err := decode(r, &req); err != nil {
 		return err
 	}
+	// Food pickup is always the merchant's location.
+	a.svc.Lock()
+	if req.Service == "food" && req.Food != nil {
+		if m := a.svc.St.Merchants[req.Food.MerchantID]; m != nil {
+			req.Pickup = domain.Stop{Address: m.Merchant.Address, Location: m.Merchant.Location, ContactName: domain.StrPtr(m.Merchant.Name)}
+		}
+	}
+	a.svc.Unlock()
+
+	var rt *integrations.Route
+	if a.svc.Maps != nil && a.svc.Maps.Enabled() {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		route, err := a.svc.Maps.Route(ctx, req.Pickup.Location, req.Dropoff.Location)
+		cancel()
+		if err == nil {
+			rt = &route
+		} else {
+			integrations.LogIntegration("google routes", err) // fall back to straight-line pricing
+		}
+	}
+
 	a.svc.Lock()
 	defer a.svc.Unlock()
-	q, err := a.priceQuote(&req)
+	q, err := a.priceQuote(&req, rt)
 	if err != nil {
 		return err
 	}
@@ -156,7 +178,7 @@ func (a *API) createQuote(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (a *API) priceQuote(req *domain.QuoteRequest) (*domain.Quote, error) {
+func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*domain.Quote, error) {
 	if req.Service == "food" && req.Food != nil {
 		if m := a.svc.St.Merchants[req.Food.MerchantID]; m != nil {
 			req.Pickup = domain.Stop{Address: m.Merchant.Address, Location: m.Merchant.Location, ContactName: domain.StrPtr(m.Merchant.Name)}
@@ -167,6 +189,13 @@ func (a *API) priceQuote(req *domain.QuoteRequest) (*domain.Quote, error) {
 	}
 	dist := int(float64(domain.DistanceM(req.Pickup.Location, req.Dropoff.Location)) * 1.3)
 	dur := max(180, int(float64(dist)/1000/22*3600))
+	var poly *string
+	if rt != nil && rt.DistanceM > 0 {
+		dist, dur = rt.DistanceM, max(60, rt.DurationS)
+		if rt.Polyline != "" {
+			poly = domain.StrPtr(rt.Polyline)
+		}
+	}
 	km := int(math.Ceil(float64(dist) / 1000))
 	kmLabel := fmt.Sprintf("Distance %.1f km", float64(dist)/1000)
 	var lines []domain.FareLine
@@ -255,6 +284,7 @@ func (a *API) priceQuote(req *domain.QuoteRequest) (*domain.Quote, error) {
 		TotalCentavos:         total,
 		MaxItemBudgetCentavos: maxBudget,
 		FeesCentavos:          fees,
+		RoutePolyline:         poly,
 	}, nil
 }
 
@@ -304,10 +334,22 @@ func (a *API) createJob(w http.ResponseWriter, r *http.Request) error {
 		return apiErr(409, "quote_expired", "Quote expired")
 	}
 	// Re-validate (menu or store state may have changed since the quote).
-	if _, err := a.priceQuote(q.Request); err != nil {
+	if _, err := a.priceQuote(q.Request, nil); err != nil {
 		return err
 	}
 	js := a.buildJob(uid, q, b.PaymentMethod, b.Notes)
+	if (b.PaymentMethod == "gcash" || b.PaymentMethod == "maya") && a.svc.PM != nil && a.svc.PM.Enabled() {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		meta := map[string]string{"type": "job", "job_id": js.Job.ID, "user_id": uid}
+		co, err := a.svc.PM.CreateCheckout(ctx, js.Job.Code, "Ngain "+js.Job.Code, q.TotalCentavos, b.PaymentMethod, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", meta)
+		cancel()
+		if err == nil {
+			js.PMCheckoutID = co.ID
+			js.Job.Payment.CheckoutURL = domain.StrPtr(co.URL)
+		} else {
+			integrations.LogIntegration("paymongo checkout "+js.Job.Code, err)
+		}
+	}
 	a.svc.St.Jobs[js.Job.ID] = js
 	a.svc.St.JobIDs = append(a.svc.St.JobIDs, js.Job.ID)
 	delete(a.svc.St.Quotes, q.ID)
@@ -353,6 +395,7 @@ func (a *API) buildJob(uid string, q *domain.Quote, method string, notes *string
 		Payment:        domain.JobPayment{Method: method, Status: "pending"},
 		Timeline:       []domain.TimelineEntry{},
 		AllowedActions: []string{},
+		RoutePolyline:  q.RoutePolyline,
 	}
 	if method != "cash" {
 		j.Payment.CheckoutURL = domain.StrPtr(strings.TrimRight(a.svc.Cfg.PublicURL, "/") + "/pay/job/" + id)
@@ -452,13 +495,65 @@ func (a *API) listJobs(w http.ResponseWriter, r *http.Request) error {
 
 func (a *API) getJob(w http.ResponseWriter, r *http.Request) error {
 	a.svc.Lock()
-	defer a.svc.Unlock()
 	js, err := a.jobFor(r)
 	if err != nil {
+		a.svc.Unlock()
 		return err
+	}
+	needSync := js.Job.Status == "pending_payment" && js.PMCheckoutID != "" && a.svc.PM != nil && a.svc.PM.Enabled() && time.Since(js.PayCheckedAt) > 4*time.Second
+	jid := js.Job.ID
+	if needSync {
+		js.PayCheckedAt = time.Now()
+	}
+	a.svc.Unlock()
+
+	if needSync {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		a.syncJobPayment(ctx, jid)
+		cancel()
+	}
+
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	js = a.svc.St.Jobs[jid]
+	if js == nil {
+		return errNotFound
 	}
 	ok(w, a.svc.JobView(js, claimsOf(r).App))
 	return nil
+}
+
+func (a *API) syncJobPayment(ctx context.Context, jobID string) {
+	a.svc.Lock()
+	js := a.svc.St.Jobs[jobID]
+	if js == nil || js.Job.Status != "pending_payment" || js.PMCheckoutID == "" || a.svc.PM == nil || !a.svc.PM.Enabled() {
+		a.svc.Unlock()
+		return
+	}
+	csID := js.PMCheckoutID
+	a.svc.Unlock()
+
+	st, err := a.svc.PM.RetrieveCheckout(ctx, csID)
+	if err != nil {
+		integrations.LogIntegration("paymongo retrieve checkout", err)
+		return
+	}
+	if st.Paid {
+		a.svc.Lock()
+		if js := a.svc.St.Jobs[jobID]; js != nil && js.Job.Status == "pending_payment" {
+			a.markJobPaid(js, st.PaymentID)
+		}
+		a.svc.Unlock()
+	}
+}
+
+func (a *API) markJobPaid(js *domain.JobState, paymentID string) {
+	js.Job.Payment.Status = "paid"
+	if paymentID != "" {
+		js.PMPaymentID = paymentID
+	}
+	a.svc.AfterPayment(js)
+	a.svc.Touch()
 }
 
 func (a *API) cancelJob(w http.ResponseWriter, r *http.Request) error {

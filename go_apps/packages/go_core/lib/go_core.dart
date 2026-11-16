@@ -32,6 +32,7 @@ export 'translations/core_translations.dart';
 export 'utils/error_handler.dart';
 export 'utils/job_flow.dart';
 export 'utils/money.dart';
+export 'utils/polyline.dart';
 export 'utils/time.dart';
 export 'utils/validators.dart';
 export 'widgets/chat.dart';

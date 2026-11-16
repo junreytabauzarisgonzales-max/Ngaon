@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"goapp/backend/internal/domain"
+	"goapp/backend/internal/integrations"
 	"goapp/backend/internal/service"
 )
 
@@ -420,6 +421,16 @@ func (a *API) geoReverse(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	if a.svc.Maps != nil && a.svc.Maps.Enabled() {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		addr, err := a.svc.Maps.Reverse(ctx, p)
+		cancel()
+		if err == nil && addr != "" {
+			ok(w, map[string]string{"address": addr})
+			return nil
+		}
+		integrations.LogIntegration("google reverse geocode", err)
+	}
 	a.svc.Lock()
 	defer a.svc.Unlock()
 	best, bestD := domain.GeoPlace{}, 1<<30
@@ -446,9 +457,19 @@ func (a *API) geoSearch(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	q := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("q")))
+	var google []domain.GeoPlace
+	if a.svc.Maps != nil && a.svc.Maps.Enabled() && len([]rune(q)) >= 2 {
+		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+		var err error
+		google, err = a.svc.Maps.Search(ctx, q, near)
+		cancel()
+		if err != nil {
+			integrations.LogIntegration("google places search", err)
+		}
+	}
 	a.svc.Lock()
 	defer a.svc.Unlock()
-	out := []domain.GeoPlace{}
+	out := append([]domain.GeoPlace{}, google...)
 	for _, g := range a.gazetteer() {
 		if q == "" || strings.Contains(strings.ToLower(g.Name+" "+g.Address), q) {
 			out = append(out, g)

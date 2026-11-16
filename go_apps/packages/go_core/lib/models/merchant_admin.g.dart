@@ -6,63 +6,94 @@ part of 'merchant_admin.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MerchantAccount _$MerchantAccountFromJson(Map<String, dynamic> json) => MerchantAccount(
-  merchant: Merchant.fromJson(json['merchant'] as Map<String, dynamic>),
-  role: $enumDecode(_$MerchantRoleEnumMap, json['role']),
-  staffName: json['staff_name'] as String,
-);
+MerchantAccount _$MerchantAccountFromJson(Map<String, dynamic> json) =>
+    MerchantAccount(
+      merchant: Merchant.fromJson(json['merchant'] as Map<String, dynamic>),
+      role: $enumDecode(_$MerchantRoleEnumMap, json['role']),
+      staffName: json['staff_name'] as String,
+    );
 
-Map<String, dynamic> _$MerchantAccountToJson(MerchantAccount instance) => <String, dynamic>{
-  'merchant': instance.merchant.toJson(),
-  'role': _$MerchantRoleEnumMap[instance.role]!,
-  'staff_name': instance.staffName,
+Map<String, dynamic> _$MerchantAccountToJson(MerchantAccount instance) =>
+    <String, dynamic>{
+      'merchant': instance.merchant.toJson(),
+      'role': _$MerchantRoleEnumMap[instance.role]!,
+      'staff_name': instance.staffName,
+    };
+
+const _$MerchantRoleEnumMap = {
+  MerchantRole.owner: 'owner',
+  MerchantRole.staff: 'staff',
 };
 
-const _$MerchantRoleEnumMap = {MerchantRole.owner: 'owner', MerchantRole.staff: 'staff'};
+MerchantOrderRider _$MerchantOrderRiderFromJson(Map<String, dynamic> json) =>
+    MerchantOrderRider(
+      name: json['name'] as String,
+      photoUrl: json['photo_url'] as String?,
+      plate: json['plate'] as String,
+      phoneMasked: json['phone_masked'] as String,
+    );
 
-MerchantOrderRider _$MerchantOrderRiderFromJson(Map<String, dynamic> json) => MerchantOrderRider(
-  name: json['name'] as String,
-  photoUrl: json['photo_url'] as String?,
-  plate: json['plate'] as String,
-  phoneMasked: json['phone_masked'] as String,
-);
+Map<String, dynamic> _$MerchantOrderRiderToJson(MerchantOrderRider instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'photo_url': ?instance.photoUrl,
+      'plate': instance.plate,
+      'phone_masked': instance.phoneMasked,
+    };
 
-Map<String, dynamic> _$MerchantOrderRiderToJson(MerchantOrderRider instance) => <String, dynamic>{
-  'name': instance.name,
-  'photo_url': ?instance.photoUrl,
-  'plate': instance.plate,
-  'phone_masked': instance.phoneMasked,
-};
+MerchantOrder _$MerchantOrderFromJson(Map<String, dynamic> json) =>
+    MerchantOrder(
+      id: json['id'] as String,
+      jobId: json['job_id'] as String,
+      code: json['code'] as String,
+      status: $enumDecode(_$MerchantOrderStatusEnumMap, json['status']),
+      createdAt: const UtcDateTimeConverter().fromJson(
+        json['created_at'] as String,
+      ),
+      merchantAcceptDeadline: const NullableUtcDateTimeConverter().fromJson(
+        json['merchant_accept_deadline'] as String?,
+      ),
+      prepTimeMinutes: (json['prep_time_minutes'] as num?)?.toInt(),
+      readyAt: const NullableUtcDateTimeConverter().fromJson(
+        json['ready_at'] as String?,
+      ),
+      items: (json['items'] as List<dynamic>)
+          .map((e) => OrderLine.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      subtotalCentavos: (json['subtotal_centavos'] as num).toInt(),
+      commissionCentavos: (json['commission_centavos'] as num).toInt(),
+      netCentavos: (json['net_centavos'] as num).toInt(),
+      paymentMethod: $enumDecode(
+        _$PaymentMethodEnumMap,
+        json['payment_method'],
+      ),
+      riderPaysAtPickupCentavos: (json['rider_pays_at_pickup_centavos'] as num?)
+          ?.toInt(),
+      rider: json['rider'] == null
+          ? null
+          : MerchantOrderRider.fromJson(json['rider'] as Map<String, dynamic>),
+      customerFirstName: json['customer_first_name'] as String,
+      notes: json['notes'] as String?,
+      rejectReason: $enumDecodeNullable(
+        _$RejectReasonEnumMap,
+        json['reject_reason'],
+      ),
+      allowedActions: (json['allowed_actions'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+    );
 
-MerchantOrder _$MerchantOrderFromJson(Map<String, dynamic> json) => MerchantOrder(
-  id: json['id'] as String,
-  jobId: json['job_id'] as String,
-  code: json['code'] as String,
-  status: $enumDecode(_$MerchantOrderStatusEnumMap, json['status']),
-  createdAt: const UtcDateTimeConverter().fromJson(json['created_at'] as String),
-  merchantAcceptDeadline: const NullableUtcDateTimeConverter().fromJson(json['merchant_accept_deadline'] as String?),
-  prepTimeMinutes: (json['prep_time_minutes'] as num?)?.toInt(),
-  readyAt: const NullableUtcDateTimeConverter().fromJson(json['ready_at'] as String?),
-  items: (json['items'] as List<dynamic>).map((e) => OrderLine.fromJson(e as Map<String, dynamic>)).toList(),
-  subtotalCentavos: (json['subtotal_centavos'] as num).toInt(),
-  commissionCentavos: (json['commission_centavos'] as num).toInt(),
-  netCentavos: (json['net_centavos'] as num).toInt(),
-  paymentMethod: $enumDecode(_$PaymentMethodEnumMap, json['payment_method']),
-  riderPaysAtPickupCentavos: (json['rider_pays_at_pickup_centavos'] as num?)?.toInt(),
-  rider: json['rider'] == null ? null : MerchantOrderRider.fromJson(json['rider'] as Map<String, dynamic>),
-  customerFirstName: json['customer_first_name'] as String,
-  notes: json['notes'] as String?,
-  rejectReason: $enumDecodeNullable(_$RejectReasonEnumMap, json['reject_reason']),
-  allowedActions: (json['allowed_actions'] as List<dynamic>).map((e) => e as String).toList(),
-);
-
-Map<String, dynamic> _$MerchantOrderToJson(MerchantOrder instance) => <String, dynamic>{
+Map<String, dynamic> _$MerchantOrderToJson(
+  MerchantOrder instance,
+) => <String, dynamic>{
   'id': instance.id,
   'job_id': instance.jobId,
   'code': instance.code,
   'status': _$MerchantOrderStatusEnumMap[instance.status]!,
   'created_at': const UtcDateTimeConverter().toJson(instance.createdAt),
-  'merchant_accept_deadline': ?const NullableUtcDateTimeConverter().toJson(instance.merchantAcceptDeadline),
+  'merchant_accept_deadline': ?const NullableUtcDateTimeConverter().toJson(
+    instance.merchantAcceptDeadline,
+  ),
   'prep_time_minutes': ?instance.prepTimeMinutes,
   'ready_at': ?const NullableUtcDateTimeConverter().toJson(instance.readyAt),
   'items': instance.items.map((e) => e.toJson()).toList(),
@@ -88,7 +119,11 @@ const _$MerchantOrderStatusEnumMap = {
   MerchantOrderStatus.cancelled: 'cancelled',
 };
 
-const _$PaymentMethodEnumMap = {PaymentMethod.cash: 'cash', PaymentMethod.gcash: 'gcash', PaymentMethod.maya: 'maya'};
+const _$PaymentMethodEnumMap = {
+  PaymentMethod.cash: 'cash',
+  PaymentMethod.gcash: 'gcash',
+  PaymentMethod.maya: 'maya',
+};
 
 const _$RejectReasonEnumMap = {
   RejectReason.outOfStock: 'out_of_stock',
@@ -118,18 +153,21 @@ SalesReport _$SalesReportFromJson(Map<String, dynamic> json) => SalesReport(
   grossCentavos: (json['gross_centavos'] as num).toInt(),
   commissionCentavos: (json['commission_centavos'] as num).toInt(),
   netCentavos: (json['net_centavos'] as num).toInt(),
-  days: (json['days'] as List<dynamic>).map((e) => SalesDay.fromJson(e as Map<String, dynamic>)).toList(),
+  days: (json['days'] as List<dynamic>)
+      .map((e) => SalesDay.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
-Map<String, dynamic> _$SalesReportToJson(SalesReport instance) => <String, dynamic>{
-  'from': instance.from,
-  'to': instance.to,
-  'orders_count': instance.ordersCount,
-  'gross_centavos': instance.grossCentavos,
-  'commission_centavos': instance.commissionCentavos,
-  'net_centavos': instance.netCentavos,
-  'days': instance.days.map((e) => e.toJson()).toList(),
-};
+Map<String, dynamic> _$SalesReportToJson(SalesReport instance) =>
+    <String, dynamic>{
+      'from': instance.from,
+      'to': instance.to,
+      'orders_count': instance.ordersCount,
+      'gross_centavos': instance.grossCentavos,
+      'commission_centavos': instance.commissionCentavos,
+      'net_centavos': instance.netCentavos,
+      'days': instance.days.map((e) => e.toJson()).toList(),
+    };
 
 Payout _$PayoutFromJson(Map<String, dynamic> json) => Payout(
   id: json['id'] as String,
@@ -138,7 +176,9 @@ Payout _$PayoutFromJson(Map<String, dynamic> json) => Payout(
   amountCentavos: (json['amount_centavos'] as num).toInt(),
   type: $enumDecode(_$PayoutTypeEnumMap, json['type']),
   status: $enumDecode(_$PayoutStatusEnumMap, json['status']),
-  paidAt: const NullableUtcDateTimeConverter().fromJson(json['paid_at'] as String?),
+  paidAt: const NullableUtcDateTimeConverter().fromJson(
+    json['paid_at'] as String?,
+  ),
 );
 
 Map<String, dynamic> _$PayoutToJson(Payout instance) => <String, dynamic>{
@@ -151,6 +191,13 @@ Map<String, dynamic> _$PayoutToJson(Payout instance) => <String, dynamic>{
   'paid_at': ?const NullableUtcDateTimeConverter().toJson(instance.paidAt),
 };
 
-const _$PayoutTypeEnumMap = {PayoutType.payout: 'payout', PayoutType.commissionInvoice: 'commission_invoice'};
+const _$PayoutTypeEnumMap = {
+  PayoutType.payout: 'payout',
+  PayoutType.commissionInvoice: 'commission_invoice',
+};
 
-const _$PayoutStatusEnumMap = {PayoutStatus.pending: 'pending', PayoutStatus.paid: 'paid', PayoutStatus.overdue: 'overdue'};
+const _$PayoutStatusEnumMap = {
+  PayoutStatus.pending: 'pending',
+  PayoutStatus.paid: 'paid',
+  PayoutStatus.overdue: 'overdue',
+};

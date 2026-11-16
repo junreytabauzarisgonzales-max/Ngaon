@@ -109,6 +109,9 @@ func (s *Server) Routes() http.Handler {
 	return s.api.Routes()
 }
 
+func (s *Server) lock()   { s.svc.Lock() }
+func (s *Server) unlock() { s.svc.Unlock() }
+
 func (s *Server) Tick() {
 	s.svc.Tick()
 }

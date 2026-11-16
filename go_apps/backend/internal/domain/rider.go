@@ -18,17 +18,21 @@ type RiderProfile struct {
 	Rating             *float64 `json:"rating,omitempty"`
 	BalanceCentavos    int      `json:"balance_centavos"`
 	MinBalanceCentavos int      `json:"min_balance_centavos"`
+	KycStatus          *string  `json:"kyc_status,omitempty"`
 }
 
 type Rider struct {
-	Profile     RiderProfile      `json:"profile"`
-	Documents   map[string]string `json:"documents"`
-	Location    *LatLng           `json:"location"`
-	LocationAt  time.Time         `json:"location_at"`
-	ActiveJobID string            `json:"active_job_id"`
-	RatingSum   int               `json:"rating_sum"`
-	RatingCount int               `json:"rating_count"`
-	SubmittedAt time.Time         `json:"submitted_at"`
+	Profile      RiderProfile      `json:"profile"`
+	Documents    map[string]string `json:"documents"`
+	Location     *LatLng           `json:"location"`
+	LocationAt   time.Time         `json:"location_at"`
+	ActiveJobID  string            `json:"active_job_id"`
+	RatingSum    int               `json:"rating_sum"`
+	RatingCount  int               `json:"rating_count"`
+	SubmittedAt  time.Time         `json:"submitted_at"`
+	KycSessionID string            `json:"kyc_session_id,omitempty"`
+	KycURL       string            `json:"kyc_url,omitempty"`
+	KycCheckedAt time.Time         `json:"-"`
 }
 
 type JobOffer struct {

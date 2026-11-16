@@ -1,6 +1,6 @@
-# Go API contract (v1)
+# Ngain API contract (v1)
 
-This is the single source of truth for the Golang backend and the three Flutter apps (Go Customer, Go Rider, Go Merchant).
+This is the single source of truth for the Golang backend and the three Flutter apps (Ngain, Ngain Rider, Ngain Merchant).
 Everything here is implemented by the apps' HTTP repositories (`packages/go_core/lib/repositories/http/`) and simulated by the mock backend (`packages/go_core/lib/repositories/mock/`).
 
 Example payloads for every model live in [`packages/go_core/assets/mock/*.json`](packages/go_core/assets/mock). The Dart test suite round-trips each fixture through the models (`fromJson → toJson` must be identical), so **the fixtures are the canonical JSON examples**.
@@ -256,7 +256,7 @@ QuoteRequest    { service: "ride"|"food"|"pabili"|"padala", pickup: Stop, dropof
 Quote           { id, service, distance_m, duration_s, expires_at,
                   breakdown: [ { label, amount_centavos } ], total_centavos, max_item_budget_centavos? }
 
-Job             { id, code ("GO-4821"), service, status, created_at, updated_at,
+Job             { id, code ("NG-4821"), service, status, created_at, updated_at,
                   pickup: Stop, dropoff: Stop,
                   rider?: { id, name, photo_url?, phone_masked, plate, make_model, color, rating?, location?: LatLng },
                   merchant?: { id, name, phone_masked },
@@ -420,3 +420,14 @@ Server → client:
 | Q1 | **OPEN** | `confirm-items` with `approved=false`: the mock cancels the job (`cancelled_by=customer`, reason "Item total disputed…"). | The brief doesn't define the dispute flow (refund the rider? support ticket?). Product decision needed. |
 | Q2 | **OPEN** | FCM token type | `firebase_messaging` 17 deprecates `getToken()` in favour of Firebase Installation IDs ("direct send"). The apps still send a classic registration token as `fcm_token`. If the backend moves to FID direct-send, rename the field or add `fid`. |
 | Q3 | OPEN | Rider cancel / "can't complete" | Not in the brief. The rider app offers no cancel button, so riders must contact support. |
+
+### 9.1 Provider integrations (ADDED)
+
+| # | Kind | Item | Why |
+| --- | --- | --- | --- |
+| A3 | **ADDED** field | `Quote.route_polyline?`, `Job.route_polyline?`: Google encoded polyline (precision 5) of the pickup → drop-off road route | Draw the route on maps. Present only when Google Maps is configured. |
+| A4 | **ADDED** field | `RiderProfile.kyc_status?`: `not_started` \| `in_progress` \| `in_review` \| `approved` \| `declined` \| `expired` | Rider identity verification (Didit). Absent when KYC is not enabled. While present and not `approved`, the rider stays `pending_review`. `declined` moves the profile to `rejected`. |
+| A5 | **ADDED** endpoint | `POST /rider/kyc/session` → `{ session_id, url, kyc_status }` | Starts (or resumes) a Didit session. The app opens `url` in an in-app browser, then polls `GET /rider/me`. |
+| A6 | **ADDED** endpoints | `POST /webhooks/paymongo`, `POST /webhooks/didit` (provider → backend, not called by the apps) | Payment / KYC callbacks. The backend verifies signatures and re-fetches the payment or decision from the provider before acting. |
+| C9 | CLARIFIED | `payment.checkout_url` is the PayMongo hosted checkout when PayMongo is configured. `GET /jobs/{id}` and `GET /rider/wallet` / `GET /rider/me` check PayMongo for pending payments, so polling works without webhooks. | LAN testing; webhook delivery delays |
+| C10 | CLARIFIED | Booking codes are `NG-1234` | Brand |
