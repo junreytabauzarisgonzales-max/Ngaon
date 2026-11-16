@@ -12,6 +12,7 @@ import '../services/auth_service.dart';
 import '../theme/go_theme.dart';
 import '../utils/error_handler.dart';
 import '../utils/validators.dart';
+import 'dev_server.dart';
 
 /// Shared phone -> OTP -> (name) flow for all three apps.
 /// Each app supplies [onLoggedIn] to route after login.
@@ -220,6 +221,7 @@ class LoginPhoneView extends GetView<LoginController> {
           child: controller.busy.value ? const _Spinner() : Text('common.continue'.tr),
         ),
       ),
+      const ServerAddressButton(),
       if (AppConfig.current.useMockApi)
         Padding(
           padding: const EdgeInsets.only(top: 16),

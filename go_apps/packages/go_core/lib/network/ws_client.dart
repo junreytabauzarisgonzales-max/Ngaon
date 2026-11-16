@@ -68,7 +68,8 @@ class RealWsClient extends GoWsClient {
   }) : _factory = channelFactory ?? WebSocketChannel.connect,
        backoff = backoff ?? Backoff();
 
-  final String wsUrl;
+  /// Mutable for the dev server-address setting.
+  String wsUrl;
   final String? Function() accessToken;
   final Future<bool> Function() refreshToken;
   final ChannelFactory _factory;

@@ -86,6 +86,12 @@ class GoRepositoryBinding extends Bindings {
 Future<void> initGoCore(AppConfig config, {KeyValueStore? store, SecureKeyValue? secure, MockBackend? mockBackend}) async {
   AppConfig.current = config;
   final storage = Get.put(StorageService(store ?? await GetStorageStore.open()), permanent: true);
+  // Dev builds: a server address chosen on the phone overrides the build-time one.
+  final savedServer = storage.store.read<String>(serverAddressKey);
+  if (config.devTools && !config.useMockApi && savedServer != null && savedServer.isNotEmpty) {
+    config.apiBaseUrl = savedServer;
+    config.wsUrl = AppConfig.wsFor(savedServer);
+  }
   Get.put(ThemeService(storage), permanent: true);
   final session = Get.put(SessionStore(secure ?? PlatformSecureKeyValue()), permanent: true);
   final auth = Get.put(AuthService(session: session, storage: storage), permanent: true);
@@ -157,7 +163,12 @@ Widget buildGoApp({
     // Status bar icons follow the theme even on screens without an AppBar.
     builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
       value: goOverlayStyle(Theme.of(context).brightness),
-      child: Column(children: [const OfflineBanner(), Expanded(child: child ?? const SizedBox.shrink())]),
+      child: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(child: child ?? const SizedBox.shrink()),
+        ],
+      ),
     ),
   );
 }
@@ -180,4 +191,23 @@ Future<void> bootstrapGoApp({
 Future<void> setGoLanguage(String code) async {
   await Get.find<StorageService>().setLanguage(code);
   await Get.updateLocale(code == 'fil' ? const Locale('fil', 'PH') : const Locale('en', 'US'));
+}
+
+const serverAddressKey = 'dev_server_api';
+
+/// Switches the backend at runtime (dev builds): saves it, repoints REST and
+/// WebSocket clients, and signs out (tokens belong to the old server).
+Future<void> setServerAddress(String apiBase) async {
+  final cfg = AppConfig.current;
+  cfg.apiBaseUrl = apiBase;
+  cfg.wsUrl = AppConfig.wsFor(apiBase);
+  await Get.find<StorageService>().store.write(serverAddressKey, apiBase);
+  Get.find<ApiClient>().setServer(apiBase);
+  final ws = Get.find<GoWsClient>();
+  if (ws is RealWsClient) {
+    await ws.disconnect();
+    ws.wsUrl = cfg.wsUrl;
+  }
+  final auth = Get.find<AuthService>();
+  if (auth.isLoggedIn) await auth.logout(remote: false);
 }

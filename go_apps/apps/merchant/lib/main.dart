@@ -7,7 +7,7 @@ import 'app/translations/merchant_translations.dart';
 
 Future<void> main() => bootstrapGoApp(
   config: AppConfig(app: GoApp.merchant),
-  title: 'Ngain Merchant',
+  title: 'Ngaon Merchant',
   initialRoute: Routes.splash,
   pages: AppPages.pages,
   translations: merchantTranslations,

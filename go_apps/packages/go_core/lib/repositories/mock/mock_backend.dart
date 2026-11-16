@@ -555,7 +555,7 @@ class MockBackend {
     final job = _job(id);
     if (job['status'] != 'items_purchased') fail(ErrorCodes.invalidStatusTransition, 'Nothing to confirm', status: 409);
     if (!approved) {
-      job['cancel_reason'] = 'Item total disputed by customer. Ngain support will contact you.';
+      job['cancel_reason'] = 'Item total disputed by customer. Ngaon support will contact you.';
       job['cancelled_by'] = 'customer';
       _setStatus(job, 'cancelled');
       return jobView(job);

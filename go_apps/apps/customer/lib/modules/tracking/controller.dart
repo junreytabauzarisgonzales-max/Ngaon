@@ -9,7 +9,7 @@ import '../../app/routes/app_routes.dart';
 import '../../app/services/active_jobs_service.dart';
 import '../checkout/controller.dart';
 
-class TrackingController extends GetxController {
+class TrackingController extends GetxController with WidgetsBindingObserver {
   final JobsRepository repo = Get.find();
   final GoWsClient ws = Get.find();
   final LocationService location = Get.find();
@@ -28,6 +28,7 @@ class TrackingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     jobId = Get.arguments as String;
     _sub = ws.events.listen(_onEvent);
     _re = ws.reconnected.listen((_) {
@@ -50,6 +51,13 @@ class TrackingController extends GetxController {
     if (j.rider?.location != null && riderLocation.value == null) riderLocation.value = j.rider!.location;
     activeJobs.upsert(j);
     _managePolling(j);
+  }
+
+  /// Back from the payment page (or app switch): refresh right away; the
+  /// backend checks PayMongo when the job is fetched.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) load(silent: true);
   }
 
   /// Online payments: poll until paid/failed (in case the socket missed it).
@@ -169,6 +177,7 @@ class TrackingController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     ws.send(WsTypes.jobUnsubscribe, {'job_id': jobId});
     _sub?.cancel();
     _re?.cancel();

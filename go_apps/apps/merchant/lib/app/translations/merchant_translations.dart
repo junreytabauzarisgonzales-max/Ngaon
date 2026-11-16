@@ -1,7 +1,7 @@
 /// Merchant-specific strings, merged with go_core's shared keys.
 const merchantTranslations = <String, Map<String, String>>{
   'en_US': {
-    'merchant.not_merchant': 'This number is not registered as a merchant. Contact Ngain support.',
+    'merchant.not_merchant': 'This number is not registered as a merchant. Contact Ngaon support.',
     'merchant.menu': 'Menu',
     'merchant.sales': 'Sales',
     'merchant.store': 'Store',
@@ -37,7 +37,7 @@ const merchantTranslations = <String, Map<String, String>>{
     'merchant.auto_reject_in': 'Auto-reject in @t',
     'merchant.customer': 'Customer',
     'merchant.prep_is': 'Prep time: @m min',
-    'merchant.commission': 'Ngain commission',
+    'merchant.commission': 'Ngaon commission',
     'merchant.rider_pays': 'Rider pays you at pickup',
     'merchant.handoff': 'Rider pickup',
     'merchant.match_code': 'Match code',
@@ -73,7 +73,7 @@ const merchantTranslations = <String, Map<String, String>>{
     'merchant.cover': 'Cover photo',
     'merchant.store_name': 'Store name',
     'merchant.address': 'Address',
-    'merchant.address_help': 'Contact Ngain support to change the address.',
+    'merchant.address_help': 'Contact Ngaon support to change the address.',
     'merchant.min_order': 'Minimum order',
     'merchant.default_prep': 'Default prep time: @m min',
     'merchant.hours': 'Opening hours',
@@ -98,7 +98,7 @@ const merchantTranslations = <String, Map<String, String>>{
     'merchant.role.staff': 'Staff',
   },
   'fil_PH': {
-    'merchant.not_merchant': 'Hindi naka-rehistro bilang merchant ang number na ito. Makipag-ugnayan sa Ngain support.',
+    'merchant.not_merchant': 'Hindi naka-rehistro bilang merchant ang number na ito. Makipag-ugnayan sa Ngaon support.',
     'merchant.menu': 'Menu',
     'merchant.sales': 'Benta',
     'merchant.store': 'Tindahan',
@@ -134,7 +134,7 @@ const merchantTranslations = <String, Map<String, String>>{
     'merchant.auto_reject_in': 'Awtomatikong tatanggihan sa @t',
     'merchant.customer': 'Customer',
     'merchant.prep_is': 'Oras ng paghahanda: @m min',
-    'merchant.commission': 'Komisyon ng Ngain',
+    'merchant.commission': 'Komisyon ng Ngaon',
     'merchant.rider_pays': 'Babayaran ka ng rider sa pickup',
     'merchant.handoff': 'Pagkuha ng rider',
     'merchant.match_code': 'Code',
@@ -170,7 +170,7 @@ const merchantTranslations = <String, Map<String, String>>{
     'merchant.cover': 'Cover photo',
     'merchant.store_name': 'Pangalan ng tindahan',
     'merchant.address': 'Address',
-    'merchant.address_help': 'Makipag-ugnayan sa Ngain support para palitan ang address.',
+    'merchant.address_help': 'Makipag-ugnayan sa Ngaon support para palitan ang address.',
     'merchant.min_order': 'Minimum order',
     'merchant.default_prep': 'Karaniwang paghahanda: @m min',
     'merchant.hours': 'Oras ng bukas',

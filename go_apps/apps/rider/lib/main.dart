@@ -7,7 +7,7 @@ import 'app/translations/rider_translations.dart';
 
 Future<void> main() => bootstrapGoApp(
   config: AppConfig(app: GoApp.rider),
-  title: 'Ngain Rider',
+  title: 'Ngaon Rider',
   initialRoute: Routes.splash,
   pages: AppPages.pages,
   translations: riderTranslations,

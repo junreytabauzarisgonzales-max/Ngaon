@@ -10,6 +10,9 @@ class GoErrors {
 
   static String message(Object error) {
     if (error is ApiException) {
+      if (error.code == ErrorCodes.rateLimited && (error.retryAfterSeconds ?? 0) > 0) {
+        return 'error.rate_limited_wait'.trParams({'s': '${error.retryAfterSeconds}'});
+      }
       final key = 'error.${error.code}';
       final t = key.tr;
       if (t != key) return t;
@@ -43,13 +46,7 @@ class GoErrors {
     if (Get.context == null) return;
     Get.closeCurrentSnackbar();
     Get.showSnackbar(
-      GetSnackBar(
-        message: text,
-        duration: const Duration(seconds: 2),
-        margin: _margin,
-        borderRadius: 12,
-        backgroundColor: GoColors.night,
-      ),
+      GetSnackBar(message: text, duration: const Duration(seconds: 2), margin: _margin, borderRadius: 12, backgroundColor: GoColors.night),
     );
   }
 

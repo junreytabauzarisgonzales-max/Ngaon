@@ -341,7 +341,7 @@ func (a *API) createJob(w http.ResponseWriter, r *http.Request) error {
 	if (b.PaymentMethod == "gcash" || b.PaymentMethod == "maya") && a.svc.PM != nil && a.svc.PM.Enabled() {
 		ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
 		meta := map[string]string{"type": "job", "job_id": js.Job.ID, "user_id": uid}
-		co, err := a.svc.PM.CreateCheckout(ctx, js.Job.Code, "Ngain "+js.Job.Code, q.TotalCentavos, b.PaymentMethod, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", meta)
+		co, err := a.svc.PM.CreateCheckout(ctx, js.Job.Code, "Ngaon "+js.Job.Code, q.TotalCentavos, b.PaymentMethod, strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", strings.TrimRight(a.svc.Cfg.PublicURL, "/")+"/pay/return", meta)
 		cancel()
 		if err == nil {
 			js.PMCheckoutID = co.ID
@@ -599,7 +599,7 @@ func (a *API) confirmItems(w http.ResponseWriter, r *http.Request) error {
 		a.svc.SetStatus(js, "picked_up")
 	} else {
 		// Dispute = cancel + support follow-up.
-		a.svc.Cancel(js, "customer", "Item total disputed by customer. Go support will contact you.")
+		a.svc.Cancel(js, "customer", "Item total disputed by customer. Ngaon support will contact you.")
 	}
 	ok(w, a.svc.JobView(js, "customer"))
 	return nil

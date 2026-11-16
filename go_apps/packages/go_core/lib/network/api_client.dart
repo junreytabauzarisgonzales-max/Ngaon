@@ -69,6 +69,12 @@ class ApiClient {
 
   static String newIdempotencyKey() => const Uuid().v4();
 
+  /// Points both clients at another server (dev server-address setting).
+  void setServer(String apiBase) {
+    dio.options.baseUrl = '$apiBase/api/v1';
+    _refreshDio.options.baseUrl = '$apiBase/api/v1';
+  }
+
   /// Refreshes tokens once; concurrent callers share the same future.
   Future<bool> refreshTokens() {
     return _refreshing ??= _doRefresh().whenComplete(() => _refreshing = null);
@@ -198,6 +204,21 @@ class RetryInterceptor extends Interceptor {
     final opts = err.requestOptions;
     final attempt = (opts.extra['retry_attempt'] as int?) ?? 0;
     final status = err.response?.statusCode;
+    // 429: honour Retry-After once when the wait is short and the request is
+    // safe to repeat (GET, or carries an Idempotency-Key).
+    if (status == 429) {
+      final wait = int.tryParse(err.response?.headers.value('retry-after') ?? '') ?? 2;
+      final safe = opts.method == 'GET' || opts.headers.containsKey('Idempotency-Key');
+      if (!safe || wait > 8 || opts.extra['rate_retried'] == true) return handler.next(err);
+      opts.extra['rate_retried'] = true;
+      await Future<void>.delayed(Duration(seconds: wait));
+      try {
+        handler.resolve(await dio.fetch<Object?>(opts));
+      } on DioException catch (e) {
+        handler.next(e);
+      }
+      return;
+    }
     final retryable =
         err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.connectionTimeout ||

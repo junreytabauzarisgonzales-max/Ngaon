@@ -1,6 +1,7 @@
 {
   "USE_MOCK_API": "false",
-  "API_BASE_URL": "https://api.ngain.example",
-  "WS_URL": "wss://api.ngain.example",
-  "GOOGLE_MAPS_KEY": "AIza...android-maps-sdk-key"
+  "API_BASE_URL": "https://api.ngaon.example",
+  "WS_URL": "wss://api.ngaon.example",
+  "GOOGLE_MAPS_KEY": "AIza...android-maps-sdk-key",
+  "DEV_TOOLS": "false"
 }

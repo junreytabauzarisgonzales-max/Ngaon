@@ -33,12 +33,15 @@ class ErrorCodes {
 /// Typed form of the error envelope
 /// `{ "error": { "code", "message", "fields" } }`.
 class ApiException implements Exception {
-  ApiException(this.code, this.message, {this.fields = const {}, this.httpStatus});
+  ApiException(this.code, this.message, {this.fields = const {}, this.httpStatus, this.retryAfterSeconds});
 
   final String code;
   final String message;
   final Map<String, String> fields;
   final int? httpStatus;
+
+  /// From the `Retry-After` header on 429 responses.
+  final int? retryAfterSeconds;
 
   bool get isNetwork => code == ErrorCodes.network || code == ErrorCodes.timeout;
 
@@ -55,7 +58,11 @@ class ApiException implements Exception {
         break;
     }
     final res = e.response;
-    if (res != null) return fromResponse(res.statusCode, res.data);
+    if (res != null) {
+      final ex = fromResponse(res.statusCode, res.data);
+      final wait = int.tryParse(res.headers.value('retry-after') ?? '');
+      return wait == null ? ex : ApiException(ex.code, ex.message, fields: ex.fields, httpStatus: ex.httpStatus, retryAfterSeconds: wait);
+    }
     if (e.error is Exception && e.type == DioExceptionType.unknown) {
       return ApiException(ErrorCodes.network, 'No connection');
     }
