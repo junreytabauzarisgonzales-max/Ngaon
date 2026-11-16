@@ -87,6 +87,20 @@ func (a *API) otpRequest(w http.ResponseWriter, r *http.Request) error {
 	} else {
 		log.Printf("OTP issued for %s", domain.MaskPhone(b.Phone))
 	}
+
+	if a.svc.Infobip != nil && a.svc.Infobip.Enabled() {
+		phone := b.Phone
+		code := rawCode
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if err := a.svc.Infobip.SendOTP(ctx, phone, code); err != nil {
+				log.Printf("infobip otp send error for %s: %v", domain.MaskPhone(phone), err)
+			} else {
+				log.Printf("infobip otp sent successfully to %s", domain.MaskPhone(phone))
+			}
+		}()
+	}
 	ok(w, map[string]int{"expires_in_seconds": 300, "resend_after_seconds": 60})
 	return nil
 }

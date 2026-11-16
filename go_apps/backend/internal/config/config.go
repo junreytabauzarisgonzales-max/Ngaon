@@ -27,6 +27,12 @@ type PayMongoConfig struct {
 	BaseURL       string
 }
 
+type InfobipConfig struct {
+	APIKey   string
+	BaseURL  string
+	SenderID string
+}
+
 type Config struct {
 	Port                string
 	PublicURL           string // e.g. http://192.168.2.194:8080 (what phones can reach)
@@ -47,6 +53,7 @@ type Config struct {
 	Maps                MapsConfig
 	Didit               DiditConfig
 	PayMongo            PayMongoConfig
+	Infobip             InfobipConfig
 	GoogleClientID      string
 }
 
@@ -97,6 +104,11 @@ func Load() Config {
 			SecretKey:     os.Getenv("PAYMONGO_SECRET_KEY"),
 			WebhookSecret: os.Getenv("PAYMONGO_WEBHOOK_SECRET"),
 			BaseURL:       env("PAYMONGO_BASE_URL", "https://api.paymongo.com"),
+		},
+		Infobip: InfobipConfig{
+			APIKey:   os.Getenv("INFOBIP_API_KEY"),
+			BaseURL:  env("INFOBIP_BASE_URL", "https://w4z2vr.api.infobip.com"),
+			SenderID: env("INFOBIP_SENDER_ID", "Ngaon"),
 		},
 		GoogleClientID: os.Getenv("GOOGLE_CLIENT_ID"),
 	}

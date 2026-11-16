@@ -43,6 +43,7 @@ type Service struct {
 	Didit      *integrations.Didit
 	PM         *integrations.PayMongo
 	Social     *integrations.SocialAuth
+	Infobip    *integrations.Infobip
 
 	revokedMu     sync.Mutex
 	revokedTokens map[string]time.Time
@@ -73,10 +74,15 @@ func New(cfg config.Config) (*Service, error) {
 		Didit:         integrations.NewDidit(cfg.Didit),
 		PM:            integrations.NewPayMongo(cfg.PayMongo),
 		Social:        integrations.NewSocialAuth(cfg.GoogleClientID),
+		Infobip: integrations.NewInfobip(integrations.InfobipConfig{
+			APIKey:   cfg.Infobip.APIKey,
+			BaseURL:  cfg.Infobip.BaseURL,
+			SenderID: cfg.Infobip.SenderID,
+		}),
 		revokedTokens: map[string]time.Time{},
 		rateBuckets:   map[string]*memRateBucket{},
 	}
-	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v", s.Maps.Enabled(), s.Didit.Enabled(), s.PM.Enabled())
+	log.Printf("integrations: google_maps=%v didit_kyc=%v paymongo=%v infobip_sms=%v", s.Maps.Enabled(), s.Didit.Enabled(), s.PM.Enabled(), s.Infobip.Enabled())
 
 	_ = os.MkdirAll(filepath.Join(cfg.DataDir, "uploads"), 0o755)
 
