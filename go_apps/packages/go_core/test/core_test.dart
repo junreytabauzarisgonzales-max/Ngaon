@@ -5,6 +5,7 @@ import 'src/job_flow_tests.dart' as job_flow;
 import 'src/mock_backend_tests.dart' as mock_backend;
 import 'src/models_tests.dart' as models;
 import 'src/network_tests.dart' as network;
+import 'src/rate_limit_tests.dart' as rate_limit;
 import 'src/utils_tests.dart' as utils;
 
 void main() {
@@ -12,5 +13,6 @@ void main() {
   group('utils', utils.main);
   group('job flow mappings', job_flow.main);
   group('network', network.main);
+  group('rate limits + server switch', rate_limit.main);
   group('mock backend', mock_backend.main);
 }

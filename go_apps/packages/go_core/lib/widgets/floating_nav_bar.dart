@@ -176,17 +176,19 @@ class GoNavShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => PopScope(
-          canPop: index.value == 0,
-          onPopInvokedWithResult: (didPop, _) {
-            if (!didPop) index.value = 0;
-          },
-          child: Scaffold(
-            extendBody: true,
-            body: IndexedStack(index: index.value, children: pages),
-            bottomNavigationBar: GoFloatingNavBar(items: items, currentIndex: index.value, onTap: _tap),
-          ),
-        ));
+    return Obx(
+      () => PopScope(
+        canPop: index.value == 0,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) index.value = 0;
+        },
+        child: Scaffold(
+          extendBody: true,
+          body: IndexedStack(index: index.value, children: pages),
+          bottomNavigationBar: GoFloatingNavBar(items: items, currentIndex: index.value, onTap: _tap),
+        ),
+      ),
+    );
   }
 }
 

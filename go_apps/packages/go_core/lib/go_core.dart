@@ -37,6 +37,7 @@ export 'utils/time.dart';
 export 'utils/validators.dart';
 export 'widgets/chat.dart';
 export 'widgets/common.dart';
+export 'widgets/dev_server.dart';
 export 'widgets/floating_nav_bar.dart';
 export 'widgets/go_map.dart';
 export 'widgets/go_sheet.dart';

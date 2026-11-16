@@ -76,10 +76,8 @@ class GoSpacing {
 
 /// Status/navigation bar style for a palette: transparent status bar,
 /// icons that contrast with the page.
-SystemUiOverlayStyle _overlay(GoPalette p) => (p.brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: p.background,
-    );
+SystemUiOverlayStyle _overlay(GoPalette p) => (p.brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+    .copyWith(statusBarColor: Colors.transparent, systemNavigationBarColor: p.background);
 
 SystemUiOverlayStyle goOverlayStyle(Brightness b) => _overlay(b == Brightness.dark ? GoPalette.dark : GoPalette.light);
 

@@ -12,20 +12,17 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => ChatMessage(
   sender: $enumDecode(_$PartyRoleEnumMap, json['sender']),
   text: json['text'] as String?,
   imageUrl: json['image_url'] as String?,
-  createdAt: const UtcDateTimeConverter().fromJson(
-    json['created_at'] as String,
-  ),
+  createdAt: const UtcDateTimeConverter().fromJson(json['created_at'] as String),
 );
 
-Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'job_id': instance.jobId,
-      'sender': _$PartyRoleEnumMap[instance.sender]!,
-      'text': ?instance.text,
-      'image_url': ?instance.imageUrl,
-      'created_at': const UtcDateTimeConverter().toJson(instance.createdAt),
-    };
+Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) => <String, dynamic>{
+  'id': instance.id,
+  'job_id': instance.jobId,
+  'sender': _$PartyRoleEnumMap[instance.sender]!,
+  'text': ?instance.text,
+  'image_url': ?instance.imageUrl,
+  'created_at': const UtcDateTimeConverter().toJson(instance.createdAt),
+};
 
 const _$PartyRoleEnumMap = {
   PartyRole.customer: 'customer',
@@ -37,20 +34,15 @@ const _$PartyRoleEnumMap = {
 UploadTicket _$UploadTicketFromJson(Map<String, dynamic> json) => UploadTicket(
   uploadUrl: json['upload_url'] as String,
   key: json['key'] as String,
-  expiresAt: const UtcDateTimeConverter().fromJson(
-    json['expires_at'] as String,
-  ),
+  expiresAt: const UtcDateTimeConverter().fromJson(json['expires_at'] as String),
 );
 
-Map<String, dynamic> _$UploadTicketToJson(UploadTicket instance) =>
-    <String, dynamic>{
-      'upload_url': instance.uploadUrl,
-      'key': instance.key,
-      'expires_at': const UtcDateTimeConverter().toJson(instance.expiresAt),
-    };
+Map<String, dynamic> _$UploadTicketToJson(UploadTicket instance) => <String, dynamic>{
+  'upload_url': instance.uploadUrl,
+  'key': instance.key,
+  'expires_at': const UtcDateTimeConverter().toJson(instance.expiresAt),
+};
 
-MaskedNumber _$MaskedNumberFromJson(Map<String, dynamic> json) =>
-    MaskedNumber(maskedNumber: json['masked_number'] as String);
+MaskedNumber _$MaskedNumberFromJson(Map<String, dynamic> json) => MaskedNumber(maskedNumber: json['masked_number'] as String);
 
-Map<String, dynamic> _$MaskedNumberToJson(MaskedNumber instance) =>
-    <String, dynamic>{'masked_number': instance.maskedNumber};
+Map<String, dynamic> _$MaskedNumberToJson(MaskedNumber instance) => <String, dynamic>{'masked_number': instance.maskedNumber};

@@ -39,6 +39,24 @@ class WalletView extends GetView<WalletController> {
                         style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 12),
+                      Obx(
+                        () => c.awaitingTopup.value
+                            ? Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: GoColors.accent),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: Text('rider.topup_waiting'.tr, style: const TextStyle(color: Colors.white70))),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                       FilledButton.icon(
                         key: const Key('wallet.topup'),
                         style: FilledButton.styleFrom(backgroundColor: GoColors.accent, foregroundColor: GoColors.night),
