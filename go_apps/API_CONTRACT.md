@@ -433,7 +433,7 @@ Server → client:
 | --- | --- | --- | --- |
 | A3 | **ADDED** field | `Quote.route_polyline?`, `Job.route_polyline?`: Google encoded polyline (precision 5) of the pickup → drop-off road route | Draw the route on maps. Present only when Google Maps is configured. |
 | A4 | **ADDED** field | `RiderProfile.kyc_status?`: `not_started` \| `in_progress` \| `in_review` \| `approved` \| `declined` \| `expired` | Rider identity verification (Didit). Absent when KYC is not enabled. While present and not `approved`, the rider stays `pending_review`. `declined` moves the profile to `rejected`. |
-| A5 | **ADDED** endpoint | `POST /rider/kyc/session` → `{ session_id, url, kyc_status }` | Starts (or resumes) a Didit session. The app opens `url` in an in-app browser, then polls `GET /rider/me`. |
+| A5 | **ADDED** endpoint | `POST /rider/kyc/session` → `{ session_id, session_token, url, kyc_status }` | Starts (or resumes) a Didit session. Returns `session_token` for native `didit_sdk` integration and `url` for in-app browser/webview fallback. Polling is done via `GET /rider/me`. |
 | A6 | **ADDED** endpoints | `POST /webhooks/paymongo`, `POST /webhooks/didit` (provider → backend, not called by the apps) | Payment / KYC callbacks. The backend verifies signatures and re-fetches the payment or decision from the provider before acting. |
 | C9 | CLARIFIED | `payment.checkout_url` is the PayMongo hosted checkout when PayMongo is configured. `GET /jobs/{id}` and `GET /rider/wallet` / `GET /rider/me` check PayMongo for pending payments, so polling works without webhooks. | LAN testing; webhook delivery delays |
 | C10 | CLARIFIED | Booking codes are `NG-1234` | Brand |

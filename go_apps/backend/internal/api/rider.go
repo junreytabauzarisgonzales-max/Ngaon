@@ -109,10 +109,18 @@ func (a *API) riderKycSession(w http.ResponseWriter, r *http.Request) error {
 		}
 		rd.Profile.KycStatus = domain.StrPtr(sStatus)
 		a.svc.Touch()
+		token := sess.SessionToken
+		if token == "" && sess.URL != "" {
+			parts := strings.Split(strings.TrimRight(sess.URL, "/"), "/")
+			if len(parts) > 0 {
+				token = parts[len(parts)-1]
+			}
+		}
 		ok(w, map[string]string{
-			"session_id": sess.SessionID,
-			"url":        sess.URL,
-			"kyc_status": sStatus,
+			"session_id":    sess.SessionID,
+			"session_token": token,
+			"url":           sess.URL,
+			"kyc_status":    sStatus,
 		})
 		return nil
 	}

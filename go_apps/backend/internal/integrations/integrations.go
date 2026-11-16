@@ -259,9 +259,10 @@ func NewDidit(cfg DiditConfig) *Didit {
 func (d *Didit) Enabled() bool { return d != nil && d.cfg.APIKey != "" && d.cfg.WorkflowID != "" }
 
 type DiditSession struct {
-	SessionID string `json:"session_id"`
-	URL       string `json:"url"`
-	Status    string `json:"status"`
+	SessionID    string `json:"session_id"`
+	SessionToken string `json:"session_token"`
+	URL          string `json:"url"`
+	Status       string `json:"status"`
 }
 
 // CreateSession starts (or, for the same vendor_data, resumes) a verification.
