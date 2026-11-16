@@ -6,7 +6,6 @@ export function Brand({ inverse = false, href = "#top" }: { inverse?: boolean; h
   return (
     <a href={href} className={`brand${inverse ? " brand-inverse" : ""}`} aria-label="Ngaon home">
       <Image src="/brand/ngaon-logo-192.jpg" alt="" width={38} height={38} />
-      <span>ngaon<span className="brand-dot">.</span></span>
     </a>
   );
 }
