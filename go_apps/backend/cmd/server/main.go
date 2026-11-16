@@ -5,52 +5,38 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
 	"goapp/backend/internal/app"
+	"goapp/backend/internal/config"
 )
 
-func env(k, def string) string {
-	if v := os.Getenv(k); v != "" {
-		return v
-	}
-	return def
-}
-
-func envInt(k string, def int) int {
-	if n, err := strconv.Atoi(os.Getenv(k)); err == nil {
-		return n
-	}
-	return def
-}
-
 func main() {
-	cfg := app.Config{
-		Port:               env("PORT", "8080"),
-		PublicURL:          env("PUBLIC_URL", "http://localhost:8080"),
-		DataDir:            env("DATA_DIR", "./data"),
-		JWTSecret:          []byte(env("JWT_SECRET", "dev-only-change-me")),
-		DevOTPCode:         os.Getenv("DEV_OTP_CODE"),
-		AutoApproveSeconds: envInt("AUTO_APPROVE_RIDERS_SECONDS", 0),
-		RiderStartBalance:  envInt("RIDER_START_BALANCE", 0),
-		AdminToken:         env("ADMIN_TOKEN", "change-me"),
-		AnyLocation:        os.Getenv("DEV_ANY_LOCATION") == "true",
-		MaxDispatchM:       envInt("MAX_DISPATCH_M", 15000),
-	}
+	cfg := config.Load()
 	s, err := app.NewServer(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	srv := &http.Server{Addr: ":" + cfg.Port, Handler: s.Routes(), ReadHeaderTimeout: 10 * time.Second}
+	defer s.Close()
+
+	srv := &http.Server{
+		Addr:              ":" + cfg.Port,
+		Handler:           s.Routes(),
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       120 * time.Second,
+		MaxHeaderBytes:    1 << 20,
+	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	go func() {
 		tick, save := time.NewTicker(time.Second), time.NewTicker(3*time.Second)
+		defer tick.Stop()
+		defer save.Stop()
 		for {
 			select {
 			case <-ctx.Done():

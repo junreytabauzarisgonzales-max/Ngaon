@@ -1,15 +1,20 @@
-package app
+package service
 
-import "time"
+import (
+	"goapp/backend/internal/domain"
+)
 
 var finalStatuses = map[string]bool{"completed": true, "cancelled": true}
 
-func isLive(status string) bool { return !finalStatuses[status] }
+// IsLive returns true if the job is active / in-progress.
+func IsLive(status string) bool {
+	return !finalStatuses[status]
+}
 
-// customerActions: API_CONTRACT §4 (customer app).
-func customerActions(js *JobState) []string {
+// CustomerActions returns allowed customer actions based on current job status.
+func CustomerActions(js *domain.JobState) []string {
 	j := &js.Job
-	live := isLive(j.Status)
+	live := IsLive(j.Status)
 	a := []string{}
 	switch j.Status {
 	case "pending_payment", "merchant_pending", "merchant_preparing", "searching", "rider_assigned":
@@ -30,8 +35,8 @@ func customerActions(js *JobState) []string {
 	return a
 }
 
-// riderNextStatuses: the statuses the rider may set next (ADDED in contract §4).
-func riderNextStatuses(j *Job) []string {
+// RiderNextStatuses returns the statuses a rider may transition a job to.
+func RiderNextStatuses(j *domain.Job) []string {
 	switch j.Status {
 	case "rider_assigned":
 		return []string{"arrived_pickup"}
@@ -55,32 +60,17 @@ func riderNextStatuses(j *Job) []string {
 	return nil
 }
 
-func riderActions(js *JobState) []string {
-	a := append([]string{}, riderNextStatuses(&js.Job)...)
-	if isLive(js.Job.Status) {
+// RiderActions returns all actions allowed for the rider viewer.
+func RiderActions(js *domain.JobState) []string {
+	a := append([]string{}, RiderNextStatuses(&js.Job)...)
+	if IsLive(js.Job.Status) {
 		a = append(a, "chat", "call")
 	}
 	return a
 }
 
-// jobView returns a copy of the job with allowed_actions for the given app.
-func (s *Server) jobView(js *JobState, app string) Job {
-	j := deepCopy(js.Job)
-	if app == "rider" {
-		j.AllowedActions = riderActions(js)
-	} else {
-		j.AllowedActions = customerActions(js)
-	}
-	// Riders see the live rider location only via their own GPS.
-	if r := s.st.Riders[js.RiderUserID]; r != nil && j.Rider != nil && r.Location != nil {
-		loc := *r.Location
-		j.Rider.Location = &loc
-	}
-	return j
-}
-
-// merchantOrderStatus implements the §5 mapping.
-func merchantOrderStatus(js *JobState) string {
+// MerchantOrderStatus implements the contract status mapping for merchant orders.
+func MerchantOrderStatus(js *domain.JobState) string {
 	j := &js.Job
 	if js.Order != nil && js.Order.Status == "rejected" {
 		return "rejected"
@@ -106,13 +96,29 @@ func merchantOrderStatus(js *JobState) string {
 	return "new"
 }
 
-func (s *Server) orderView(js *JobState) MerchantOrder {
+// JobView returns a customized copy of the job formatted for a specific app viewer.
+func JobView(js *domain.JobState, app string, riderLocation *domain.LatLng) domain.Job {
+	j := domain.DeepCopy(js.Job)
+	if app == "rider" {
+		j.AllowedActions = RiderActions(js)
+	} else {
+		j.AllowedActions = CustomerActions(js)
+	}
+	if riderLocation != nil && j.Rider != nil {
+		loc := *riderLocation
+		j.Rider.Location = &loc
+	}
+	return j
+}
+
+// OrderView generates the MerchantOrder projection for the merchant app.
+func OrderView(js *domain.JobState, customerName string) domain.MerchantOrder {
 	j := &js.Job
-	status := merchantOrderStatus(js)
+	status := MerchantOrderStatus(js)
 	sub := 0
-	var lines []OrderLine
+	var lines []domain.OrderLine
 	var prep *int
-	var ready *UTC
+	var ready *domain.UTC
 	if j.Food != nil {
 		sub = j.Food.SubtotalCentavos
 		lines = j.Food.Items
@@ -127,7 +133,7 @@ func (s *Server) orderView(js *JobState) MerchantOrder {
 	if status == "rejected" || status == "cancelled" {
 		net = 0
 	}
-	o := MerchantOrder{
+	o := domain.MerchantOrder{
 		ID:                 js.Order.ID,
 		JobID:              j.ID,
 		Code:               j.Code,
@@ -140,19 +146,24 @@ func (s *Server) orderView(js *JobState) MerchantOrder {
 		CommissionCentavos: commission,
 		NetCentavos:        net,
 		PaymentMethod:      j.Payment.Method,
-		CustomerFirstName:  firstName(s.userName(js.CustomerID)),
+		CustomerFirstName:  domain.FirstName(customerName),
 		Notes:              j.Dropoff.Notes,
 		RejectReason:       js.Order.RejectReason,
 		AllowedActions:     []string{},
 	}
 	if status == "new" && !js.MerchantDeadline.IsZero() {
-		o.MerchantAcceptDeadline = at(js.MerchantDeadline)
+		o.MerchantAcceptDeadline = domain.At(js.MerchantDeadline)
 	}
 	if j.Payment.Method == "cash" && status != "rejected" && status != "cancelled" {
-		o.RiderPaysAtPickupCentavos = intp(net)
+		o.RiderPaysAtPickupCentavos = domain.IntPtr(net)
 	}
 	if j.Rider != nil {
-		o.Rider = &MerchantOrderRider{Name: j.Rider.Name, PhotoURL: j.Rider.PhotoURL, Plate: j.Rider.Plate, PhoneMasked: j.Rider.PhoneMasked}
+		o.Rider = &domain.MerchantOrderRider{
+			Name:        j.Rider.Name,
+			PhotoURL:    j.Rider.PhotoURL,
+			Plate:       j.Rider.Plate,
+			PhoneMasked: j.Rider.PhoneMasked,
+		}
 	}
 	switch status {
 	case "new":
@@ -163,51 +174,4 @@ func (s *Server) orderView(js *JobState) MerchantOrder {
 		o.AllowedActions = []string{"ready"}
 	}
 	return o
-}
-
-func (s *Server) userName(id string) string {
-	if u := s.st.Users[id]; u != nil {
-		return u.Name
-	}
-	return ""
-}
-
-// publishJob sends job.updated to customer + rider and order.updated to the merchant.
-func (s *Server) publishJob(js *JobState) {
-	js.Job.UpdatedAt = Now()
-	s.touch()
-	s.emit(js.CustomerID, "customer", "job.updated", map[string]any{"job": s.jobView(js, "customer")})
-	if js.RiderUserID != "" {
-		s.emit(js.RiderUserID, "rider", "job.updated", map[string]any{"job": s.jobView(js, "rider")})
-	}
-	if js.Order != nil && js.MerchantID != "" {
-		ov := s.orderView(js)
-		for _, uid := range s.merchantUserIDs(js.MerchantID) {
-			s.emit(uid, "merchant", "order.updated", map[string]any{"order": ov})
-		}
-	}
-}
-
-func (s *Server) setStatus(js *JobState, status string) {
-	js.Job.Status = status
-	js.Job.Timeline = append(js.Job.Timeline, TimelineEntry{Status: status, At: Now()})
-	if status == "searching" {
-		js.SearchingSince = time.Now()
-	}
-	if js.Order != nil {
-		js.Order.Status = merchantOrderStatus(js)
-	}
-	s.publishJob(js)
-}
-
-func (s *Server) merchantUserIDs(merchantID string) []string {
-	var ids []string
-	for phone, st := range s.st.Staff {
-		if st.MerchantID == merchantID {
-			if uid, ok := s.st.UserByPhone[phone]; ok {
-				ids = append(ids, uid)
-			}
-		}
-	}
-	return ids
 }

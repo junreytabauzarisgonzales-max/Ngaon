@@ -1,17 +1,92 @@
-# Go API for local testing with the phone apps over Wi-Fi.
+# Go API with PostgreSQL and Redis for local testing with the phone apps over Wi-Fi.
 name: go-apps
 # Values come from .env (see .env.example).
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: go-postgres
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-goapp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-goapp_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-go_delivery}
+    ports:
+      # Host port 5433 maps to container port 5432 to prevent conflict with any existing local postgres
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-goapp} -d $${POSTGRES_DB:-go_delivery}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: go-redis
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - "${REDIS_PASSWORD:-goapp_redis_secret}"
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - "volatile-lru"
+      - --protected-mode
+      - "yes"
+      - --rename-command
+      - "FLUSHALL"
+      - ""
+      - --rename-command
+      - "FLUSHDB"
+      - ""
+      - --rename-command
+      - "CONFIG"
+      - ""
+      - --rename-command
+      - "DEBUG"
+      - ""
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$${REDIS_PASSWORD:-goapp_redis_secret} redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build: .
     image: go-api:dev
     container_name: go-api
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8080:8080"
     env_file: .env
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-goapp}:${POSTGRES_PASSWORD:-goapp_secret}@postgres:5432/${POSTGRES_DB:-go_delivery}?sslmode=disable
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-goapp_redis_secret}@redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - go-data:/data
 
 volumes:
   go-data:
+  postgres-data:
+  redis-data:

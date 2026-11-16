@@ -1,45 +1,64 @@
-package app
+package api
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"sort"
 	"strings"
 	"time"
+
+	"goapp/backend/internal/domain"
+	"goapp/backend/internal/service"
 )
 
-func (s *Server) staffOf(r *http.Request) (MerchantStaff, *MerchantRow, error) {
-	u := s.st.Users[claimsOf(r).Sub]
-	st, isStaff := s.st.Staff[u.Phone]
+func (a *API) invalidateMerchantCache(ctx context.Context, merchantID string) {
+	if a.svc.Redis != nil && merchantID != "" {
+		cctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+		_ = a.svc.Redis.InvalidateMerchantCache(cctx, merchantID)
+		cancel()
+	}
+}
+
+func (a *API) staffOf(r *http.Request) (domain.MerchantStaff, *domain.MerchantRow, error) {
+	u := a.svc.St.Users[claimsOf(r).Sub]
+	if u == nil {
+		return domain.MerchantStaff{}, nil, errUnauthorized
+	}
+	st, isStaff := a.svc.St.Staff[u.Phone]
 	if !isStaff {
 		return st, nil, apiErr(403, "forbidden", "This number is not registered as a merchant")
 	}
-	row := s.st.Merchants[st.MerchantID]
+	row := a.svc.St.Merchants[st.MerchantID]
 	if row == nil {
 		return st, nil, errForbidden
 	}
 	return st, row, nil
 }
 
-func (s *Server) merchantMe(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	st, row, err := s.staffOf(r)
+func (a *API) merchantMe(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	st, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	ok(w, map[string]any{"merchant": s.publicMerchant(row, nil, false), "role": st.Role, "staff_name": st.StaffName})
+	ok(w, map[string]any{
+		"merchant":   a.publicMerchant(row, nil, false),
+		"role":       st.Role,
+		"staff_name": st.StaffName,
+	})
 	return nil
 }
 
-func (s *Server) patchStore(w http.ResponseWriter, r *http.Request) error {
+func (a *API) patchStore(w http.ResponseWriter, r *http.Request) error {
 	var raw map[string]json.RawMessage
 	if err := decode(r, &raw); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
@@ -61,7 +80,7 @@ func (s *Server) patchStore(w http.ResponseWriter, r *http.Request) error {
 		if string(pu) == "null" {
 			m.PausedUntil = nil
 		} else {
-			var t UTC
+			var t domain.UTC
 			if json.Unmarshal(pu, &t) == nil {
 				m.PausedUntil = &t
 			}
@@ -79,23 +98,24 @@ func (s *Server) patchStore(w http.ResponseWriter, r *http.Request) error {
 		}
 		m.MinOrderCentavos = n
 	}
-	var hours []OpeningHours
+	var hours []domain.OpeningHours
 	if get("hours", &hours) {
 		m.Hours = hours
 	}
 	if get("logo_key", &str) {
-		m.LogoURL = s.fileURL(str)
+		m.LogoURL = a.svc.FileURL(str)
 	}
 	if get("cover_key", &str) {
-		m.CoverURL = s.fileURL(str)
+		m.CoverURL = a.svc.FileURL(str)
 	}
 	if get("name", &str) && strings.TrimSpace(str) != "" {
 		m.Name = strings.TrimSpace(str)
 	}
-	s.touch()
-	pub := s.publicMerchant(row, nil, false)
-	for _, uid := range s.merchantUserIDs(m.ID) {
-		s.emit(uid, "merchant", "merchant.updated", map[string]any{"merchant": pub})
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), m.ID)
+	pub := a.publicMerchant(row, nil, false)
+	for _, uid := range a.svc.MerchantUserIDs(m.ID) {
+		a.svc.Emit(uid, "merchant", "merchant.updated", map[string]any{"merchant": pub})
 	}
 	ok(w, pub)
 	return nil
@@ -103,10 +123,10 @@ func (s *Server) patchStore(w http.ResponseWriter, r *http.Request) error {
 
 // ---------- orders ----------
 
-func (s *Server) ordersOf(merchantID string) []*JobState {
-	var out []*JobState
-	for i := len(s.st.JobIDs) - 1; i >= 0; i-- {
-		js := s.st.Jobs[s.st.JobIDs[i]]
+func (a *API) ordersOf(merchantID string) []*domain.JobState {
+	var out []*domain.JobState
+	for i := len(a.svc.St.JobIDs) - 1; i >= 0; i-- {
+		js := a.svc.St.Jobs[a.svc.St.JobIDs[i]]
 		if js != nil && js.MerchantID == merchantID && js.Order != nil && js.Job.Status != "pending_payment" {
 			out = append(out, js)
 		}
@@ -114,18 +134,18 @@ func (s *Server) ordersOf(merchantID string) []*JobState {
 	return out
 }
 
-func (s *Server) merchantOrders(w http.ResponseWriter, r *http.Request) error {
+func (a *API) merchantOrders(w http.ResponseWriter, r *http.Request) error {
 	q := r.URL.Query()
 	status, from, to := q.Get("status"), q.Get("from"), q.Get("to")
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	var out []MerchantOrder
-	for _, js := range s.ordersOf(row.Merchant.ID) {
-		ms := merchantOrderStatus(js)
+	var out []domain.MerchantOrder
+	for _, js := range a.ordersOf(row.Merchant.ID) {
+		ms := service.MerchantOrderStatus(js)
 		match := ms == status
 		if status == "done" {
 			match = ms == "picked_up" || ms == "completed" || ms == "rejected" || ms == "cancelled"
@@ -133,24 +153,24 @@ func (s *Server) merchantOrders(w http.ResponseWriter, r *http.Request) error {
 		if status == "" {
 			match = true
 		}
-		d := manilaDate(js.Job.CreatedAt.Time)
+		d := domain.ManilaDate(js.Job.CreatedAt.Time)
 		if !match || (from != "" && d < from) || (to != "" && d > to) {
 			continue
 		}
-		out = append(out, s.orderView(js))
+		out = append(out, a.svc.OrderView(js))
 	}
 	page, next := paginate(out, r, 50)
 	okPage(w, page, next)
 	return nil
 }
 
-func (s *Server) orderByID(r *http.Request) (*JobState, error) {
-	_, row, err := s.staffOf(r)
+func (a *API) orderByID(r *http.Request) (*domain.JobState, error) {
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return nil, err
 	}
 	id := r.PathValue("id")
-	for _, js := range s.ordersOf(row.Merchant.ID) {
+	for _, js := range a.ordersOf(row.Merchant.ID) {
 		if js.Order.ID == id {
 			return js, nil
 		}
@@ -158,18 +178,18 @@ func (s *Server) orderByID(r *http.Request) (*JobState, error) {
 	return nil, errNotFound
 }
 
-func (s *Server) merchantOrder(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	js, err := s.orderByID(r)
+func (a *API) merchantOrder(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	js, err := a.orderByID(r)
 	if err != nil {
 		return err
 	}
-	ok(w, s.orderView(js))
+	ok(w, a.svc.OrderView(js))
 	return nil
 }
 
-func (s *Server) merchantAccept(w http.ResponseWriter, r *http.Request) error {
+func (a *API) merchantAccept(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		PrepTimeMinutes int `json:"prep_time_minutes"`
 	}
@@ -179,31 +199,33 @@ func (s *Server) merchantAccept(w http.ResponseWriter, r *http.Request) error {
 	if b.PrepTimeMinutes < 5 || b.PrepTimeMinutes > 60 {
 		return fieldErr("prep_time_minutes", "out_of_range", "5–60 minutes")
 	}
-	s.lock()
-	defer s.unlock()
-	js, err := s.orderByID(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	js, err := a.orderByID(r)
 	if err != nil {
 		return err
 	}
 	if js.Job.Status != "merchant_pending" {
 		return apiErr(409, "order_already_handled", "This order was already handled")
 	}
-	js.Job.Food.PrepTimeMinutes = intp(b.PrepTimeMinutes)
+	js.Job.Food.PrepTimeMinutes = domain.IntPtr(b.PrepTimeMinutes)
 	js.MerchantDeadline = time.Time{}
-	s.setStatus(js, "merchant_preparing")
+	a.svc.SetStatus(js, "merchant_preparing")
 	// Dispatch starts right away so the rider arrives around ready time.
-	s.setStatus(js, "searching")
-	s.dispatch(js)
-	ok(w, s.orderView(js))
+	a.svc.SetStatus(js, "searching")
+	a.svc.Dispatch(js)
+	ok(w, a.svc.OrderView(js))
 	return nil
 }
 
 var rejectReasons = map[string]string{
-	"out_of_stock": "Sorry, an item is out of stock.", "too_busy": "Sorry, the store is too busy right now.",
-	"closing_soon": "Sorry, the store is closing soon.", "other": "The store could not accept your order.",
+	"out_of_stock": "Sorry, an item is out of stock.",
+	"too_busy":     "Sorry, the store is too busy right now.",
+	"closing_soon": "Sorry, the store is closing soon.",
+	"other":        "The store could not accept your order.",
 }
 
-func (s *Server) merchantReject(w http.ResponseWriter, r *http.Request) error {
+func (a *API) merchantReject(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		Reason string  `json:"reason"`
 		Note   *string `json:"note"`
@@ -215,9 +237,9 @@ func (s *Server) merchantReject(w http.ResponseWriter, r *http.Request) error {
 	if !valid {
 		return fieldErr("reason", "invalid", "Invalid reason")
 	}
-	s.lock()
-	defer s.unlock()
-	js, err := s.orderByID(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	js, err := a.orderByID(r)
 	if err != nil {
 		return err
 	}
@@ -227,44 +249,44 @@ func (s *Server) merchantReject(w http.ResponseWriter, r *http.Request) error {
 	if b.Note != nil && strings.TrimSpace(*b.Note) != "" {
 		msg += " " + strings.TrimSpace(*b.Note)
 	}
-	js.Order.RejectReason = strp(b.Reason)
-	s.cancel(js, "merchant", msg)
-	ok(w, s.orderView(js))
+	js.Order.RejectReason = domain.StrPtr(b.Reason)
+	a.svc.Cancel(js, "merchant", msg)
+	ok(w, a.svc.OrderView(js))
 	return nil
 }
 
-func (s *Server) merchantReady(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	js, err := s.orderByID(r)
+func (a *API) merchantReady(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	js, err := a.orderByID(r)
 	if err != nil {
 		return err
 	}
-	if merchantOrderStatus(js) != "preparing" {
+	if service.MerchantOrderStatus(js) != "preparing" {
 		return apiErr(409, "invalid_status_transition", "Order is not being prepared")
 	}
 	js.Job.Food.IsReady = true
-	js.Job.Food.ReadyAt = at(time.Now())
+	js.Job.Food.ReadyAt = domain.At(time.Now())
 	js.Order.Status = "ready"
-	s.publishJob(js)
-	ok(w, s.orderView(js))
+	a.svc.PublishJob(js)
+	ok(w, a.svc.OrderView(js))
 	return nil
 }
 
 // ---------- menu ----------
 
-func (s *Server) merchantMenu(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+func (a *API) merchantMenu(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	ok(w, s.publicMerchant(row, nil, true).Menu)
+	ok(w, a.publicMerchant(row, nil, true).Menu)
 	return nil
 }
 
-func (row *MerchantRow) category(id string) *MenuCategory {
+func categoryOf(row *domain.MerchantRow, id string) *domain.MenuCategory {
 	for i := range row.Merchant.Menu {
 		if row.Merchant.Menu[i].ID == id {
 			return &row.Merchant.Menu[i]
@@ -273,7 +295,7 @@ func (row *MerchantRow) category(id string) *MenuCategory {
 	return nil
 }
 
-func (s *Server) addCategory(w http.ResponseWriter, r *http.Request) error {
+func (a *API) addCategory(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		Name string `json:"name"`
 	}
@@ -283,48 +305,55 @@ func (s *Server) addCategory(w http.ResponseWriter, r *http.Request) error {
 	if strings.TrimSpace(b.Name) == "" {
 		return fieldErr("name", "required", "Name required")
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	c := MenuCategory{ID: newID(), Name: strings.TrimSpace(b.Name), SortOrder: len(row.Merchant.Menu), Items: []MenuItem{}}
+	c := domain.MenuCategory{
+		ID:        domain.NewID(),
+		Name:      strings.TrimSpace(b.Name),
+		SortOrder: len(row.Merchant.Menu),
+		Items:     []domain.MenuItem{},
+	}
 	row.Merchant.Menu = append(row.Merchant.Menu, c)
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	ok(w, c)
 	return nil
 }
 
-func (s *Server) renameCategory(w http.ResponseWriter, r *http.Request) error {
+func (a *API) renameCategory(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		Name *string `json:"name"`
 	}
 	if err := decode(r, &b); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	c := row.category(r.PathValue("id"))
+	c := categoryOf(row, r.PathValue("id"))
 	if c == nil {
 		return errNotFound
 	}
 	if b.Name != nil && strings.TrimSpace(*b.Name) != "" {
 		c.Name = strings.TrimSpace(*b.Name)
 	}
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	ok(w, c)
 	return nil
 }
 
-func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+func (a *API) deleteCategory(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
@@ -335,7 +364,8 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) error {
 				return fieldErr("category", "not_empty", "Category is not empty")
 			}
 			row.Merchant.Menu = append(row.Merchant.Menu[:i], row.Merchant.Menu[i+1:]...)
-			s.touch()
+			a.svc.Touch()
+			a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 			okEmpty(w)
 			return nil
 		}
@@ -343,16 +373,16 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) error {
 	return errNotFound
 }
 
-func (s *Server) reorderCategories(w http.ResponseWriter, r *http.Request) error {
+func (a *API) reorderCategories(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		CategoryIDs []string `json:"category_ids"`
 	}
 	if err := decode(r, &b); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
@@ -375,7 +405,8 @@ func (s *Server) reorderCategories(w http.ResponseWriter, r *http.Request) error
 	for i := range menu {
 		menu[i].SortOrder = i
 	}
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	okEmpty(w)
 	return nil
 }
@@ -401,29 +432,48 @@ type itemInput struct {
 	} `json:"addon_groups"`
 }
 
-func (s *Server) applyItemInput(in itemInput, id string, existing *MenuItem) (MenuItem, error) {
+func (a *API) applyItemInput(in itemInput, id string, existing *domain.MenuItem) (domain.MenuItem, error) {
 	if strings.TrimSpace(in.Name) == "" {
-		return MenuItem{}, fieldErr("name", "required", "Name required")
+		return domain.MenuItem{}, fieldErr("name", "required", "Name required")
 	}
 	if in.PriceCentavos < 0 {
-		return MenuItem{}, fieldErr("price_centavos", "invalid", "Invalid price")
+		return domain.MenuItem{}, fieldErr("price_centavos", "invalid", "Invalid price")
 	}
-	it := MenuItem{ID: id, CategoryID: in.CategoryID, Name: strings.TrimSpace(in.Name), Description: in.Description, PriceCentavos: in.PriceCentavos, IsAvailable: in.IsAvailable, AddonGroups: []AddonGroup{}}
+	it := domain.MenuItem{
+		ID:            id,
+		CategoryID:    in.CategoryID,
+		Name:          strings.TrimSpace(in.Name),
+		Description:   in.Description,
+		PriceCentavos: in.PriceCentavos,
+		IsAvailable:   in.IsAvailable,
+		AddonGroups:   []domain.AddonGroup{},
+	}
 	if in.PhotoKey != nil {
-		it.PhotoURL = s.fileURL(*in.PhotoKey)
+		it.PhotoURL = a.svc.FileURL(*in.PhotoKey)
 	} else if existing != nil {
 		it.PhotoURL = existing.PhotoURL
 	}
 	for _, g := range in.AddonGroups {
 		if g.MinSelect < 0 || g.MaxSelect < 1 || g.MinSelect > g.MaxSelect {
-			return MenuItem{}, fieldErr("addon_groups", "invalid_min_max", "Check add-on min/max")
+			return domain.MenuItem{}, fieldErr("addon_groups", "invalid_min_max", "Check add-on min/max")
 		}
-		ng := AddonGroup{ID: newID(), Name: g.Name, MinSelect: g.MinSelect, MaxSelect: g.MaxSelect, Options: []AddonOption{}}
+		ng := domain.AddonGroup{
+			ID:        domain.NewID(),
+			Name:      g.Name,
+			MinSelect: g.MinSelect,
+			MaxSelect: g.MaxSelect,
+			Options:   []domain.AddonOption{},
+		}
 		if g.ID != nil {
 			ng.ID = *g.ID
 		}
 		for _, o := range g.Options {
-			no := AddonOption{ID: newID(), Name: o.Name, PriceCentavos: o.PriceCentavos, IsAvailable: o.IsAvailable}
+			no := domain.AddonOption{
+				ID:            domain.NewID(),
+				Name:          o.Name,
+				PriceCentavos: o.PriceCentavos,
+				IsAvailable:   o.IsAvailable,
+			}
 			if o.ID != nil {
 				no.ID = *o.ID
 			}
@@ -434,32 +484,33 @@ func (s *Server) applyItemInput(in itemInput, id string, existing *MenuItem) (Me
 	return it, nil
 }
 
-func (s *Server) createItem(w http.ResponseWriter, r *http.Request) error {
+func (a *API) createItem(w http.ResponseWriter, r *http.Request) error {
 	var in itemInput
 	if err := decode(r, &in); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	c := row.category(in.CategoryID)
+	c := categoryOf(row, in.CategoryID)
 	if c == nil {
 		return fieldErr("category_id", "not_found", "Category not found")
 	}
-	it, err := s.applyItemInput(in, newID(), nil)
+	it, err := a.applyItemInput(in, domain.NewID(), nil)
 	if err != nil {
 		return err
 	}
 	c.Items = append(c.Items, it)
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	ok(w, it)
 	return nil
 }
 
-func (row *MerchantRow) itemLoc(id string) (*MenuCategory, int) {
+func itemLoc(row *domain.MerchantRow, id string) (*domain.MenuCategory, int) {
 	for ci := range row.Merchant.Menu {
 		for ii := range row.Merchant.Menu[ci].Items {
 			if row.Merchant.Menu[ci].Items[ii].ID == id {
@@ -470,91 +521,94 @@ func (row *MerchantRow) itemLoc(id string) (*MenuCategory, int) {
 	return nil, -1
 }
 
-func (s *Server) updateItem(w http.ResponseWriter, r *http.Request) error {
+func (a *API) updateItem(w http.ResponseWriter, r *http.Request) error {
 	var in itemInput
 	if err := decode(r, &in); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	cat, idx := row.itemLoc(r.PathValue("id"))
+	cat, idx := itemLoc(row, r.PathValue("id"))
 	if cat == nil {
 		return errNotFound
 	}
 	existing := cat.Items[idx]
-	it, err := s.applyItemInput(in, existing.ID, &existing)
+	it, err := a.applyItemInput(in, existing.ID, &existing)
 	if err != nil {
 		return err
 	}
 	if in.CategoryID == cat.ID {
 		cat.Items[idx] = it
 	} else {
-		dst := row.category(in.CategoryID)
+		dst := categoryOf(row, in.CategoryID)
 		if dst == nil {
 			return fieldErr("category_id", "not_found", "Category not found")
 		}
 		cat.Items = append(cat.Items[:idx], cat.Items[idx+1:]...)
 		dst.Items = append(dst.Items, it)
 	}
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	ok(w, it)
 	return nil
 }
 
-func (s *Server) deleteItem(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+func (a *API) deleteItem(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	cat, idx := row.itemLoc(r.PathValue("id"))
+	cat, idx := itemLoc(row, r.PathValue("id"))
 	if cat == nil {
 		return errNotFound
 	}
 	cat.Items = append(cat.Items[:idx], cat.Items[idx+1:]...)
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	okEmpty(w)
 	return nil
 }
 
-func (s *Server) itemAvailability(w http.ResponseWriter, r *http.Request) error {
+func (a *API) itemAvailability(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		IsAvailable bool `json:"is_available"`
 	}
 	if err := decode(r, &b); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	cat, idx := row.itemLoc(r.PathValue("id"))
+	cat, idx := itemLoc(row, r.PathValue("id"))
 	if cat == nil {
 		return errNotFound
 	}
 	cat.Items[idx].IsAvailable = b.IsAvailable
-	s.touch()
+	a.svc.Touch()
+	a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 	ok(w, cat.Items[idx])
 	return nil
 }
 
-func (s *Server) optionAvailability(w http.ResponseWriter, r *http.Request) error {
+func (a *API) optionAvailability(w http.ResponseWriter, r *http.Request) error {
 	var b struct {
 		IsAvailable bool `json:"is_available"`
 	}
 	if err := decode(r, &b); err != nil {
 		return err
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
@@ -563,7 +617,8 @@ func (s *Server) optionAvailability(w http.ResponseWriter, r *http.Request) erro
 		for ii := range row.Merchant.Menu[ci].Items {
 			if o := findOption(&row.Merchant.Menu[ci].Items[ii], id); o != nil {
 				o.IsAvailable = b.IsAvailable
-				s.touch()
+				a.svc.Touch()
+				a.invalidateMerchantCache(r.Context(), row.Merchant.ID)
 				okEmpty(w)
 				return nil
 			}
@@ -574,67 +629,75 @@ func (s *Server) optionAvailability(w http.ResponseWriter, r *http.Request) erro
 
 // ---------- reports ----------
 
-func (s *Server) salesReport(w http.ResponseWriter, r *http.Request) error {
+func (a *API) salesReport(w http.ResponseWriter, r *http.Request) error {
 	from, to := r.URL.Query().Get("from"), r.URL.Query().Get("to")
 	if from == "" || to == "" || from > to {
 		return fieldErr("from", "invalid", "from/to required")
 	}
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
 	type agg struct{ n, gross, net, comm int }
 	byDay := map[string]*agg{}
-	for _, js := range s.ordersOf(row.Merchant.ID) {
-		st := merchantOrderStatus(js)
+	for _, js := range a.ordersOf(row.Merchant.ID) {
+		st := service.MerchantOrderStatus(js)
 		if st != "completed" && st != "picked_up" {
 			continue
 		}
-		d := manilaDate(js.Job.CreatedAt.Time)
-		a := byDay[d]
-		if a == nil {
-			a = &agg{}
-			byDay[d] = a
+		d := domain.ManilaDate(js.Job.CreatedAt.Time)
+		ag := byDay[d]
+		if ag == nil {
+			ag = &agg{}
+			byDay[d] = ag
 		}
-		a.n++
-		a.gross += js.Job.Food.SubtotalCentavos
-		a.comm += js.Order.Commission
-		a.net += js.Job.Food.SubtotalCentavos - js.Order.Commission
+		ag.n++
+		ag.gross += js.Job.Food.SubtotalCentavos
+		ag.comm += js.Order.Commission
+		ag.net += js.Job.Food.SubtotalCentavos - js.Order.Commission
 	}
 	days := []map[string]any{}
 	var tot agg
 	for _, d := range dateRange(from, to) {
-		a := byDay[d]
-		if a == nil {
-			a = &agg{}
+		ag := byDay[d]
+		if ag == nil {
+			ag = &agg{}
 		}
-		tot.n += a.n
-		tot.gross += a.gross
-		tot.net += a.net
-		tot.comm += a.comm
-		days = append(days, map[string]any{"date": d, "orders_count": a.n, "gross_centavos": a.gross, "net_centavos": a.net})
+		tot.n += ag.n
+		tot.gross += ag.gross
+		tot.net += ag.net
+		tot.comm += ag.comm
+		days = append(days, map[string]any{"date": d, "orders_count": ag.n, "gross_centavos": ag.gross, "net_centavos": ag.net})
 	}
-	ok(w, map[string]any{"from": from, "to": to, "orders_count": tot.n, "gross_centavos": tot.gross, "commission_centavos": tot.comm, "net_centavos": tot.net, "days": days})
+	ok(w, map[string]any{
+		"from":                from,
+		"to":                  to,
+		"orders_count":        tot.n,
+		"gross_centavos":      tot.gross,
+		"commission_centavos": tot.comm,
+		"net_centavos":        tot.net,
+		"days":                days,
+	})
 	return nil
 }
 
 // listPayouts: seeded history + this week's pending payout for online-paid orders.
-func (s *Server) listPayouts(w http.ResponseWriter, r *http.Request) error {
-	s.lock()
-	defer s.unlock()
-	_, row, err := s.staffOf(r)
+func (a *API) listPayouts(w http.ResponseWriter, r *http.Request) error {
+	a.svc.Lock()
+	defer a.svc.Unlock()
+	_, row, err := a.staffOf(r)
 	if err != nil {
 		return err
 	}
-	now := time.Now().In(manila)
+	now := time.Now().In(domain.Manila)
 	weekStart := now.AddDate(0, 0, -((int(now.Weekday()) + 6) % 7))
 	from, to := weekStart.Format("2006-01-02"), weekStart.AddDate(0, 0, 6).Format("2006-01-02")
 	online, cashCommission := 0, 0
-	for _, js := range s.ordersOf(row.Merchant.ID) {
-		d := manilaDate(js.Job.CreatedAt.Time)
-		if merchantOrderStatus(js) != "completed" || d < from || d > to {
+	for _, js := range a.ordersOf(row.Merchant.ID) {
+		d := domain.ManilaDate(js.Job.CreatedAt.Time)
+		if service.MerchantOrderStatus(js) != "completed" || d < from || d > to {
 			continue
 		}
 		if js.Job.Payment.Method == "cash" {
@@ -643,9 +706,16 @@ func (s *Server) listPayouts(w http.ResponseWriter, r *http.Request) error {
 			online += js.Job.Food.SubtotalCentavos - js.Order.Commission
 		}
 	}
-	out := []*Payout{{ID: "current-" + from, PeriodFrom: from, PeriodTo: to, AmountCentavos: online, Type: "payout", Status: "pending"}}
+	out := []*domain.Payout{{
+		ID:             "current-" + from,
+		PeriodFrom:     from,
+		PeriodTo:       to,
+		AmountCentavos: online,
+		Type:           "payout",
+		Status:         "pending",
+	}}
 	_ = cashCommission // collected from riders at settlement; nothing invoiced to the store
-	for _, p := range s.st.Payouts {
+	for _, p := range a.svc.St.Payouts {
 		if p.MerchantID == row.Merchant.ID {
 			out = append(out, p)
 		}
