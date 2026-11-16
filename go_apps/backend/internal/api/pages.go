@@ -260,6 +260,21 @@ func (a *API) indexPage(w http.ResponseWriter, _ *http.Request) {
 <p class="muted">API base: %s/api/v1</p></div></body></html>`, pageCSS, users, jobs, live, online, a.svc.Hub.Count(), a.svc.Cfg.PublicURL)
 }
 
+func (a *API) privacyPage(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngaon - Privacy Policy</title>%s</head><body><div class="card"><div class="brand">Ngaon</div><h1>Privacy Policy</h1><p>Ngaon values your privacy. We collect your name, phone number, and location only to connect you with drivers, food merchants, and delivery services in Tawi-Tawi, Philippines.</p><p>We do not sell your personal information. For inquiries, contact rhayanldvce@gmail.com.</p></div></body></html>`, pageCSS)
+}
+
+func (a *API) termsPage(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngaon - Terms of Service</title>%s</head><body><div class="card"><div class="brand">Ngaon</div><h1>Terms of Service</h1><p>By using Ngaon, you agree to follow local transport regulations and respect drivers and fellow passengers.</p></div></body></html>`, pageCSS)
+}
+
+func (a *API) dataDeletionPage(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<!doctype html><html><head><title>Ngaon - User Data Deletion</title>%s</head><body><div class="card"><div class="brand">Ngaon</div><h1>Data Deletion Instructions</h1><p>To delete your Ngaon account and all associated personal data, you can delete your profile directly from the Ngaon mobile app under Settings -> Delete Account, or email us at rhayanldvce@gmail.com.</p></div></body></html>`, pageCSS)
+}
+
 func (a *API) paymongoWebhook(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {

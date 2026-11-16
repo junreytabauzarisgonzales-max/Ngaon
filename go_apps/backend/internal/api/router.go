@@ -33,6 +33,9 @@ func (a *API) Routes() http.Handler {
 
 	mux.HandleFunc("GET /healthz", a.healthz)
 	mux.HandleFunc("GET /{$}", a.indexPage)
+	mux.HandleFunc("GET /privacy", a.privacyPage)
+	mux.HandleFunc("GET /terms", a.termsPage)
+	mux.HandleFunc("GET /data-deletion", a.dataDeletionPage)
 
 	// auth
 	mux.HandleFunc("POST "+v+"/auth/otp/request", p(a.otpRequest))
