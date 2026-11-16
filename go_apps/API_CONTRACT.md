@@ -254,9 +254,11 @@ MenuItemInput   { category_id, name, description?, photo_key?, price_centavos, i
 QuoteRequest    { service: "ride"|"food"|"pabili"|"padala", pickup: Stop, dropoff: Stop,
                   food?:   { merchant_id, items: [ { item_id, quantity, addon_option_ids: [id], note? } ] },
                   pabili?: { store_name, items: [ { name, quantity, note? } ], estimated_item_total_centavos },
-                  padala?: { size: "small"|"medium"|"large", description, recipient_name, recipient_phone, photo_key? } }
+                  padala?: { size: "small"|"medium"|"large", description, recipient_name, recipient_phone, photo_key? },
+                  ride?:   { tier?: "solo"|"pasabay_tricycle"|"pasabay_4w", seats_booked?: int } }
 Quote           { id, service, distance_m, duration_s, expires_at,
-                  breakdown: [ { label, amount_centavos } ], total_centavos, max_item_budget_centavos? }
+                  breakdown: [ { label, amount_centavos } ], total_centavos, max_item_budget_centavos?,
+                  route_polyline?, ride_tiers?: [ { tier, name, vehicle_type, max_capacity, seats_booked, total_centavos, min_fare_centavos, breakdown } ] }
 
 Job             { id, code ("NG-4821"), service, status, created_at, updated_at,
                   pickup: Stop, dropoff: Stop,
@@ -267,15 +269,17 @@ Job             { id, code ("NG-4821"), service, status, created_at, updated_at,
                            rider_pays_merchant_centavos? },                       // ADDED
                   pabili?: { store_name, items: [ { name, quantity, note? } ], receipt_url?, item_total_centavos? },
                   padala?: { size, description, recipient_name, recipient_phone, photo_url? },
+                  ride?:   { tier: "solo"|"pasabay_tricycle"|"pasabay_4w", vehicle_type: "motorcycle"|"tricycle"|"4wheels",
+                             seats_booked: int, total_shared_seats: int, base_fare_centavos: int },
                   fare: { breakdown: [ { label, amount_centavos } ], total_centavos },
                   payment: { method: "cash"|"gcash"|"maya", status: "pending"|"paid"|"failed"|"refunded", checkout_url? },
                   proof_url?, cancel_reason?, cancelled_by?: "customer"|"rider"|"merchant"|"system",
                   allowed_actions: [string],                                       // see §4
-                  timeline: [ { status, at } ] }
+                  timeline: [ { status, at } ], route_polyline? }
 
 JobOffer        { id, job: Job, earnings_centavos, pickup_distance_m, expires_at }
 RiderProfile    { id, user_id, status: "incomplete"|"pending_review"|"approved"|"rejected"|"suspended",
-                  rejection_reason?, is_online, vehicle?: { plate, make_model, color }, rating?,
+                  rejection_reason?, is_online, vehicle?: { plate, make_model, color, type?: "motorcycle"|"tricycle"|"4wheels", capacity?: int }, rating?,
                   balance_centavos, min_balance_centavos }
 WalletTransaction { id, type: "topup"|"commission"|"earning"|"adjustment"|"payout",
                   amount_centavos (signed), balance_after_centavos, job_id?, note?, created_at }

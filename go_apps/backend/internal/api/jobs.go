@@ -204,8 +204,22 @@ func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*dom
 	var maxBudget *int
 	switch req.Service {
 	case "ride":
-		addLine("Base fare", 4000)
-		addLine(kmLabel, max(0, km-1)*1500)
+		tier := "solo"
+		if req.Ride != nil && req.Ride.Tier != "" {
+			tier = req.Ride.Tier
+		}
+		distFee := max(0, km-1) * 1500
+		switch tier {
+		case "pasabay_4w":
+			addLine("4-Wheels base fare", 5000)
+			addLine(kmLabel, max(0, km-1)*1800)
+		case "pasabay_tricycle":
+			addLine("Tricycle base fare", 4000)
+			addLine(kmLabel, distFee)
+		default:
+			addLine("Base fare", 4000)
+			addLine(kmLabel, distFee)
+		}
 	case "food":
 		if req.Food == nil || len(req.Food.Items) == 0 {
 			return nil, fieldErr("food", "required", "No items")
@@ -274,7 +288,7 @@ func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*dom
 			fees += l.AmountCentavos
 		}
 	}
-	return &domain.Quote{
+	q := &domain.Quote{
 		ID:                    domain.NewID(),
 		Service:               req.Service,
 		DistanceM:             dist,
@@ -285,7 +299,63 @@ func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*dom
 		MaxItemBudgetCentavos: maxBudget,
 		FeesCentavos:          fees,
 		RoutePolyline:         poly,
-	}, nil
+	}
+	if req.Service == "ride" {
+		seats := 1
+		if req.Ride != nil && req.Ride.SeatsBooked > 0 {
+			seats = req.Ride.SeatsBooked
+		}
+		distFee := max(0, km-1) * 1500
+		soloTotal := 4000 + distFee
+		trikeTotal := 4000 + distFee
+		carTotal := 5000 + max(0, km-1)*1800
+
+		trikeMin := (trikeTotal / 4) * seats
+		carMin := (carTotal / 4) * seats
+
+		q.RideTiers = []domain.RideTierQuote{
+			{
+				Tier:            "solo",
+				Name:            "Solo (Motorcycle)",
+				VehicleType:     "motorcycle",
+				MaxCapacity:     1,
+				SeatsBooked:     1,
+				TotalCentavos:   soloTotal,
+				MinFareCentavos: soloTotal,
+				Breakdown: []domain.FareLine{
+					{Label: "Base fare", AmountCentavos: 4000},
+					{Label: kmLabel, AmountCentavos: distFee},
+				},
+			},
+			{
+				Tier:            "pasabay_tricycle",
+				Name:            "Pasabay (Tricycle)",
+				VehicleType:     "tricycle",
+				MaxCapacity:     4,
+				SeatsBooked:     seats,
+				TotalCentavos:   trikeTotal,
+				MinFareCentavos: trikeMin,
+				Breakdown: []domain.FareLine{
+					{Label: "Tricycle vehicle trip", AmountCentavos: trikeTotal},
+					{Label: fmt.Sprintf("Pasabay split (drops to ₱%.2f with 4 passengers)", float64(trikeMin)/100), AmountCentavos: 0},
+				},
+			},
+			{
+				Tier:            "pasabay_4w",
+				Name:            "Pasabay (4-Wheels)",
+				VehicleType:     "4wheels",
+				MaxCapacity:     4,
+				SeatsBooked:     seats,
+				TotalCentavos:   carTotal,
+				MinFareCentavos: carMin,
+				Breakdown: []domain.FareLine{
+					{Label: "4-Wheels vehicle trip", AmountCentavos: carTotal},
+					{Label: fmt.Sprintf("Pasabay split (drops to ₱%.2f with 4 passengers)", float64(carMin)/100), AmountCentavos: 0},
+				},
+			},
+		}
+	}
+	return q, nil
 }
 
 // ---------- jobs ----------
@@ -408,6 +478,30 @@ func (a *API) buildJob(uid string, q *domain.Quote, method string, notes *string
 		CommissionCentavos: q.FeesCentavos - earnings,
 	}
 	switch req.Service {
+	case "ride":
+		tier := "solo"
+		seats := 1
+		vtype := "motorcycle"
+		if req.Ride != nil {
+			if req.Ride.Tier != "" {
+				tier = req.Ride.Tier
+			}
+			if req.Ride.SeatsBooked > 0 {
+				seats = req.Ride.SeatsBooked
+			}
+		}
+		if tier == "pasabay_tricycle" {
+			vtype = "tricycle"
+		} else if tier == "pasabay_4w" {
+			vtype = "4wheels"
+		}
+		j.Ride = &domain.JobRide{
+			Tier:             tier,
+			VehicleType:      vtype,
+			SeatsBooked:      seats,
+			TotalSharedSeats: seats,
+			BaseFareCentavos: q.TotalCentavos,
+		}
 	case "food":
 		row := a.svc.St.Merchants[req.Food.MerchantID]
 		m := &row.Merchant

@@ -78,11 +78,37 @@ func (s *Service) Dispatch(js *domain.JobState) {
 	var cs []cand
 	for _, rd := range s.St.Riders {
 		p := rd.Profile
-		if p.Status != "approved" || !p.IsOnline || rd.ActiveJobID != "" || busy[p.UserID] || rd.Location == nil ||
+		if p.Status != "approved" || !p.IsOnline || busy[p.UserID] || rd.Location == nil ||
 			p.BalanceCentavos < p.MinBalanceCentavos || time.Since(rd.LocationAt) > 15*time.Minute ||
 			contains(js.DeclinedBy, p.UserID) || p.UserID == js.CustomerID {
 			continue
 		}
+
+		// Check service and vehicle tier capacity:
+		if js.Job.Service == "ride" && js.Job.Ride != nil && js.Job.Ride.Tier != "solo" {
+			reqTier := js.Job.Ride.Tier
+			vType := rd.VehicleType()
+			if reqTier == "pasabay_tricycle" && vType != "tricycle" {
+				continue
+			}
+			if reqTier == "pasabay_4w" && vType != "4wheels" && vType != "car" {
+				continue
+			}
+			seats := js.Job.Ride.SeatsBooked
+			if seats <= 0 {
+				seats = 1
+			}
+			occupied := s.RiderOccupiedSeats(rd)
+			if occupied+seats > rd.VehicleCapacity() {
+				continue
+			}
+		} else {
+			// Solo ride, food, pabili, padala: driver must have 0 occupied seats
+			if s.RiderOccupiedSeats(rd) > 0 {
+				continue
+			}
+		}
+
 		d := domain.DistanceM(*rd.Location, js.Job.Pickup.Location)
 		if s.Cfg.MaxDispatchM == 0 || d <= s.Cfg.MaxDispatchM {
 			cs = append(cs, cand{rd, d})

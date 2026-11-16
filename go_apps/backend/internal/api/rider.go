@@ -197,6 +197,19 @@ func (a *API) riderSubmit(w http.ResponseWriter, r *http.Request) error {
 	}
 	v := b.Vehicle
 	v.Plate = strings.ToUpper(strings.TrimSpace(v.Plate))
+	if v.Type == "" {
+		v.Type = "motorcycle"
+	}
+	if v.Capacity <= 0 {
+		switch v.Type {
+		case "tricycle":
+			v.Capacity = 4
+		case "4wheels", "car":
+			v.Capacity = 4
+		default:
+			v.Capacity = 1
+		}
+	}
 	rd.Profile.Vehicle = &v
 	rd.Documents = docs
 	rd.Profile.Status = "pending_review"
@@ -360,8 +373,19 @@ func (a *API) acceptOffer(w http.ResponseWriter, r *http.Request) error {
 	if rd == nil {
 		return errForbidden
 	}
-	if rd.ActiveJobID != "" {
-		return apiErr(409, "invalid_status_transition", "Finish your active job first")
+	isPasabay := js.Job.Service == "ride" && js.Job.Ride != nil && js.Job.Ride.Tier != "solo"
+	if isPasabay {
+		seats := js.Job.Ride.SeatsBooked
+		if seats <= 0 {
+			seats = 1
+		}
+		if a.svc.RiderOccupiedSeats(rd)+seats > rd.VehicleCapacity() {
+			return apiErr(409, "invalid_status_transition", "Your vehicle is full")
+		}
+	} else {
+		if a.svc.RiderOccupiedSeats(rd) > 0 {
+			return apiErr(409, "invalid_status_transition", "Finish your active job first")
+		}
 	}
 	delete(a.svc.St.Offers, o.ID)
 	if a.svc.Redis != nil {
@@ -387,7 +411,11 @@ func (a *API) acceptOffer(w http.ResponseWriter, r *http.Request) error {
 		Rating:      rd.Profile.Rating,
 	}
 	rd.ActiveJobID = js.Job.ID
+	rd.ActiveJobIDs = append(rd.ActiveJobIDs, js.Job.ID)
 	a.svc.SetStatus(js, "rider_assigned")
+	if isPasabay {
+		a.svc.RecalculateSharedRides(uid)
+	}
 	a.svc.SystemMessage(js, js.Job.Rider.Name+" accepted your booking and is on the way.")
 	ok(w, a.svc.JobView(js, "rider"))
 	return nil
@@ -519,9 +547,23 @@ func (a *API) riderJobStatus(w http.ResponseWriter, r *http.Request) error {
 	a.svc.SetStatus(js, b.Status)
 	if b.Status == "completed" {
 		if rd := a.svc.St.Riders[uid]; rd != nil {
-			rd.ActiveJobID = ""
+			var remaining []string
+			for _, id := range rd.ActiveJobIDs {
+				if id != js.Job.ID {
+					remaining = append(remaining, id)
+				}
+			}
+			rd.ActiveJobIDs = remaining
+			if len(remaining) > 0 {
+				rd.ActiveJobID = remaining[0]
+			} else {
+				rd.ActiveJobID = ""
+			}
 		}
 		js.CompletedAt = time.Now()
+		if js.Job.Service == "ride" && js.Job.Ride != nil && js.Job.Ride.Tier != "solo" {
+			a.svc.RecalculateSharedRides(uid)
+		}
 	}
 	ok(w, a.svc.JobView(js, "rider"))
 	return nil

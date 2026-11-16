@@ -328,8 +328,20 @@ func (s *Service) Cancel(js *domain.JobState, cancelledBy, reason string) {
 	if js.Order != nil {
 		js.Order.Status = "rejected"
 	}
-	if r := s.St.Riders[js.RiderUserID]; r != nil && r.ActiveJobID == js.Job.ID {
-		r.ActiveJobID = ""
+	if r := s.St.Riders[js.RiderUserID]; r != nil {
+		if r.ActiveJobID == js.Job.ID {
+			r.ActiveJobID = ""
+		}
+		var remaining []string
+		for _, id := range r.ActiveJobIDs {
+			if id != js.Job.ID {
+				remaining = append(remaining, id)
+			}
+		}
+		r.ActiveJobIDs = remaining
+		if len(remaining) > 0 {
+			r.ActiveJobID = remaining[0]
+		}
 	}
 	for id, o := range s.St.Offers {
 		if o.JobID == js.Job.ID {
@@ -347,6 +359,106 @@ func (s *Service) Cancel(js *domain.JobState, cancelledBy, reason string) {
 
 func (s *Service) InServiceArea(p domain.LatLng) bool {
 	return s.St.ServiceArea.InServiceArea(p, s.Cfg.AnyLocation)
+}
+
+func (s *Service) RiderOccupiedSeats(rd *domain.Rider) int {
+	if rd == nil {
+		return 0
+	}
+	count := 0
+	seen := map[string]bool{}
+	for _, jid := range rd.ActiveJobIDs {
+		if seen[jid] {
+			continue
+		}
+		seen[jid] = true
+		if js := s.St.Jobs[jid]; js != nil && IsLive(js.Job.Status) {
+			seats := 1
+			if js.Job.Ride != nil && js.Job.Ride.SeatsBooked > 0 {
+				seats = js.Job.Ride.SeatsBooked
+			}
+			count += seats
+		}
+	}
+	if count == 0 && rd.ActiveJobID != "" {
+		if js := s.St.Jobs[rd.ActiveJobID]; js != nil && IsLive(js.Job.Status) {
+			seats := 1
+			if js.Job.Ride != nil && js.Job.Ride.SeatsBooked > 0 {
+				seats = js.Job.Ride.SeatsBooked
+			}
+			count += seats
+		}
+	}
+	return count
+}
+
+func (s *Service) RecalculateSharedRides(riderUserID string) {
+	rd := s.St.Riders[riderUserID]
+	if rd == nil {
+		return
+	}
+	var pasabayJobs []*domain.JobState
+	totalSeats := 0
+	seen := map[string]bool{}
+	for _, jid := range rd.ActiveJobIDs {
+		if seen[jid] {
+			continue
+		}
+		seen[jid] = true
+		if js := s.St.Jobs[jid]; js != nil && IsLive(js.Job.Status) && js.Job.Service == "ride" && js.Job.Ride != nil && js.Job.Ride.Tier != "solo" {
+			pasabayJobs = append(pasabayJobs, js)
+			seats := js.Job.Ride.SeatsBooked
+			if seats <= 0 {
+				seats = 1
+			}
+			totalSeats += seats
+		}
+	}
+	if len(pasabayJobs) == 0 || totalSeats <= 0 {
+		return
+	}
+
+	for _, js := range pasabayJobs {
+		seats := js.Job.Ride.SeatsBooked
+		if seats <= 0 {
+			seats = 1
+		}
+		baseFare := js.Job.Ride.BaseFareCentavos
+		if baseFare <= 0 {
+			baseFare = js.Job.Fare.TotalCentavos
+			js.Job.Ride.BaseFareCentavos = baseFare
+		}
+		newFare := (baseFare / totalSeats) * seats
+		if newFare < 1500 {
+			newFare = 1500 // minimum fare ₱15
+		}
+		oldFare := js.Job.Fare.TotalCentavos
+		diff := oldFare - newFare
+
+		js.Job.Ride.TotalSharedSeats = totalSeats
+		js.Job.Fare.TotalCentavos = newFare
+		js.FeesCentavos = newFare
+		js.EarningsCentavos = newFare * 80 / 100
+		js.CommissionCentavos = newFare - js.EarningsCentavos
+
+		discount := baseFare - newFare
+		js.Job.Fare.Breakdown = []domain.FareLine{
+			{Label: "Vehicle trip fare", AmountCentavos: baseFare},
+			{Label: fmt.Sprintf("Pasabay split (%d seats sharing)", totalSeats), AmountCentavos: -discount},
+		}
+
+		if diff > 0 && js.Job.Payment.Method != "cash" && js.PMPaymentID != "" && s.PM != nil && s.PM.Enabled() {
+			pid, code := js.PMPaymentID, js.Job.Code
+			go func(amount int) {
+				_ = s.PM.Refund(context.Background(), pid, amount, "Pasabay price drop for "+code)
+			}(diff)
+		}
+
+		s.Emit(js.CustomerID, "customer", "job.updated", map[string]any{
+			"job": s.JobView(js, "customer"),
+			"pasabay_message": fmt.Sprintf("Another passenger joined! Your fare is now ₱%.2f", float64(newFare)/100),
+		})
+	}
 }
 
 func (s *Service) AfterPayment(js *domain.JobState) {

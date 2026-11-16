@@ -6,6 +6,32 @@ type Vehicle struct {
 	Plate     string `json:"plate"`
 	MakeModel string `json:"make_model"`
 	Color     string `json:"color"`
+	Type      string `json:"type,omitempty"`     // "motorcycle", "tricycle", "4wheels" (default: "motorcycle")
+	Capacity  int    `json:"capacity,omitempty"` // max passenger capacity (default: 1 for motorcycle, 4 for tricycle, 4 for 4wheels)
+}
+
+func (v *Vehicle) VehicleType() string {
+	if v == nil || v.Type == "" {
+		return "motorcycle"
+	}
+	return v.Type
+}
+
+func (v *Vehicle) VehicleCapacity() int {
+	if v == nil {
+		return 1
+	}
+	if v.Capacity > 0 {
+		return v.Capacity
+	}
+	switch v.Type {
+	case "tricycle":
+		return 4
+	case "4wheels", "car":
+		return 4
+	default:
+		return 1
+	}
 }
 
 type RiderProfile struct {
@@ -27,12 +53,27 @@ type Rider struct {
 	Location     *LatLng           `json:"location"`
 	LocationAt   time.Time         `json:"location_at"`
 	ActiveJobID  string            `json:"active_job_id"`
+	ActiveJobIDs []string          `json:"active_job_ids,omitempty"`
 	RatingSum    int               `json:"rating_sum"`
 	RatingCount  int               `json:"rating_count"`
 	SubmittedAt  time.Time         `json:"submitted_at"`
 	KycSessionID string            `json:"kyc_session_id,omitempty"`
 	KycURL       string            `json:"kyc_url,omitempty"`
 	KycCheckedAt time.Time         `json:"-"`
+}
+
+func (rd *Rider) VehicleType() string {
+	if rd == nil || rd.Profile.Vehicle == nil {
+		return "motorcycle"
+	}
+	return rd.Profile.Vehicle.VehicleType()
+}
+
+func (rd *Rider) VehicleCapacity() int {
+	if rd == nil || rd.Profile.Vehicle == nil {
+		return 1
+	}
+	return rd.Profile.Vehicle.VehicleCapacity()
 }
 
 type JobOffer struct {

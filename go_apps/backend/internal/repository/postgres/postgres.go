@@ -391,7 +391,7 @@ func Load(db *sql.DB, st *repository.State, anyLocation bool) error {
 	}
 
 	// 4. Riders
-	rRows, err := db.Query("SELECT id, user_id, status, is_online, plate_number, vehicle_model, vehicle_color, rejection_reason, rating, rating_sum, rating_count, balance_centavos, min_balance_centavos, current_latitude, current_longitude, last_location_updated_at, active_job_id, submitted_at FROM riders")
+	rRows, err := db.Query("SELECT id, user_id, status, is_online, vehicle_type, plate_number, vehicle_model, vehicle_color, rejection_reason, rating, rating_sum, rating_count, balance_centavos, min_balance_centavos, current_latitude, current_longitude, last_location_updated_at, active_job_id, submitted_at FROM riders")
 	if err != nil {
 		return fmt.Errorf("query riders: %w", err)
 	}
@@ -399,13 +399,13 @@ func Load(db *sql.DB, st *repository.State, anyLocation bool) error {
 
 	for rRows.Next() {
 		var rd domain.Rider
-		var plate, model, color, rej, actJob sql.NullString
+		var vType, plate, model, color, rej, actJob sql.NullString
 		var rating, lat, lng sql.NullFloat64
 		var locAt, subAt sql.NullTime
 
 		if err := rRows.Scan(
 			&rd.Profile.ID, &rd.Profile.UserID, &rd.Profile.Status, &rd.Profile.IsOnline,
-			&plate, &model, &color, &rej, &rating, &rd.RatingSum, &rd.RatingCount,
+			&vType, &plate, &model, &color, &rej, &rating, &rd.RatingSum, &rd.RatingCount,
 			&rd.Profile.BalanceCentavos, &rd.Profile.MinBalanceCentavos,
 			&lat, &lng, &locAt, &actJob, &subAt,
 		); err != nil {
@@ -417,6 +417,7 @@ func Load(db *sql.DB, st *repository.State, anyLocation bool) error {
 				Plate:     plate.String,
 				MakeModel: model.String,
 				Color:     color.String,
+				Type:      vType.String,
 			}
 		}
 		rd.Profile.RejectionReason = strPtr(rej)
@@ -1000,10 +1001,12 @@ func Save(db *sql.DB, st *repository.State) error {
 			actJob = &rd.ActiveJobID
 		}
 
+		vType := rd.VehicleType()
 		if _, err := tx.Exec(`
 			INSERT INTO riders (id, user_id, vehicle_type, plate_number, vehicle_model, vehicle_color, status, is_online, rejection_reason, rating, rating_sum, rating_count, balance_centavos, min_balance_centavos, current_latitude, current_longitude, last_location_updated_at, active_job_id, submitted_at, updated_at)
-			VALUES ($1, $2, 'motorcycle', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW())
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW())
 			ON CONFLICT (user_id) DO UPDATE SET
+				vehicle_type = EXCLUDED.vehicle_type,
 				plate_number = EXCLUDED.plate_number,
 				vehicle_model = EXCLUDED.vehicle_model,
 				vehicle_color = EXCLUDED.vehicle_color,
@@ -1021,7 +1024,7 @@ func Save(db *sql.DB, st *repository.State) error {
 				active_job_id = EXCLUDED.active_job_id,
 				submitted_at = EXCLUDED.submitted_at,
 				updated_at = NOW();
-		`, rd.Profile.ID, rd.Profile.UserID, plate, model, color, rd.Profile.Status, rd.Profile.IsOnline, nullStr(rd.Profile.RejectionReason), nullFloat(rd.Profile.Rating), rd.RatingSum, rd.RatingCount, rd.Profile.BalanceCentavos, rd.Profile.MinBalanceCentavos, nullFloat(lat), nullFloat(lng), rd.LocationAt, nullStr(actJob), rd.SubmittedAt); err != nil {
+		`, rd.Profile.ID, rd.Profile.UserID, vType, plate, model, color, rd.Profile.Status, rd.Profile.IsOnline, nullStr(rd.Profile.RejectionReason), nullFloat(rd.Profile.Rating), rd.RatingSum, rd.RatingCount, rd.Profile.BalanceCentavos, rd.Profile.MinBalanceCentavos, nullFloat(lat), nullFloat(lng), rd.LocationAt, nullStr(actJob), rd.SubmittedAt); err != nil {
 			return fmt.Errorf("save rider %s: %w", rd.Profile.UserID, err)
 		}
 

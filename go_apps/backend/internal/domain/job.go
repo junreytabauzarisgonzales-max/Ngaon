@@ -68,6 +68,14 @@ type JobPadala struct {
 	PhotoURL       *string `json:"photo_url,omitempty"`
 }
 
+type JobRide struct {
+	Tier             string `json:"tier"`                         // "solo", "pasabay_tricycle", "pasabay_4w"
+	VehicleType      string `json:"vehicle_type"`                 // "motorcycle", "tricycle", "4wheels"
+	SeatsBooked      int    `json:"seats_booked"`                 // number of seats booked by this customer (default: 1)
+	TotalSharedSeats int    `json:"total_shared_seats,omitempty"` // total seats booked across active shared passengers
+	BaseFareCentavos int    `json:"base_fare_centavos"`           // unshared vehicle trip fare
+}
+
 type JobPayment struct {
 	Method      string  `json:"method"`
 	Status      string  `json:"status"`
@@ -93,6 +101,7 @@ type Job struct {
 	Food           *JobFood        `json:"food,omitempty"`
 	Pabili         *JobPabili      `json:"pabili,omitempty"`
 	Padala         *JobPadala      `json:"padala,omitempty"`
+	Ride           *JobRide        `json:"ride,omitempty"`
 	Fare           Fare            `json:"fare"`
 	Payment        JobPayment      `json:"payment"`
 	ProofURL       *string         `json:"proof_url,omitempty"`
@@ -184,18 +193,34 @@ type QuoteRequest struct {
 		RecipientPhone string  `json:"recipient_phone"`
 		PhotoKey       *string `json:"photo_key,omitempty"`
 	} `json:"padala,omitempty"`
+	Ride *struct {
+		Tier        string `json:"tier,omitempty"`         // "solo", "pasabay_tricycle", "pasabay_4w" (default "solo")
+		SeatsBooked int    `json:"seats_booked,omitempty"` // 1..4 (default 1)
+	} `json:"ride,omitempty"`
+}
+
+type RideTierQuote struct {
+	Tier            string     `json:"tier"`              // "solo", "pasabay_tricycle", "pasabay_4w"
+	Name            string     `json:"name"`              // "Solo (Motorcycle)", "Pasabay (Tricycle)", "Pasabay (4-Wheels)"
+	VehicleType     string     `json:"vehicle_type"`      // "motorcycle", "tricycle", "4wheels"
+	MaxCapacity     int        `json:"max_capacity"`      // 1, 4, 4
+	SeatsBooked     int        `json:"seats_booked"`      // 1..4
+	TotalCentavos   int        `json:"total_centavos"`    // current trip fare for this passenger
+	MinFareCentavos int        `json:"min_fare_centavos"` // fare when shared at max capacity
+	Breakdown       []FareLine `json:"breakdown"`
 }
 
 type Quote struct {
-	ID                    string     `json:"id"`
-	Service               string     `json:"service"`
-	DistanceM             int        `json:"distance_m"`
-	DurationS             int        `json:"duration_s"`
-	ExpiresAt             UTC        `json:"expires_at"`
-	Breakdown             []FareLine `json:"breakdown"`
-	TotalCentavos         int        `json:"total_centavos"`
-	MaxItemBudgetCentavos *int       `json:"max_item_budget_centavos,omitempty"`
-	RoutePolyline         *string    `json:"route_polyline,omitempty"`
+	ID                    string          `json:"id"`
+	Service               string          `json:"service"`
+	DistanceM             int             `json:"distance_m"`
+	DurationS             int             `json:"duration_s"`
+	ExpiresAt             UTC             `json:"expires_at"`
+	Breakdown             []FareLine      `json:"breakdown"`
+	TotalCentavos         int             `json:"total_centavos"`
+	MaxItemBudgetCentavos *int            `json:"max_item_budget_centavos,omitempty"`
+	RoutePolyline         *string         `json:"route_polyline,omitempty"`
+	RideTiers             []RideTierQuote `json:"ride_tiers,omitempty"`
 
 	// internal
 	UserID       string        `json:"-"`
