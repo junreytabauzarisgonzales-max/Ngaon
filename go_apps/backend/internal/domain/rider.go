@@ -6,13 +6,16 @@ type Vehicle struct {
 	Plate     string `json:"plate"`
 	MakeModel string `json:"make_model"`
 	Color     string `json:"color"`
-	Type      string `json:"type,omitempty"`     // "motorcycle", "tricycle", "4wheels" (default: "motorcycle")
-	Capacity  int    `json:"capacity,omitempty"` // max passenger capacity (default: 1 for motorcycle, 4 for tricycle, 4 for 4wheels)
+	Type      string `json:"type,omitempty"`     // "motorcycle", "tricycle", "car" (default: "motorcycle")
+	Capacity  int    `json:"capacity,omitempty"` // max passenger capacity (default: 1 for motorcycle, 4 for tricycle, 4 for car)
 }
 
 func (v *Vehicle) VehicleType() string {
 	if v == nil || v.Type == "" {
 		return "motorcycle"
+	}
+	if v.Type == "4wheels" {
+		return "car"
 	}
 	return v.Type
 }
@@ -27,7 +30,7 @@ func (v *Vehicle) VehicleCapacity() int {
 	switch v.Type {
 	case "tricycle":
 		return 4
-	case "4wheels", "car":
+	case "car", "4wheels":
 		return 4
 	default:
 		return 1

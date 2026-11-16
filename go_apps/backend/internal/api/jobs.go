@@ -210,8 +210,8 @@ func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*dom
 		}
 		distFee := max(0, km-1) * 1500
 		switch tier {
-		case "pasabay_4w":
-			addLine("4-Wheels base fare", 5000)
+		case "pasabay_car", "pasabay_4w":
+			addLine("Car base fare", 5000)
 			addLine(kmLabel, max(0, km-1)*1800)
 		case "pasabay_tricycle":
 			addLine("Tricycle base fare", 4000)
@@ -341,15 +341,15 @@ func (a *API) priceQuote(req *domain.QuoteRequest, rt *integrations.Route) (*dom
 				},
 			},
 			{
-				Tier:            "pasabay_4w",
-				Name:            "Pasabay (4-Wheels)",
-				VehicleType:     "4wheels",
+				Tier:            "pasabay_car",
+				Name:            "Pasabay (Car)",
+				VehicleType:     "car",
 				MaxCapacity:     4,
 				SeatsBooked:     seats,
 				TotalCentavos:   carTotal,
 				MinFareCentavos: carMin,
 				Breakdown: []domain.FareLine{
-					{Label: "4-Wheels vehicle trip", AmountCentavos: carTotal},
+					{Label: "Car vehicle trip", AmountCentavos: carTotal},
 					{Label: fmt.Sprintf("Pasabay split (drops to ₱%.2f with 4 passengers)", float64(carMin)/100), AmountCentavos: 0},
 				},
 			},
@@ -492,8 +492,8 @@ func (a *API) buildJob(uid string, q *domain.Quote, method string, notes *string
 		}
 		if tier == "pasabay_tricycle" {
 			vtype = "tricycle"
-		} else if tier == "pasabay_4w" {
-			vtype = "4wheels"
+		} else if tier == "pasabay_car" || tier == "pasabay_4w" {
+			vtype = "car"
 		}
 		j.Ride = &domain.JobRide{
 			Tier:             tier,

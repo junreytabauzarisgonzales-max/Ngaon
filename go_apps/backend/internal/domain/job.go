@@ -69,8 +69,8 @@ type JobPadala struct {
 }
 
 type JobRide struct {
-	Tier             string `json:"tier"`                         // "solo", "pasabay_tricycle", "pasabay_4w"
-	VehicleType      string `json:"vehicle_type"`                 // "motorcycle", "tricycle", "4wheels"
+	Tier             string `json:"tier"`                         // "solo", "pasabay_tricycle", "pasabay_car"
+	VehicleType      string `json:"vehicle_type"`                 // "motorcycle", "tricycle", "car"
 	SeatsBooked      int    `json:"seats_booked"`                 // number of seats booked by this customer (default: 1)
 	TotalSharedSeats int    `json:"total_shared_seats,omitempty"` // total seats booked across active shared passengers
 	BaseFareCentavos int    `json:"base_fare_centavos"`           // unshared vehicle trip fare
@@ -194,15 +194,15 @@ type QuoteRequest struct {
 		PhotoKey       *string `json:"photo_key,omitempty"`
 	} `json:"padala,omitempty"`
 	Ride *struct {
-		Tier        string `json:"tier,omitempty"`         // "solo", "pasabay_tricycle", "pasabay_4w" (default "solo")
+		Tier        string `json:"tier,omitempty"`         // "solo", "pasabay_tricycle", "pasabay_car" (default "solo")
 		SeatsBooked int    `json:"seats_booked,omitempty"` // 1..4 (default 1)
 	} `json:"ride,omitempty"`
 }
 
 type RideTierQuote struct {
-	Tier            string     `json:"tier"`              // "solo", "pasabay_tricycle", "pasabay_4w"
-	Name            string     `json:"name"`              // "Solo (Motorcycle)", "Pasabay (Tricycle)", "Pasabay (4-Wheels)"
-	VehicleType     string     `json:"vehicle_type"`      // "motorcycle", "tricycle", "4wheels"
+	Tier            string     `json:"tier"`              // "solo", "pasabay_tricycle", "pasabay_car"
+	Name            string     `json:"name"`              // "Solo (Motorcycle)", "Pasabay (Tricycle)", "Pasabay (Car)"
+	VehicleType     string     `json:"vehicle_type"`      // "motorcycle", "tricycle", "car"
 	MaxCapacity     int        `json:"max_capacity"`      // 1, 4, 4
 	SeatsBooked     int        `json:"seats_booked"`      // 1..4
 	TotalCentavos   int        `json:"total_centavos"`    // current trip fare for this passenger

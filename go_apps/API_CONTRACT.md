@@ -255,7 +255,7 @@ QuoteRequest    { service: "ride"|"food"|"pabili"|"padala", pickup: Stop, dropof
                   food?:   { merchant_id, items: [ { item_id, quantity, addon_option_ids: [id], note? } ] },
                   pabili?: { store_name, items: [ { name, quantity, note? } ], estimated_item_total_centavos },
                   padala?: { size: "small"|"medium"|"large", description, recipient_name, recipient_phone, photo_key? },
-                  ride?:   { tier?: "solo"|"pasabay_tricycle"|"pasabay_4w", seats_booked?: int } }
+                  ride?:   { tier?: "solo"|"pasabay_tricycle"|"pasabay_car", seats_booked?: int } }
 Quote           { id, service, distance_m, duration_s, expires_at,
                   breakdown: [ { label, amount_centavos } ], total_centavos, max_item_budget_centavos?,
                   route_polyline?, ride_tiers?: [ { tier, name, vehicle_type, max_capacity, seats_booked, total_centavos, min_fare_centavos, breakdown } ] }
@@ -269,7 +269,7 @@ Job             { id, code ("NG-4821"), service, status, created_at, updated_at,
                            rider_pays_merchant_centavos? },                       // ADDED
                   pabili?: { store_name, items: [ { name, quantity, note? } ], receipt_url?, item_total_centavos? },
                   padala?: { size, description, recipient_name, recipient_phone, photo_url? },
-                  ride?:   { tier: "solo"|"pasabay_tricycle"|"pasabay_4w", vehicle_type: "motorcycle"|"tricycle"|"4wheels",
+                  ride?:   { tier: "solo"|"pasabay_tricycle"|"pasabay_car", vehicle_type: "motorcycle"|"tricycle"|"car",
                              seats_booked: int, total_shared_seats: int, base_fare_centavos: int },
                   fare: { breakdown: [ { label, amount_centavos } ], total_centavos },
                   payment: { method: "cash"|"gcash"|"maya", status: "pending"|"paid"|"failed"|"refunded", checkout_url? },

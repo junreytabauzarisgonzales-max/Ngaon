@@ -91,7 +91,7 @@ func (s *Service) Dispatch(js *domain.JobState) {
 			if reqTier == "pasabay_tricycle" && vType != "tricycle" {
 				continue
 			}
-			if reqTier == "pasabay_4w" && vType != "4wheels" && vType != "car" {
+			if (reqTier == "pasabay_car" || reqTier == "pasabay_4w") && vType != "car" && vType != "4wheels" {
 				continue
 			}
 			seats := js.Job.Ride.SeatsBooked
