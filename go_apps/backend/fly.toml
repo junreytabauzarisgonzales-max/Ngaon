@@ -13,7 +13,7 @@ primary_region = 'sin'
 
 [env]
   PORT = '8080'
-  PUBLIC_URL = 'https://ngaon-backend.fly.dev'
+  PUBLIC_URL = 'https://api.ngaon.app'
 
 [http_service]
   internal_port = 8080
