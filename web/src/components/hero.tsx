@@ -12,13 +12,15 @@ export function Hero() {
   const screen = appScreens.find((item) => item.id === "customer-home");
   return <section className="hero" aria-labelledby="hero-heading">
     <div className="hero-glow" aria-hidden="true" />
+    <div className="hero-grid-lines" aria-hidden="true" />
     <div className="container hero-grid">
       <HeroEntrance className="hero-content">
         <p className="location-pill"><span className="location-dot" />Made for Bongao, Tawi-Tawi<ArrowUpRight size={13} aria-hidden="true" /></p>
-        <div className="hero-chip-group" aria-label="Ngaon services"><span className="hero-chip">Ride</span><span className="hero-chip">Food</span><span className="hero-chip">Pabili</span><span className="hero-chip">Padala</span></div>
-        <m.h1 id="hero-heading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>Your everyday,{" "}<br /><span>delivered.</span><m.div initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.8 }} className="hero-logo-wrap" style={{ marginLeft: 8, display: "inline-block", verticalAlign: "middle" }}><Image src="/brand/ngaon-logo.gif" alt="Ngaon logo" width={160} height={160} className="hero-logo" /></m.div></m.h1>
+        <div className="hero-chip-group" aria-label="Ngaon services"><span className="hero-chip"><i aria-hidden="true" />Ride</span><span className="hero-chip"><i aria-hidden="true" />Food</span><span className="hero-chip"><i aria-hidden="true" />Pabili</span><span className="hero-chip"><i aria-hidden="true" />Padala</span></div>
+        <m.h1 id="hero-heading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}><span className="hero-title-line">Your everyday,</span><span className="hero-title-line hero-title-line-accent">delivered.<m.span initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.8 }} className="hero-logo-wrap"><span className="hero-logo-ring" aria-hidden="true" /><Image src="/brand/ngaon-logo.gif" alt="Ngaon logo" width={160} height={160} className="hero-logo" /></m.span></span></m.h1>
         <p className="hero-description">Rides, food, shopping errands, and parcel delivery—together in Ngaon, built for Bongao, Tawi-Tawi.</p>
         <div className="hero-actions"><LinkButton href="#features">Explore Ngaon</LinkButton><LinkButton href="#showcase" secondary>See the App</LinkButton></div>
+        <div className="hero-service-labels" aria-label="Services available in Ngaon"><span>Ride</span><i /><span>Food</span><i /><span>Pabili</span><i /><span>Padala</span></div>
         <a className="hero-scroll" href="#features"><span><ArrowDown size={14} aria-hidden="true" /></span>A little more about your everyday</a>
       </HeroEntrance>
       <HeroEntrance className="hero-visual" delay={0.08} mockup>

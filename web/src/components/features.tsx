@@ -20,7 +20,8 @@ export function Features() {
     <div className="container">
       <Reveal><div className="heading-row"><SectionHeading eyebrow="A little help, every day" title="One app. Four ways to get things moving." id="features-heading" /><p className="heading-aside">Whatever your day looks like,<br />there’s a Ngaon for that.</p></div></Reveal>
       <div className="features-grid">{services.map((service, index) => <Reveal key={service.id} delay={index * 0.06} className={`feature-slot slot-${service.id}`}><article className={`feature-card feature-${service.id}`}>
-        <div className="feature-card-top"><IconBox imageSrc={serviceIconSources[icons[service.icon] as ServiceIconName]} /><span className="feature-number">0{index + 1}</span></div>
+        <span className="feature-card-index" aria-hidden="true">0{index + 1}</span>
+        <div className="feature-card-top"><IconBox imageSrc={serviceIconSources[icons[service.icon] as ServiceIconName]} /><span className="feature-number">NGAON / {service.title.toUpperCase()}</span></div>
         <div className="feature-copy"><p className="feature-label">{service.label}</p><h3>{service.title}</h3><p>{service.description}</p></div>
         <ServiceArt service={service.id} />
         <div className="feature-card-bottom"><span>{service.detail}</span><ArrowUpRight size={18} aria-hidden="true" /></div>

@@ -57,8 +57,9 @@ export function AppShowcase({ previews }: { previews: Record<string, ReactNode> 
     if (event.key === "ArrowRight") { event.preventDefault(); changeScreen(1); }
     if (event.key === "ArrowLeft") { event.preventDefault(); changeScreen(-1); }
   }}>
-    <div className="showcase-stage" id="showcase-viewport" role="group" tabIndex={0} aria-label="App preview. Use left and right arrow keys to browse.">
-      <div className="showcase-ring" aria-hidden="true" /><span className="showcase-corner-label"><Layers size={13} aria-hidden="true" />{screen.image ? "ACTUAL APP SCREEN" : "ILLUSTRATIVE APP CONCEPT"}</span>
+      <div className="showcase-stage" id="showcase-viewport" role="group" tabIndex={0} aria-label="App preview. Use left and right arrow keys to browse.">
+        <div className="showcase-ring" aria-hidden="true" /><span className="showcase-corner-label"><Layers size={13} aria-hidden="true" />{screen.image ? "ACTUAL APP SCREEN" : "ILLUSTRATIVE APP CONCEPT"}</span>
+        <span className="showcase-stage-index" aria-hidden="true">{String(index + 1).padStart(2, "0")} / {String(screens.length).padStart(2, "0")}</span>
       <div className="showcase-draggable" onDragStart={(event) => event.preventDefault()} onPointerDown={(event) => {
         if (event.button !== 0 || !event.isPrimary) return;
         swipeStart.current = { x: event.clientX, y: event.clientY, pointer: event.pointerId };
@@ -81,11 +82,11 @@ export function AppShowcase({ previews }: { previews: Record<string, ReactNode> 
     </div>
     <div className="showcase-description">
       <div className="role-tabs" role="group" aria-label="Filter previews by application">
+        <button type="button" aria-pressed={role === null} aria-label={`Show all previews, ${appScreens.length} screens`} onClick={() => selectRole(null)}>All<span className="role-count" aria-hidden="true">{String(appScreens.length).padStart(2, "0")}</span></button>
         {applications.map((app) => {
           const count = appScreens.filter((item) => item.role === app.id).length;
           return <button type="button" key={app.id} aria-pressed={role === app.id} aria-label={`Show ${app.name} previews, ${count} screens`} onClick={() => selectRole(app.id)}>{app.shortName}<span className="role-count" aria-hidden="true">{String(count).padStart(2, "0")}</span></button>;
         })}
-        <button type="button" aria-pressed={role === null} aria-label={`Show all previews, ${appScreens.length} screens`} onClick={() => selectRole(null)}>All<span className="role-count" aria-hidden="true">{String(appScreens.length).padStart(2, "0")}</span></button>
       </div>
       <div className="showcase-app-label"><Image src={appIconSources[application.id]} width={28} height={28} alt="" /><span>{application.name}</span><span className="small-tag">{screen.image ? "App screenshot" : "Illustration"}</span></div>
       <p className="screen-counter" aria-hidden="true">{String(index + 1).padStart(2, "0")} <span>/ {String(screens.length).padStart(2, "0")}</span></p>
