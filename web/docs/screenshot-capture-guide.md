@@ -5,8 +5,8 @@ This guide tells an engineer how to capture genuine customer/rider/merchant app 
 ## Status
 
 - **No Flutter SDK, Dart, adb, or Android emulator/device was found in this environment**, so captures could not be performed here.
-- `go_apps/` contains only Android launcher icons (192×192) — no customer/rider/merchant screenshots.
-- The website therefore keeps labeled **illustrative previews** until genuine captures are supplied.
+- Customer captures supplied separately are now used by the website; rider and merchant captures are still not present.
+- The website keeps labeled **illustrative previews** for roles and screens without genuine captures.
 
 ## Prerequisites
 

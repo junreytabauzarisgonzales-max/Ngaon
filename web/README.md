@@ -73,9 +73,9 @@ Replace that example with your real approved HTTPS origin. When unset, the site 
 - `docs/phase-4-report.md`: Phase 4 production-readiness findings and pending items.
 - `docs/screenshot-capture-guide.md`: precise mock-mode capture steps for genuine customer/rider/merchant screens.
 
-### Genuine screenshots are still needed
+### Genuine screenshots
 
-No genuine screenshots were found in the source repository, and this environment has no Flutter SDK or Android emulator available, so captures were not performed here. Current phone previews are explicitly labeled **illustrative previews, not app screenshots**, both visibly and accessibly. They are diagrams of documented concepts, not fabricated captures.
+Customer screenshots supplied separately are now included in the showcase as optimized WebP captures. Rider and merchant previews remain explicitly labeled **illustrative previews, not app screenshots**, both visibly and accessibly, until those captures are supplied.
 
 To add approved screenshots:
 
@@ -93,7 +93,7 @@ image: {
 
 Use the image's real dimensions. The hero automatically uses the `customer-home` image when supplied. The showcase preserves screenshot colors/aspect ratio and labels each preview as "App screenshot" or "Illustration". Application selection controls show Customer, Rider, and Merchant so every role can be browsed in the carousel; they replace illustrations only when genuine captures exist for that role.
 
-Requested captures: customer home/menu/checkout/tracking/Pabili confirmation, rider offers/active job/earnings, and merchant order board/menu/sales. See `docs/screenshot-capture-guide.md` for exact mock-mode steps, route names, demo data, and safe-data rules.
+Remaining requested captures: customer checkout/cart, rider dashboard/offers/active job/earnings/wallet, and merchant order board/order detail/menu/sales. See `docs/screenshot-capture-guide.md` for exact mock-mode steps, route names, demo data, and safe-data rules.
 
 ### Downloads, release status, and contacts
 

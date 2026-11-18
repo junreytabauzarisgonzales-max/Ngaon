@@ -2,6 +2,7 @@ export type AppRole = "customer" | "rider" | "merchant";
 export type PreviewKind =
   | "home"
   | "tracking"
+  | "activity"
   | "pabili"
   | "food"
   | "padala"
@@ -55,14 +56,15 @@ export const applications: {
   { id: "merchant", name: "Ngaon Merchant", shortName: "Merchant", description: "Manage incoming orders, menu items, preparation, and store activity.", detail: "For your business", downloadUrl: null, releaseStatus: null },
 ];
 
-// Genuine customer/rider/merchant screenshots were not present in the repository.
-// Each screen keeps a labeled illustration until an approved capture is added.
 export const appScreens: AppScreen[] = [
-  { id: "customer-home", role: "customer", kind: "home", title: "Your day starts here.", description: "Four everyday services, together in the customer app. Choose what you need and take the next step." },
-  { id: "customer-food", role: "customer", kind: "food", title: "From local kitchens.", description: "Browse merchants, build your order with available add-ons, and follow merchant preparation through delivery." },
-  { id: "customer-pabili", role: "customer", kind: "pabili", title: "Your list. A helping hand.", description: "Build a shopping list and budget. Review the receipt total from your rider before the delivery continues." },
-  { id: "customer-padala", role: "customer", kind: "padala", title: "Send with care.", description: "Set parcel pickup and drop-off details, add recipient information, and follow the delivery through completion." },
-  { id: "customer-tracking", role: "customer", kind: "tracking", title: "Stay in the loop.", description: "Follow booking updates and the assigned rider’s location as your ride or delivery progresses." },
+  { id: "customer-home", role: "customer", kind: "home", title: "Your day starts here.", description: "Four everyday services, together in the customer app. Choose what you need and take the next step.", image: { src: "/screenshots/customer-home.webp", width: 640, height: 1426, alt: "Ngaon customer home screen showing Juan and the Ride, Food, Pabili, and Padala services" } },
+  { id: "customer-ride", role: "customer", kind: "home", title: "A ride when you need one.", description: "Review a motorcycle route, fare, payment method, and booking action before you confirm.", image: { src: "/screenshots/customer-ride.webp", width: 640, height: 1426, alt: "Ngaon customer ride quote screen showing a motorcycle route and forty peso fare" } },
+  { id: "customer-food", role: "customer", kind: "food", title: "Something good, nearby.", description: "Browse a customer food screen with clearly labeled demonstration menu choices.", image: { src: "/screenshots/customer-food.webp", width: 640, height: 1426, alt: "Ngaon customer food screen showing demo menu choices from local merchants" } },
+  { id: "customer-pabili", role: "customer", kind: "pabili", title: "Your list. A helping hand.", description: "Build a shopping list, set the store and drop-off details, and review the price before requesting the errand.", image: { src: "/screenshots/customer-pabili.webp", width: 640, height: 1426, alt: "Ngaon customer Pabili screen showing store, delivery, and shopping list fields" } },
+  { id: "customer-padala", role: "customer", kind: "padala", title: "Send with care.", description: "Set parcel pickup and drop-off details, add recipient information, and choose a parcel size.", image: { src: "/screenshots/customer-padala.webp", width: 640, height: 1426, alt: "Ngaon customer Padala screen showing parcel pickup, drop-off, recipient, and size fields" } },
+  { id: "customer-tracking-map", role: "customer", kind: "tracking", title: "See the journey.", description: "The active booking map shows the pickup, destination, and the current search for a rider.", image: { src: "/screenshots/customer-tracking-map.webp", width: 640, height: 1426, alt: "Ngaon customer active ride map showing pickup, destination, and finding a rider status" } },
+  { id: "customer-tracking-details", role: "customer", kind: "tracking", title: "Stay in the loop.", description: "Review the route, fare, payment status, and booking timeline as the ride progresses.", image: { src: "/screenshots/customer-tracking-details.webp", width: 640, height: 1426, alt: "Ngaon customer ride tracking details showing route, fare, payment, and status timeline" } },
+  { id: "customer-activity", role: "customer", kind: "activity", title: "Your bookings, together.", description: "Active and past activity stay in one place, with the current booking ready to open.", image: { src: "/screenshots/customer-activity.webp", width: 640, height: 1426, alt: "Ngaon customer activity screen showing an active ride booking and navigation tabs" } },
   { id: "rider-jobs", role: "rider", kind: "rider", title: "A clearer next step.", description: "New offers, active-job steps, and delivery proof stay together while you ride." },
   { id: "rider-active", role: "rider", kind: "riderActive", title: "Every step, in order.", description: "Move through pickup, drop-off, and delivery proof with the job details kept together." },
   { id: "rider-earnings", role: "rider", kind: "riderEarnings", title: "Your work, in view.", description: "Review completed jobs, earnings summaries, and wallet information in the rider app." },

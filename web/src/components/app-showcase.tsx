@@ -5,6 +5,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, m, useIsPresent, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Layers } from "lucide-react";
 import { appScreens, applications, type AppRole } from "@/content/site-content";
+import { appIconSources } from "./app-icons";
 
 function PreviewSlide({ children, label, direction }: {
   children: ReactNode; label: string; direction: number;
@@ -86,7 +87,7 @@ export function AppShowcase({ previews }: { previews: Record<string, ReactNode> 
         })}
         <button type="button" aria-pressed={role === null} aria-label={`Show all previews, ${appScreens.length} screens`} onClick={() => selectRole(null)}>All<span className="role-count" aria-hidden="true">{String(appScreens.length).padStart(2, "0")}</span></button>
       </div>
-      <div className="showcase-app-label"><Image src="/brand/ngaon-logo-192.jpg" width={28} height={28} alt="" /><span>{application.name}</span><span className="small-tag">{screen.image ? "App screenshot" : "Illustration"}</span></div>
+      <div className="showcase-app-label"><Image src={appIconSources[application.id]} width={28} height={28} alt="" /><span>{application.name}</span><span className="small-tag">{screen.image ? "App screenshot" : "Illustration"}</span></div>
       <p className="screen-counter" aria-hidden="true">{String(index + 1).padStart(2, "0")} <span>/ {String(screens.length).padStart(2, "0")}</span></p>
       <div className="showcase-live-copy">
         {/* Reserve exactly the tallest caption at each width, without a fixed-height gap. */}

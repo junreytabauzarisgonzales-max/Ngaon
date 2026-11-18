@@ -65,7 +65,8 @@ h1, h2, h3, p { margin: 0; }
 .heading-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 48px; margin-bottom: 47px; }
 .heading-row .section-heading { max-width: 590px; }
 .heading-aside { color: var(--muted); font-size: 13px; line-height: 1.8; flex-shrink: 0; padding-bottom: 4px; }
-.icon-box { width: 48px; height: 48px; border-radius: 15px; background: var(--soft); color: var(--green); display: inline-flex; justify-content: center; align-items: center; border: 1px solid var(--line); }
+.icon-box { width: 48px; height: 48px; border-radius: 15px; background: var(--soft); color: var(--green); display: inline-flex; justify-content: center; align-items: center; border: 1px solid var(--line); overflow: hidden; }
+.icon-box > img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .text-link { display: inline-flex; align-items: center; gap: 15px; width: fit-content; min-height: 44px; font-size: 13px; font-weight: 550; }
 .text-link svg { transition: transform 180ms; }
 .text-link:hover svg { transform: translate(2px, -2px); }
@@ -120,7 +121,11 @@ h1, h2, h3, p { margin: 0; }
 .phone-screen { position: relative; overflow: hidden; border-radius: 36px; width: 100%; height: 100%; background: var(--white); }
 .phone-camera { position: absolute; width: 77px; height: 19px; background: var(--deep); border-radius: 20px; left: 50%; top: 15px; transform: translateX(-50%); z-index: 3; }
 .phone-home-indicator { position: absolute; width: 80px; height: 4px; background: var(--deep); border-radius: 4px; left: 50%; transform: translateX(-50%); bottom: 16px; }
-.actual-screenshot { width: 100%; height: 100%; object-fit: contain; background: var(--white); }
+.actual-screenshot { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.service-icon-image { display: block; object-fit: cover; border-radius: 22%; }
+.preview-large-icon .service-icon-image { border-radius: 18px; }
+.preview-mini-icon .service-icon-image { border-radius: 9px; }
+.preview-services .service-icon-image { border-radius: 10px; }
 .illustrative-screen { padding: 14px 17px 26px; height: 100%; position: relative; }
 .preview-status { display: flex; justify-content: space-between; align-items: center; font-size: 8px; font-weight: 650; height: 16px; margin-bottom: 23px; }
 .preview-status > span:last-child { display: flex; gap: 3px; align-items: center; }
