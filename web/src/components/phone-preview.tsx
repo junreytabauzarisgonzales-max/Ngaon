@@ -77,7 +77,7 @@ function ScreenIllustration({ kind }: { kind: PreviewKind }) {
 
 export function PhonePreview({ kind = "home", image, className = "", eager = false }: { kind?: PreviewKind; image?: AppScreen["image"]; className?: string; eager?: boolean }) {
   return <div className={`phone-frame${image ? " phone-frame-image" : ""} ${className}`}>
-    {!image && <div className="phone-camera" aria-hidden="true" />}
+    <div className="phone-camera" aria-hidden="true" />
     <div className="phone-screen">
       {image ? <Image src={image.src} alt={image.alt} width={image.width} height={image.height} className="actual-screenshot" sizes="(max-width: 640px) 260px, 300px" loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : "auto"} decoding="async" draggable={false} /> : <div className="illustrative-screen" role="img" aria-label={`Illustrative ${kind} app concept, not an actual app screenshot`}>
         <div className="preview-status" aria-hidden="true"><span>9:41</span><span><Signal size={12} /><Wifi size={12} /><BatteryFull size={16} /></span></div>
@@ -86,6 +86,6 @@ export function PhonePreview({ kind = "home", image, className = "", eager = fal
         <div className="illustration-label">ILLUSTRATIVE PREVIEW · NOT AN APP SCREENSHOT</div>
       </div>}
     </div>
-    {!image && <span className="phone-home-indicator" aria-hidden="true" />}
+    <span className="phone-home-indicator" aria-hidden="true" />
   </div>;
 }

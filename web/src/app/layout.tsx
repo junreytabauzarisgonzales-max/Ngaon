@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
+import Script from "next/script";
 import { MotionProvider } from "@/components/motion";
 import { siteUrl } from "@/content/site-content";
 import "./globals.css";
@@ -36,7 +37,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = { themeColor: "#FFFFFF", colorScheme: "light" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#07130D" },
+  ],
+  colorScheme: "light dark",
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structured = siteUrl ? {
@@ -60,8 +67,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   } : null;
 
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body>
+        <Script id="theme-init" strategy="beforeInteractive">{`(() => { try { const stored = window.localStorage.getItem("ngaon-theme"); const theme = stored === "dark" || stored === "light" ? stored : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); document.documentElement.dataset.theme = theme; } catch { document.documentElement.dataset.theme = "light"; } })();`}</Script>
         <a href="#main" className="skip-link">Skip to content</a>
         <MotionProvider>{children}</MotionProvider>
         {structured && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />}

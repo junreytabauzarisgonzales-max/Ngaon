@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m, useIsPresent, useReducedMotion } from "motion/react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { navigation } from "@/content/site-content";
+import { legalNavigation, navigation } from "@/content/site-content";
+import { ThemeToggle } from "./theme-toggle";
 
 function MobileMenu({ onNavigate }: { onNavigate: (href: string) => void }) {
   const present = useIsPresent();
@@ -21,7 +22,7 @@ function MobileMenu({ onNavigate }: { onNavigate: (href: string) => void }) {
       exit={{ opacity: 0, y: reduced ? 0 : -4 }}
       transition={{ duration: reduced ? 0 : 0.16, ease: [0.22, 1, 0.36, 1] }}
     >
-      {[...navigation, { label: "Get Ngaon", href: "#download" }].map((link) => (
+      {[...navigation, { label: "Get Ngaon", href: "#download" }, ...legalNavigation].map((link) => (
         <a key={link.href} href={link.href} onClick={() => onNavigate(link.href)}>
           {link.label}<ArrowUpRight size={17} aria-hidden="true" />
         </a>
@@ -58,6 +59,7 @@ export function MobileNavigation() {
     <div ref={wrapper} className="mobile-navigation" onBlur={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
     }}>
+      <ThemeToggle className="mobile-theme-toggle" />
       <button ref={button} type="button" className="icon-button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
         {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
       </button>

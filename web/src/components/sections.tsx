@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUpRight, Info, MapPin, Plus, Smartphone } from "lucide-react";
-import { applications, faqs, navigation } from "@/content/site-content";
+import { applications, faqs, legalNavigation, navigation } from "@/content/site-content";
 import { Reveal } from "./motion";
 import { appIconSources } from "./app-icons";
 import { Brand, IconBox, SectionHeading } from "./ui";
@@ -21,5 +21,5 @@ export function Faq() {
 }
 
 export function Footer() {
-  return <footer className="site-footer"><div className="container"><div className="footer-main"><div><Brand /><p>Your everyday, delivered.<br />Locally connected in Bongao, Tawi-Tawi.</p></div><nav aria-label="Footer navigation">{[...navigation, { label: "Get Ngaon", href: "#download" }, { label: "FAQ", href: "#faq" }].map((link) => <a href={link.href} key={link.href}>{link.label}</a>)}</nav><a href="#top" className="back-top" aria-label="Back to top"><ArrowUpRight size={22} strokeWidth={1.5} aria-hidden="true" /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Ngaon.</span><span><MapPin size={12} aria-hidden="true" />Bongao, Tawi-Tawi, Philippines</span><span>Ride. Food. Pabili. Padala.</span></div></div></footer>;
+  return <footer className="site-footer"><div className="container"><div className="footer-main"><div><Brand /><p>Your everyday, delivered.<br />Locally connected in Bongao, Tawi-Tawi.</p></div><nav aria-label="Footer navigation">{[...navigation, { label: "Get Ngaon", href: "#download" }, { label: "FAQ", href: "#faq" }, ...legalNavigation].map((link) => <a href={link.href} key={link.href}>{link.label}</a>)}</nav><a href="#top" className="back-top" aria-label="Back to top"><ArrowUpRight size={22} strokeWidth={1.5} aria-hidden="true" /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Ngaon.</span><span><MapPin size={12} aria-hidden="true" />Bongao, Tawi-Tawi, Philippines</span><span>Ride. Food. Pabili. Padala.</span></div></div></footer>;
 }

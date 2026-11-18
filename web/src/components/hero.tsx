@@ -32,6 +32,11 @@ export function Hero() {
         <p className="hero-location"><MapPin size={13} aria-hidden="true" />Locally connected. Simply Ngaon.</p>
       </HeroEntrance>
     </div>
-    <div className="hero-bottom"><div className="container hero-bottom-inner"><p>Less running around.<br /><strong>More getting on with your day.</strong></p><div><span>01 /</span><p>Go somewhere.<br /><strong>Or let it come to you.</strong></p></div><ArrowUpRight size={28} strokeWidth={1.2} aria-hidden="true" /></div></div>
+     <div className="hero-bottom"><div className="container hero-bottom-inner">
+       <div className="hero-trust-item"><span>01</span><div><strong>Ride</strong><small>Motorcycle rides.</small></div></div>
+       <div className="hero-trust-item"><span>02</span><div><strong>Food</strong><small>From local kitchens.</small></div></div>
+       <div className="hero-trust-item"><span>03</span><div><strong>Pabili</strong><small>One less errand.</small></div></div>
+       <div className="hero-trust-item"><span>04</span><div><strong>Padala</strong><small>Send with care.</small></div></div>
+     </div></div>
   </section>;
 }
