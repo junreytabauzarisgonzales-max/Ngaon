@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
-import Script from "next/script";
 import { MotionProvider } from "@/components/motion";
+import { themeBootScript } from "@/content/theme";
 import { siteUrl } from "@/content/site-content";
 import "./globals.css";
 
 const title = "Ngaon — Ride, Food, Pabili & Padala in Bongao, Tawi-Tawi.";
-const description = "Rides, food, shopping errands, and parcel delivery—together in Ngaon, built for Bongao, Tawi-Tawi. Explore the customer, rider, and merchant apps.";
+const description = "Ngaon means “to get or grab” in Sinama and “kumain” (to eat) in Bisaya. Rides, food, shopping errands, and parcel delivery built for Bongao, Tawi-Tawi with local dialect features for Sinama, Tausug, and Bisaya.";
 
 const socialCard = "/social/ngaon-card.png";
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   applicationName: "Ngaon",
   icons: [
     { rel: "icon", url: "/brand/icon-32.png", sizes: "32x32", type: "image/png" },
-    { rel: "icon", url: "/brand/ngaon-logo-192.jpg", sizes: "192x192", type: "image/jpeg" },
+    { rel: "icon", url: "/brand/icon-192.png", sizes: "192x192", type: "image/png" },
     { rel: "apple-touch-icon", url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
   ],
   openGraph: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
-    { media: "(prefers-color-scheme: dark)", color: "#07130D" },
+    { media: "(prefers-color-scheme: dark)", color: "#0A0F0C" },
   ],
   colorScheme: "light dark",
 };
@@ -68,8 +68,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
-        <Script id="theme-init" strategy="beforeInteractive">{`(() => { try { const stored = window.localStorage.getItem("ngaon-theme"); const theme = stored === "dark" || stored === "light" ? stored : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); document.documentElement.dataset.theme = theme; } catch { document.documentElement.dataset.theme = "light"; } })();`}</Script>
         <a href="#main" className="skip-link">Skip to content</a>
         <MotionProvider>{children}</MotionProvider>
         {structured && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />}

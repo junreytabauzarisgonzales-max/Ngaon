@@ -1,29 +1,53 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
+import { Monitor, Moon, Sun } from "lucide-react";
+import { themeStorageKey as KEY } from "@/content/theme";
 
-type Theme = "light" | "dark";
-const storageKey = "ngaon-theme";
-const subscribe = (onStoreChange: () => void) => {
-  window.addEventListener("ngaon-theme-change", onStoreChange);
-  return () => window.removeEventListener("ngaon-theme-change", onStoreChange);
-};
-const getSnapshot = (): Theme => document.documentElement.dataset.theme === "dark" ? "dark" : "light";
-const getServerSnapshot = (): Theme => "light";
+type ThemeChoice = "system" | "light" | "dark";
+const ORDER: ThemeChoice[] = ["system", "light", "dark"];
+const LABEL: Record<ThemeChoice, string> = { system: "Theme: match device", light: "Theme: light", dark: "Theme: dark" };
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+/** Applies a theme choice: "system" lets the device decide (CSS media query). */
+export function applyTheme(choice: ThemeChoice) {
+  const root = document.documentElement;
+  if (choice === "system") delete root.dataset.theme;
+  else root.dataset.theme = choice;
+}
 
-  function toggleTheme() {
-    const nextTheme: Theme = theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = nextTheme;
-    window.localStorage.setItem(storageKey, nextTheme);
-    window.dispatchEvent(new Event("ngaon-theme-change"));
+// Saved choice as an external store (localStorage), shared by every toggle.
+const listeners = new Set<() => void>();
+function readChoice(): ThemeChoice {
+  try {
+    const saved = localStorage.getItem(KEY);
+    return saved === "light" || saved === "dark" ? saved : "system";
+  } catch {
+    return "system";
+  }
+}
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** System → Light → Dark, remembered on this device. */
+export function ThemeToggle() {
+  const choice = useSyncExternalStore(subscribe, readChoice, () => "system" as ThemeChoice);
+
+  function next() {
+    const value = ORDER[(ORDER.indexOf(choice) + 1) % ORDER.length];
+    applyTheme(value);
+    try {
+      if (value === "system") localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, value);
+    } catch {}
+    listeners.forEach((l) => l());
   }
 
-  const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
-  return <button type="button" className={`icon-button theme-toggle ${className}`} aria-label={label} title={label} onClick={toggleTheme}>
-    {theme === "dark" ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
-  </button>;
+  const Icon = choice === "light" ? Sun : choice === "dark" ? Moon : Monitor;
+  return (
+    <button type="button" className="theme-toggle" onClick={next} aria-label={`${LABEL[choice]}. Change theme`} title={LABEL[choice]}>
+      <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+    </button>
+  );
 }

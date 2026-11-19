@@ -64,18 +64,18 @@ Replace that example with your real approved HTTPS origin. When unset, the site 
 - `src/content/site-content.ts`: navigation, four services, workflow, applications, FAQ, preview metadata, and optional domain.
 - `src/components/`: mostly Server Components with small interactive boundaries for navigation, animation, and carousel state. Phone illustrations are rendered on the server and passed into the carousel as children.
 - `src/app/globals.css`: Tailwind entry, exact approved six-color palette, responsive layout, illustrations, and reduced-motion styles.
-- `public/brand/ngaon-logo-192.png`: authentic customer application launcher icon, the website's primary brand (native 192×192 pixels). Used for the header/footer mark, favicon (`favicon.ico`), `icon-32.png`, and `apple-touch-icon.png`.
-- `public/brand/icon-32.png`, `public/brand/apple-touch-icon.png`: generated from the authentic launcher icon.
-- `public/social/ngaon-card.png`: 1200×630 Open Graph/twitter card artwork built from the authentic logo, the exact green-and-white palette, and verified copy. Metadata uses it only when a real `NEXT_PUBLIC_SITE_URL` is supplied, to avoid emitting an invented production origin.
+- `public/brand/ngaon-logo.png`, `ngaon-logo-white.png`, `ngaon-mark.png`: the apps' own logo files (`go_apps/packages/go_core/assets/brand/`), trimmed and resized. Header/footer use the logo; the hero and showcase use the rider mark.
+- `public/brand/icon-32.png`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`: generated from the same brand files (rider mark for the small favicon, full logo on white like the Android launcher icon for the larger ones).
+- `public/social/ngaon-card.png`: 1200×630 Open Graph/twitter card with the app logo, rider mark and the four service colors used in the apps. Metadata uses it only when a real `NEXT_PUBLIC_SITE_URL` is supplied, to avoid emitting an invented production origin.
 - Geist's package supplies local font files and its license; builds do not fetch Google Fonts.
 - `docs/website-implementation-plan.md`: saved approved discovery/design plan.
 - `docs/phase-3-report.md`: Phase 3 refinement findings, measurements, and limitations.
 - `docs/phase-4-report.md`: Phase 4 production-readiness findings and pending items.
 - `docs/screenshot-capture-guide.md`: precise mock-mode capture steps for genuine customer/rider/merchant screens.
 
-### Genuine screenshots
+### Genuine screenshots are still needed
 
-Customer screenshots supplied separately are now included in the showcase as optimized WebP captures. Rider and merchant previews remain explicitly labeled **illustrative previews, not app screenshots**, both visibly and accessibly, until those captures are supplied.
+No genuine screenshots were found in the source repository, and this environment has no Flutter SDK or Android emulator available, so captures were not performed here. Current phone previews are explicitly labeled **illustrative previews, not app screenshots**, both visibly and accessibly. They are diagrams of documented concepts, not fabricated captures.
 
 To add approved screenshots:
 
@@ -93,7 +93,7 @@ image: {
 
 Use the image's real dimensions. The hero automatically uses the `customer-home` image when supplied. The showcase preserves screenshot colors/aspect ratio and labels each preview as "App screenshot" or "Illustration". Application selection controls show Customer, Rider, and Merchant so every role can be browsed in the carousel; they replace illustrations only when genuine captures exist for that role.
 
-Remaining requested captures: customer checkout/cart, rider dashboard/offers/active job/earnings/wallet, and merchant order board/order detail/menu/sales. See `docs/screenshot-capture-guide.md` for exact mock-mode steps, route names, demo data, and safe-data rules.
+Requested captures: customer home/menu/checkout/tracking/Pabili confirmation, rider offers/active job/earnings, and merchant order board/menu/sales. See `docs/screenshot-capture-guide.md` for exact mock-mode steps, route names, demo data, and safe-data rules.
 
 ### Downloads, release status, and contacts
 

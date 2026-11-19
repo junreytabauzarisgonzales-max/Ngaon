@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview": "npm run build && python3 -m http.server 3000 --directory out"
   },
   "dependencies": {
     "geist": "1.9.2",
@@ -26,5 +27,7 @@
     "tailwindcss": "4.3.5",
     "typescript": "^5.9.3"
   },
-  "engines": { "node": "^20.19.0 || ^22.13.0 || >=24.0.0" }
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  }
 }
