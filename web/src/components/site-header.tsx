@@ -13,7 +13,7 @@ export function SiteHeader() {
         </nav>
         <div className="header-actions">
           <ThemeToggle />
-          <LinkButton href="#download" className="header-cta">Get Ngaon</LinkButton>
+          <LinkButton href="#showcase" className="header-cta">See the apps</LinkButton>
           <MobileNavigation />
         </div>
       </div>

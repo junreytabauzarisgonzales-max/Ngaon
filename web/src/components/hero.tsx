@@ -14,10 +14,10 @@ export function Hero() {
     <div className="hero-glow" aria-hidden="true" />
     <div className="container hero-grid">
       <HeroEntrance className="hero-content">
-        <p className="location-pill"><span className="location-dot" />Made for Bongao, Tawi-Tawi · Sinama · Tausug · Bisaya<ArrowUpRight size={13} aria-hidden="true" /></p>
+        <p className="location-pill"><span className="location-dot" />A local network for everyday life<ArrowUpRight size={13} aria-hidden="true" /></p>
         <div className="hero-chip-group" aria-label="Ngaon services"><span className="hero-chip">Ride</span><span className="hero-chip">Food</span><span className="hero-chip">Pabili</span><span className="hero-chip">Padala</span></div>
-        <m.h1 id="hero-heading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>Grab a ride.{" "}<br /><span>Gather to eat.</span><m.div initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.8 }} className="hero-logo-wrap" style={{ marginLeft: 8, display: "inline-block", verticalAlign: "middle" }}><Image src="/brand/ngaon-mark.png" alt="Ngaon logo" width={150} height={100} className="hero-logo" /></m.div></m.h1>
-        <p className="hero-description"><strong>Ngaon</strong> is the <strong>Sinama</strong> word for <em>“to get or grab”</em>—and in <strong>Bisaya</strong>, it means <em>“kumain” (to eat)</em>. One local super-app for rides, meals, errands, and parcels in Bongao, with dialect support for <strong>Sinama, Tausug, and Bisaya</strong>.</p>
+        <m.h1 id="hero-heading" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>Grab a ride.<br /><span>Gather to eat.</span><m.span initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.8 }} className="hero-logo-wrap" style={{ marginLeft: 8, display: "inline-block", verticalAlign: "middle" }}><Image src="/brand/ngaon-mark.png" alt="" width={150} height={100} className="hero-logo" /></m.span></m.h1>
+        <p className="hero-description"><strong>Ngaon</strong> is the <strong>Sinama</strong> word for <em>“to get or grab”</em>—and in <strong>Bisaya</strong>, it means <em>“kumain” or “to eat”</em>. <strong>Mukaon</strong> also means <em>“to eat.”</em> One local super-app for rides, meals, errands, and parcels in Bongao, with dialect support for <strong>Sinama, Tausug, and Bisaya</strong>.</p>
         <div className="hero-etymology" aria-label="Meaning of the word Ngaon">
           <div className="hero-etymology-item">
             <span className="hero-etymology-lang">SINAMA</span>
@@ -37,7 +37,7 @@ export function Hero() {
             <span>Explore local dialect features →</span>
           </a>
         </div>
-        <div className="hero-actions"><LinkButton href="#dialects">Why “Ngaon” &amp; Dialects</LinkButton><LinkButton href="#showcase" secondary>See the App</LinkButton></div>
+        <div className="hero-actions"><LinkButton href="#features">Explore Ngaon</LinkButton><LinkButton href="#showcase" secondary>See the apps</LinkButton></div>
         <a className="hero-scroll" href="#features"><span><ArrowDown size={14} aria-hidden="true" /></span>A little more about your everyday</a>
       </HeroEntrance>
       <HeroEntrance className="hero-visual" delay={0.08} mockup>
@@ -49,6 +49,6 @@ export function Hero() {
         <p className="hero-location"><MapPin size={13} aria-hidden="true" />Speaks Sinama, Tausug &amp; Bisaya in Bongao.</p>
       </HeroEntrance>
     </div>
-    <div className="hero-bottom"><div className="container hero-bottom-inner"><p>In Sinama: <strong>“To get or grab.”</strong><br />In Bisaya: <strong>“Kumain — to eat.”</strong></p><div><span>LOCAL DIALECTS /</span><p>Built to speak your language.<br /><strong>Sinama · Tausug · Bisaya · English</strong></p></div><ArrowUpRight size={28} strokeWidth={1.2} aria-hidden="true" /></div></div>
+    <div className="hero-bottom"><div className="container hero-bottom-inner"><p>In Sinama: <strong>“To get or grab.”</strong><br />In Bisaya: <strong>“Kumain” or “to eat.”</strong></p><div><span>LOCAL DIALECTS /</span><p>Built to speak your language.<br /><strong>Sinama · Tausug · Bisaya · English</strong></p></div><ArrowUpRight size={28} strokeWidth={1.2} aria-hidden="true" /></div></div>
   </section>;
 }

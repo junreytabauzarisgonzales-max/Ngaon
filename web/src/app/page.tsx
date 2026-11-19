@@ -12,7 +12,7 @@ import { PhonePreview } from "@/components/phone-preview";
 import { appScreens } from "@/content/site-content";
 
 export default function HomePage() {
-  return <div id="top"><SiteHeader /><main id="main" tabIndex={-1}>
+  return <div id="top" className="home-page"><SiteHeader /><main id="main" tabIndex={-1}>
     <Hero /><Features /><DialectFeature /><HowItWorks /><BookingSteps />
     <section id="showcase" tabIndex={-1} className="section showcase-section" aria-labelledby="showcase-heading"><div className="container"><Reveal><SectionHeading centered eyebrow="Meet the experience" title="Take a closer look." description="Thoughtfully connected, from the first tap to the last stop." id="showcase-heading" /></Reveal><AppShowcase previews={Object.fromEntries(appScreens.map((screen) => [screen.id, <PhonePreview key={screen.id} kind={screen.kind} image={screen.image} video={screen.video} />]))} /></div></section>
     <Ecosystem /><About /><Download /><Faq />

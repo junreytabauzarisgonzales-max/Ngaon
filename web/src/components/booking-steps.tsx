@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { bookingSteps } from "@/content/site-content";
 import { Reveal } from "./motion";
 import { PhonePreview } from "./phone-preview";
@@ -33,6 +34,7 @@ export function BookingSteps() {
           </li>
         ))}
       </ol>
+      <p className="booking-scroll-hint" aria-hidden="true">Swipe to explore the journey <ArrowRight size={15} /></p>
     </section>
   );
 }

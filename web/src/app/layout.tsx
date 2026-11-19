@@ -1,12 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
+import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { MotionProvider } from "@/components/motion";
 import { themeBootScript } from "@/content/theme";
 import { siteUrl } from "@/content/site-content";
 import "./globals.css";
 
+const displayFont = Plus_Jakarta_Sans({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
+});
+
+const bodyFont = DM_Sans({
+  variable: "--font-body",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
 const title = "Ngaon — Ride, Food, Pabili & Padala in Bongao, Tawi-Tawi.";
-const description = "Ngaon means “to get or grab” in Sinama and “kumain” (to eat) in Bisaya. Rides, food, shopping errands, and parcel delivery built for Bongao, Tawi-Tawi with local dialect features for Sinama, Tausug, and Bisaya.";
+const description = "Ngaon means “to get or grab” in Sinama and “kumain” or “to eat” in Bisaya. Mukaon also means “to eat.” Rides, food, shopping errands, and parcel delivery built for Bongao, Tawi-Tawi with local dialect features for Sinama, Tausug, and Bisaya.";
 
 const socialCard = "/social/ngaon-card.png";
 
@@ -67,7 +81,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   } : null;
 
   return (
-    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>

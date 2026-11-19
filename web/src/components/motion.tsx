@@ -8,12 +8,12 @@ export function MotionProvider({ children }: { children: ReactNode }) {
 }
 
 // Content is server-rendered visibly. Only the mounted, in-view element animates.
-export function Reveal({ children, className = "", delay = 0 }: {
-  children: ReactNode; className?: string; delay?: number;
+export function Reveal({ children, className = "", delay = 0, role, ariaLabel }: {
+  children: ReactNode; className?: string; delay?: number; role?: "img"; ariaLabel?: string;
 }) {
   const reduced = useReducedMotion();
   return (
-    <m.div className={className} initial={false} whileInView={reduced ? { opacity: 1, y: 0 } : { opacity: [0.8, 1], y: [12, 0] }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: reduced ? 0 : 0.42, delay: reduced ? 0 : Math.min(delay, 0.12), ease: [0.22, 1, 0.36, 1] }}>
+    <m.div className={className} role={role} aria-label={ariaLabel} initial={false} whileInView={reduced ? { opacity: 1, y: 0 } : { opacity: [0.8, 1], y: [12, 0] }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: reduced ? 0 : 0.42, delay: reduced ? 0 : Math.min(delay, 0.12), ease: [0.22, 1, 0.36, 1] }}>
       {children}
     </m.div>
   );

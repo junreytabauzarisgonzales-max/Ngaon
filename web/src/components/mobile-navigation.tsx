@@ -21,7 +21,7 @@ function MobileMenu({ onNavigate }: { onNavigate: (href: string) => void }) {
       exit={{ opacity: 0, y: reduced ? 0 : -4 }}
       transition={{ duration: reduced ? 0 : 0.16, ease: [0.22, 1, 0.36, 1] }}
     >
-      {[...navigation, { label: "Get Ngaon", href: "#download" }].map((link) => (
+       {[...navigation, { label: "Explore the apps", href: "#showcase" }].map((link) => (
         <a key={link.href} href={link.href} onClick={() => onNavigate(link.href)}>
           {link.label}<ArrowUpRight size={17} aria-hidden="true" />
         </a>

@@ -25,10 +25,10 @@ export type AppScreen = {
 };
 
 export const navigation = [
-  { label: "Features", href: "#features" },
-  { label: "Dialects", href: "#dialects" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "The app", href: "#showcase" },
+  { label: "Services", href: "#features" },
+  { label: "Our voice", href: "#dialects" },
+  { label: "The journey", href: "#booking" },
+  { label: "The apps", href: "#showcase" },
   { label: "About", href: "#about" },
 ] as const;
 
@@ -45,11 +45,11 @@ export const nameMeanings = [
   {
     id: "bisaya",
     language: "Bisaya",
-    meaning: "“Kumain” — to eat",
+    meaning: "“Kumain” or “to eat”",
     tag: "FOOD · LOCAL KITCHENS",
     headline: "Gather around. Let’s eat.",
     description:
-      "In Bisaya, Ngaon echoes the warm, familiar invitation to eat (kumain). From neighborhood carinderias to favorite local cafes, Ngaon brings freshly cooked comfort food from Bongao’s kitchens straight to your table.",
+      "In Bisaya, Ngaon means “kumain” or “to eat.” Mukaon also means “to eat.” From neighborhood carinderias to favorite local cafes, Ngaon brings freshly cooked comfort food from Bongao’s kitchens straight to your table.",
   },
 ] as const;
 
@@ -107,14 +107,14 @@ export const dialectProfiles: DialectProfile[] = [
     summary:
       "From the public market to Poblacion and beyond, Tausug language prompts and quick-chat replies let customers, riders, and store owners coordinate without barriers.",
     servicePhrases: [
-      { service: "Ride", phrase: "Sumakay pa katān", meaning: "Book a ride anywhere around town" },
+      { service: "Ride", phrase: "Sumakat misan hain tungud", meaning: "Book a ride anywhere around town" },
       { service: "Food", phrase: "Mamiy pagkaun", meaning: "Order hot meals and local favorites" },
-      { service: "Pabili", phrase: "Hipapamiy ha tabu’", meaning: "Have your shopping list bought at the market" },
-      { service: "Padala", phrase: "Hipahatod parsèl", meaning: "Have a package picked up and delivered" },
+      { service: "Pabili", phrase: "Mag Pa bih pa tabu’", meaning: "Have your shopping list bought at the market" },
+      { service: "Padala", phrase: "Hipahatod in parsèl", meaning: "Have a package picked up and delivered" },
     ],
     chatPresets: [
-      { speaker: "Customer", local: "Ari ra aku ha tungud sin tinda.", english: "I’m waiting right in front of the store." },
-      { speaker: "Rider", local: "Miyurul na aku, tagad-tagad kaw.", english: "I’m on my way now, please wait a moment." },
+      { speaker: "Customer", local: "Yari ra aku ha tungud sin tinda.", english: "I’m waiting right in front of the store." },
+      { speaker: "Rider", local: "Harap maun na aku, tagad-tagad kaw.", english: "I’m on my way now, please wait a moment." },
       { speaker: "Merchant", local: "Sakap na in pagkaun mu.", english: "Your meal is packed and ready for pickup." },
     ],
   },
@@ -124,9 +124,9 @@ export const dialectProfiles: DialectProfile[] = [
     badge: "Mindanao & Visayas Community",
     greeting: "Maayong adlaw! Mangaon ug mag-Ngaon ta.",
     greetingTranslation: "Good day! Let’s eat and get moving with Ngaon.",
-    tagline: "Where “Ngaon” means kumain (to eat)—a daily invitation to share a meal.",
+    tagline: "Where “Ngaon” means “kumain” or “to eat.” “Mukaon” also means “to eat.”",
     summary:
-      "Bringing the warmth of “Mangaon ta!” (Let’s eat!) into the app, Bisaya dialect features make ordering food, chatting with riders, and checking delivery updates effortless.",
+      "Bringing the warmth of “Mangaon ta!” (Let’s eat!) and “Mukaon” (to eat) into the app, Bisaya dialect features make ordering food, chatting with riders, and checking delivery updates effortless.",
     servicePhrases: [
       { service: "Ride", phrase: "Sakay na ta", meaning: "Hop on a quick, reliable motorcycle ride" },
       { service: "Food", phrase: "Ngaon / Mangaon ta!", meaning: "Kumain—order delicious meals to enjoy together" },
@@ -221,7 +221,7 @@ export const bookingSteps = [
 ];
 
 export const faqs = [
-  { question: "What does the name “Ngaon” mean?", answer: "Ngaon carries two everyday meanings close to home: in Sinama, it means “to get” or “to grab”—whether grabbing a motorcycle ride, getting errands done, or picking up a parcel. In Bisaya, it means “kumain” (to eat)—an everyday invitation to enjoy hot meals from local kitchens." },
+  { question: "What does the name “Ngaon” mean?", answer: "Ngaon carries two everyday meanings close to home: in Sinama, it means “to get” or “to grab”—whether grabbing a motorcycle ride, getting errands done, or picking up a parcel. In Bisaya, it means “kumain” or “to eat.” “Mukaon” also means “to eat”—an everyday invitation to enjoy hot meals from local kitchens." },
   { question: "Does Ngaon support local dialects like Sinama, Tausug, and Bisaya?", answer: "Yes. Alongside English, Ngaon is built with local dialect features for Sinama, Tausug, and Bisaya—including localized service prompts, status updates, and one-tap rider-customer chat presets tailored for everyday communication in Bongao, Tawi-Tawi." },
   { question: "What is Ngaon?", answer: "Ngaon is a delivery super-app designed for Bongao, Tawi-Tawi. It brings Ride, Food, Pabili, and Padala together through connected customer, rider, and merchant applications." },
   { question: "What services does Ngaon offer?", answer: "Ride is for motorcycle trips. Food lets you browse merchants and order meals. Pabili is for shopping errands. Padala is for parcel pickup and delivery. Actual booking availability is determined in the application." },

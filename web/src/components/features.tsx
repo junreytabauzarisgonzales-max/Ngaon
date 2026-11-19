@@ -17,7 +17,7 @@ function CheckMark() { return <span className="tiny-check">✓</span>; }
 export function Features() {
   return <section id="features" tabIndex={-1} className="section section-features" aria-labelledby="features-heading">
     <div className="container">
-      <Reveal><div className="heading-row"><SectionHeading eyebrow="Sinama: to grab · Bisaya: kumain" title="One app. Four ways to get things moving." id="features-heading" /><p className="heading-aside">Whether you need to grab a ride or <em>kumain</em>,<br />there’s a Ngaon for that.</p></div></Reveal>
+      <Reveal><div className="heading-row"><SectionHeading eyebrow="Sinama: to grab · Bisaya: to eat" title="One app. Four ways to get things moving." id="features-heading" /><p className="heading-aside">Whether you need to grab a ride or <em>kumain</em>,<br />there’s a Ngaon for that.</p></div></Reveal>
       <div className="features-grid">{services.map((service, index) => <Reveal key={service.id} delay={index * 0.06} className={`feature-slot slot-${service.id}`}><article className={`feature-card feature-${service.id}`}>
         <div className="feature-card-top"><IconBox icon={icons[service.icon]} /><span className="feature-number">0{index + 1}</span></div>
         <div className="feature-copy"><p className="feature-label">{service.label}</p><h3>{service.title}</h3><p>{service.description}</p></div>

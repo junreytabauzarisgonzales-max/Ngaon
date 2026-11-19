@@ -50,7 +50,7 @@ export function DialectFeature() {
             <p className="heading-aside">
               In Sinama: <strong>“to get or grab.”</strong>
               <br />
-              In Bisaya: <strong>“kumain — to eat.”</strong>
+              In Bisaya: <strong>“kumain” or “to eat.”</strong>
             </p>
           </div>
         </Reveal>
@@ -104,8 +104,21 @@ export function DialectFeature() {
                       type="button"
                       role="tab"
                       aria-selected={active}
+                      aria-controls="dialect-panel"
+                      id={`dialect-tab-${dialect.id}`}
+                      tabIndex={active ? 0 : -1}
                       className={`dialect-tab${active ? " is-active" : ""}`}
                       onClick={() => setActiveDialect(dialect.id)}
+                      onKeyDown={(event) => {
+                        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+                        event.preventDefault();
+                        const currentIndex = dialectProfiles.findIndex((item) => item.id === dialect.id);
+                        const direction = event.key === "ArrowRight" ? 1 : -1;
+                        const nextIndex = (currentIndex + direction + dialectProfiles.length) % dialectProfiles.length;
+                        const next = dialectProfiles[nextIndex];
+                        setActiveDialect(next.id);
+                        document.getElementById(`dialect-tab-${next.id}`)?.focus();
+                      }}
                     >
                       <Languages size={14} aria-hidden="true" />
                       <span>{dialect.name}</span>
@@ -115,7 +128,7 @@ export function DialectFeature() {
               </div>
             </div>
 
-            <div className="dialect-stage" role="tabpanel" aria-live="polite">
+            <div className="dialect-stage" id="dialect-panel" role="tabpanel" aria-labelledby={`dialect-tab-${activeDialect}`} aria-live="polite" tabIndex={0}>
               <div className="dialect-greeting-card">
                 <div className="dialect-greeting-meta">
                   <span className="dialect-region-pill">

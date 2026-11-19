@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
 
 /**
  * Muted, looping app screen recording that reliably plays across Chrome and Brave
@@ -17,6 +18,7 @@ export function AutoplayVideo({ base, poster, className, width, height, label, e
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const v = videoRef.current;
@@ -115,50 +117,70 @@ export function AutoplayVideo({ base, poster, className, width, height, label, e
       mq.removeEventListener("change", tryPlay);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [base]);
+  }, [base, reduced]);
 
   return (
     <div ref={wrapRef} className={className} style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP screen recording base layer guarantees playback in Brave & Chrome */}
-      <img
-        src={`${base}.webp`}
-        alt={label}
-        width={width}
-        height={height}
-        className="actual-screenshot"
-        style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
-        loading={eager ? "eager" : "lazy"}
-        fetchPriority={eager ? "high" : "auto"}
-        decoding="async"
-        draggable={false}
-      />
-      <video
-        ref={videoRef}
-        className="actual-screenshot"
-        poster={poster}
-        width={width}
-        height={height}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload={eager ? "auto" : "metadata"}
-        aria-label={label}
-        disablePictureInPicture
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          opacity: videoPlaying ? 1 : 0,
-          transition: "opacity 160ms ease",
-          pointerEvents: "none",
-        }}
-      >
-        <source src={`${base}.mp4`} type="video/mp4" />
-        <source src={`${base}.webm`} type="video/webm" />
-      </video>
+      {reduced ? (
+        // A static poster is the least surprising experience for reduced-motion visitors.
+        // eslint-disable-next-line @next/next/no-img-element -- static poster keeps reduced-motion rendering immediate
+        <img
+          src={poster}
+          alt={label}
+          width={width}
+          height={height}
+          className="actual-screenshot"
+          style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
+          decoding="async"
+          draggable={false}
+        />
+      ) : (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- animated WebP fallback guarantees playback when video is blocked */}
+          <img
+            src={`${base}.webp`}
+            alt=""
+            aria-hidden="true"
+            width={width}
+            height={height}
+            className="actual-screenshot"
+            style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : "auto"}
+            decoding="async"
+            draggable={false}
+          />
+          <video
+            ref={videoRef}
+            className="actual-screenshot"
+            poster={poster}
+            width={width}
+            height={height}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload={eager ? "auto" : "metadata"}
+            aria-label={label}
+            disablePictureInPicture
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: videoPlaying ? 1 : 0,
+              transition: "opacity 160ms ease",
+              pointerEvents: "none",
+            }}
+          >
+            <source src={`${base}.mp4`} type="video/mp4" />
+            <source src={`${base}.webm`} type="video/webm" />
+          </video>
+        </>
+      )}
     </div>
   );
 }
